@@ -159,6 +159,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CTimer.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="CTimer.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="MicroLevel.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -175,6 +181,15 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="CSerial.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="mutex.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="ringbuf.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="ringbuf.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

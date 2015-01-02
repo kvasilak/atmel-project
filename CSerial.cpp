@@ -27,16 +27,25 @@
 #include "common.h"			//GLOBAL DEFINITIONS
 #include <avr/io.h>			//I/O
 #include <inttypes.h>		//
-#include "cserial.h"
 #include <avr/pgmspace.h>	//PGM space read
-//Definitions
+#include <avr/interrupt.h>
 
+#include "cserial.h"
 
-CSerial::CSerial() :
-m_Base(10)
+static CRingBuffer *TxBuf;
+static CRingBuffer *RxBuf;
+
+CSerial::CSerial():
+m_Base(10),
+IsOpen(false)
+{
+}
+	
+void CSerial::Init(uint8_t *const txbuf, uint16_t txsize, uint8_t *const rxbuf, uint16_t rxsize)
 {
 	//Set baudrate and enabling interfaces
 	//115200 8n1, atmega164 @ 16mhz specific
+	IsOpen = false;
 	
 	UBRR0H = 0;
 	UBRR0L = 16; 
@@ -44,25 +53,44 @@ m_Base(10)
 
 	UCSR0C = (3 << UCSZ00); //8n1 
 	UCSR0B = _BV(RXEN0) | _BV(TXEN0);   // Enable RX and TX
+	
+	TxBuffer.Init(txbuf, txsize);
+	RxBuffer.Init(rxbuf, rxsize);
+	
+	TxBuf = &TxBuffer;
+	RxBuf = &RxBuffer;
+	
+	IsOpen = true;
+	sei();
 }
 
 //Put text on UART
 void CSerial::put(const char* text) 
 {
-	while(*text){
-		this->send(*text);
+	while(*text)
+	{
+		//drop data if buffer overflows
+		TxBuffer.Put(*text);
 		text++;
 	}
+	
+	//make sure the interrupt is enabled
+	UCSR0B |= _BV(UDRIE0);
 }
 
 #ifdef UART_PGM
 //Put text from PGM
 void CSerial::put_p(const char *text) 
 {
-	while(pgm_read_byte(text)){
-		this->send(pgm_read_byte(text));
+	while(pgm_read_byte(text))
+	{
+		//drop data if buffer overflows
+		TxBuffer.Put(pgm_read_byte(text));
 		*text++;
 	}
+	
+	//make sure the interrupt is enabled
+	UCSR0B |= _BV(TXCIE0);
 }
 
 #endif
@@ -104,12 +132,7 @@ void CSerial::put(int16_t number)
 	}
 }
 
-//Transmit one byte
-void CSerial::send(uint8_t data) 
-{
-	loop_until_bit_is_set(UCSR0A, UDRE0);
-	UDR0 = data;	
-}
+
 #ifdef UART_RECIVE
 //Recive one byte
 uint8_t CSerial::get() 
@@ -153,6 +176,23 @@ CSerial &operator<<(CSerial &rs232, void* val) {
 	return rs232;
 }
 #endif //PGM
+
+ISR(USART0_UDRE_vect)
+{
+	uint8_t c;
+	
+	 ErrorT err = TxBuf->Get(&c);
+	
+	if( ErrNone == err)
+	{
+		UDR0 = c;
+	}
+	else
+	{
+		//disable tx data empty interrupt
+		UCSR0B &= ~_BV(TXCIE0);
+	}
+}
 
 #endif
 

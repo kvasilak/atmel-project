@@ -6,22 +6,31 @@
  */ 
 
 #include "common.h"
-#include <avr/io.h>
-#include <util/delay.h>
+//#include <avr/io.h>
 #include "CSerial.h"
+#include "CTimer.h"
 #include "CBlink.h"
 
 uint16_t a = 0;
 uint8_t b = 0;
+uint8_t txbuf[100];
+uint8_t rxbuf[100];
 
 int main(void)
 {
 	CSerial Serial;
+	Serial.Init(txbuf, 100, rxbuf, 100);
+	
+	CTimer::Init();
+	uint16_t start = CTimer::GetTick();
 
     while(1)
     {
-		Serial <<  a++ << ", " << b-- << ", Hello World!\r\n";
-
-		_delay_ms(100);
+		if(CTimer::IsTimedOut(10000, start))
+		{
+			Serial <<  a++ << ", " << b-- << ", Hello World 2!\r\n";
+			
+			start = CTimer::GetTick();
+		}
     }
 }
