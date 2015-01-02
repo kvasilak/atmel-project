@@ -35,12 +35,18 @@
 static CRingBuffer *TxBuf;
 static CRingBuffer *RxBuf;
 
+__extension__ typedef int __guard __attribute__((mode (__DI__)));
+
+int __cxa_guard_acquire(__guard *g) {return !*(char *)(g);};
+void __cxa_guard_release (__guard *g) {*(char *)g = 1;};
+
 CSerial::CSerial():
 m_Base(10),
 IsOpen(false)
 {
 }
 	
+
 void CSerial::Init(uint8_t *const txbuf, uint16_t txsize, uint8_t *const rxbuf, uint16_t rxsize)
 {
 	//Set baudrate and enabling interfaces

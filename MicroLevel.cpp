@@ -18,7 +18,7 @@ uint8_t rxbuf[100];
 
 int main(void)
 {
-	CSerial Serial;
+	CSerial Serial = CSerial::Instance();
 	Serial.Init(txbuf, 100, rxbuf, 100);
 	
 	CTimer::Init();
@@ -26,9 +26,9 @@ int main(void)
 
     while(1)
     {
-		if(CTimer::IsTimedOut(10000, start))
+		if(CTimer::IsTimedOut(250, start))
 		{
-			Serial <<  a++ << ", " << b-- << ", Hello World 2!\r\n";
+			Serial <<  a++ << ", " << b-- << ", Hello World 3!\r\n";
 			
 			start = CTimer::GetTick();
 		}

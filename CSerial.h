@@ -32,11 +32,17 @@
 
 #include "ringbuf.h"
 
+
 //UART class
 class CSerial 
 {
 	public:
-		CSerial();
+		static CSerial &Instance()
+		{
+			static CSerial serial;
+			
+			return serial;
+		}
 		void Init(uint8_t *const txbuf, uint16_t txsize, uint8_t *const rxbuf, uint16_t rxsize);						//INIT
 		void put(const char *text);		//PUT TEXT ON LCD
 		#ifdef UART_PGM
@@ -52,6 +58,7 @@ class CSerial
 		void Dec() {m_Base = 10; };		//Show numbers in Base 10 ( decimal)
 			
 	private:
+		CSerial();
 		uint8_t m_Base;					//Decimal numbers by default
 		bool IsOpen;
 		CRingBuffer TxBuffer;
