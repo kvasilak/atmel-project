@@ -22,11 +22,11 @@ int main(void)
 	Serial.Init(txbuf, 100, rxbuf, 100);
 	
 	CTimer::Init();
-	uint16_t start = CTimer::GetTick();
+	uint32_t start = CTimer::GetTick();
 
     while(1)
     {
-		if(CTimer::IsTimedOut(250, start))
+		if(CTimer::IsTimedOut(100, start))
 		{
 			Serial <<  a++ << ", " << b-- << ", Hello World 3!\r\n";
 			

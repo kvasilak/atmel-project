@@ -187,7 +187,7 @@ ISR(USART0_UDRE_vect)
 {
 	uint8_t c;
 
-	if( TxBuf->Get(&c))
+	if(true == TxBuf->Get(&c))
 	{
 		UDR0 = c;
 	}
