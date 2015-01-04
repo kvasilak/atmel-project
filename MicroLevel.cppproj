@@ -160,6 +160,9 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="circularbuffer.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="CTimer.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -185,12 +188,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="mutex.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="ringbuf.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="ringbuf.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

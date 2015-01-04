@@ -31,9 +31,10 @@
 #include <avr/interrupt.h>
 
 #include "cserial.h"
+#include "circularbuffer.h"
 
-static CRingBuffer *TxBuf;
-static CRingBuffer *RxBuf;
+static CircularBuffer <uint8_t, 100> TxBuf;
+static CircularBuffer <uint8_t, 100> RxBuf;
 
 __extension__ typedef int __guard __attribute__((mode (__DI__)));
 
@@ -47,7 +48,7 @@ IsOpen(false)
 }
 	
 
-void CSerial::Init(uint8_t *const txbuf, uint16_t txsize, uint8_t *const rxbuf, uint16_t rxsize)
+void CSerial::Init()
 {
 	//Set baudrate and enabling interfaces
 	//115200 8n1, atmega164 @ 16mhz specific
@@ -60,12 +61,6 @@ void CSerial::Init(uint8_t *const txbuf, uint16_t txsize, uint8_t *const rxbuf, 
 	UCSR0C = (3 << UCSZ00); //8n1 
 	UCSR0B = _BV(RXEN0) | _BV(TXEN0);   // Enable RX and TX
 	
-	TxBuffer.Init(txbuf, txsize);
-	RxBuffer.Init(rxbuf, rxsize);
-	
-	TxBuf = &TxBuffer;
-	RxBuf = &RxBuffer;
-	
 	IsOpen = true;
 	sei();
 }
@@ -76,7 +71,7 @@ void CSerial::put(const char* text)
 	while(*text)
 	{
 		//drop data if buffer overflows
-		TxBuffer.Put(*text);
+		TxBuf.Put(*text);
 		text++;
 	}
 	
@@ -91,7 +86,7 @@ void CSerial::put_p(const char *text)
 	while(pgm_read_byte(text))
 	{
 		//drop data if buffer overflows
-		TxBuffer.Put(pgm_read_byte(text));
+		TxBuf.Put(pgm_read_byte(text));
 		*text++;
 	}
 	
@@ -187,7 +182,7 @@ ISR(USART0_UDRE_vect)
 {
 	uint8_t c;
 
-	if(true == TxBuf->Get(&c))
+	if(true == TxBuf.Get(c))
 	{
 		UDR0 = c;
 	}

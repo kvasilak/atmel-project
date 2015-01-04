@@ -30,9 +30,6 @@
 #include <inttypes.h>			//
 #include <avr/pgmspace.h>		//PGM space read
 
-#include "ringbuf.h"
-
-
 //UART class
 class CSerial 
 {
@@ -43,7 +40,7 @@ class CSerial
 			
 			return serial;
 		}
-		void Init(uint8_t *const txbuf, uint16_t txsize, uint8_t *const rxbuf, uint16_t rxsize);						//INIT
+		void Init();						//INIT
 		void put(const char *text);		//PUT TEXT ON LCD
 		#ifdef UART_PGM
 		void put_p(const char *text);	//PUT TEXT FROM PGM SPACE
@@ -61,8 +58,6 @@ class CSerial
 		CSerial();
 		uint8_t m_Base;					//Decimal numbers by default
 		bool IsOpen;
-		CRingBuffer TxBuffer;
-		CRingBuffer RxBuffer;
 };
 //
 #ifdef UART_STREAMS

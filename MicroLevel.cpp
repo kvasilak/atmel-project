@@ -6,7 +6,6 @@
  */ 
 
 #include "common.h"
-//#include <avr/io.h>
 #include "CSerial.h"
 #include "CTimer.h"
 #include "CBlink.h"
@@ -19,7 +18,7 @@ uint8_t rxbuf[100];
 int main(void)
 {
 	CSerial Serial = CSerial::Instance();
-	Serial.Init(txbuf, 100, rxbuf, 100);
+	Serial.Init();
 	
 	CTimer::Init();
 	uint32_t start = CTimer::GetTick();
