@@ -73,7 +73,7 @@ void CRingBuffer::Clear()
 }
 
 //Put a Byte into the buffer
-ErrorT CRingBuffer::Put(uint8_t c)
+bool CRingBuffer::Put(uint8_t c)
 {
 	uint16_t in;
 
@@ -93,10 +93,10 @@ ErrorT CRingBuffer::Put(uint8_t c)
     
     In = in;
       
-    return ErrNone;
+    return true;
   }
   
-  return ErrBufferFull;
+  return false;
 }
 
 //allows adding after buffer is full 
@@ -111,10 +111,8 @@ void CRingBuffer::Add(uint8_t c)
 
 //Get a byte from the buffer
 //Removes byte
-ErrorT CRingBuffer::Get(uint8_t *const c)
+bool CRingBuffer::Get(uint8_t *const c)
 {
-//  assert(c == NULL);
-  
   //buffer is empty?
   if(In != Out)
   {
@@ -129,10 +127,10 @@ ErrorT CRingBuffer::Get(uint8_t *const c)
       Out = 0; 
     }
     
-    return ErrNone;
+    return true;
   }
     
-  return ErrBufferEmpty;
+  return false;
 }
 
 //Read the value at the index, do not remove from buffer

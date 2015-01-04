@@ -186,10 +186,8 @@ CSerial &operator<<(CSerial &rs232, void* val) {
 ISR(USART0_UDRE_vect)
 {
 	uint8_t c;
-	
-	 ErrorT err = TxBuf->Get(&c);
-	
-	if( ErrNone == err)
+
+	if( TxBuf->Get(&c))
 	{
 		UDR0 = c;
 	}

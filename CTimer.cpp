@@ -11,7 +11,7 @@
 #include "CTimer.h"
 #include "mutex.h"
 
-volatile uint16_t	CTimer::TimerTic =0; //1.024 ms per tic
+volatile uint32_t	CTimer::TimerTic =0; //1.024 ms per tic
 
 
 void CTimer::Init()
@@ -35,18 +35,23 @@ void CTimer::Init()
 
 
 //returns TRUE when time expires
-bool CTimer::IsTimedOut(uint16_t period, uint16_t startTime)
+bool CTimer::IsTimedOut(uint32_t period, uint32_t startTime)
 {
 	//detects counter rollover due to the magic of fixed point math
 	return (GetTick() - startTime) > period ? true : false;
 }
 
 //Get the system tic
-uint16_t CTimer::GetTick(void)
+uint32_t CTimer::GetTick()
 {
 	CMutex m;
 	return CTimer::TimerTic;
 }
+
+//uint32_t millis()
+//{
+//	return CTimer::GetTick();
+//}
 
 // clock interrupt - clear flag immediately to resume count
 ISR(TIMER0_COMPA_vect)

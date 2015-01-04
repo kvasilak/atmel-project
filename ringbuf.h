@@ -19,11 +19,7 @@
 #ifndef RING_BUFFER_INCLUDED
 #define RING_BUFFER_INCLUDED
 
-enum ErrorT{
-	ErrNone,
-	ErrBufferFull,
-	ErrBufferEmpty
-} ;
+
 
 //declaration and definition of the ringbuffer class
 class CRingBuffer
@@ -35,9 +31,9 @@ public:
 	uint16_t Free() const;
     uint16_t Size() const;
     void Clear();
-    ErrorT Put(uint8_t c);
+    bool Put(uint8_t c);
 	void Add(uint8_t c);
-	ErrorT Get(uint8_t *const c);
+	bool Get(uint8_t *const c);
 	uint8_t Read(uint16_t i);
 	inline uint8_t operator[] (uint16_t i){return Read(i);}
 		
