@@ -1,0 +1,8 @@
+Micro level design issues
+
+* rx/tx swapped to serial debug port
+* Resister values for I2C pullup? Dave spec 29.4k, atmel data shaat says 1533 ohms
+* CTS line on debug port needs to be Grounded
+* Verify UP / Down LED current, may be high
+* verify Cal LED current, Maybe too low
+
