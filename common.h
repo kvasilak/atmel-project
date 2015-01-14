@@ -9,7 +9,7 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
-#define F_CPU 16000000
+#define F_CPU 16000000UL
 #define UART_STREAMS
 
 #ifndef cbi

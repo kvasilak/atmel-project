@@ -166,6 +166,12 @@
     <Compile Include="circularbuffer.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="CLed.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="CLed.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="CTimer.cpp">
       <SubType>compile</SubType>
     </Compile>
