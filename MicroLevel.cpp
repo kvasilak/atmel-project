@@ -9,7 +9,7 @@
 #include "CSerial.h"
 #include "CTimer.h"
 #include "CBlink.h"
-#include "i2cmaster.h"
+//#include "i2cmaster.h"
 #include <avr/io.h>
 #include "CLed.h"
 
@@ -22,12 +22,12 @@ uint8_t rxbuf[100];
 
 int main(void)
 {
-	CSerial Serial = CSerial::Instance();
+	CSerial Serial = CSerial::is();
 	Serial.Init();
 	
 	CTimer::Init();
 	uint32_t start = CTimer::GetTick();
-	CLed LEDs;
+	CLed LEDs = CLed::is();
 	uint8_t brightness = 0;
 	bool dim = false;
 	
@@ -35,7 +35,7 @@ int main(void)
 	DDRA |= _BV(DDA2);
 	PORTA |= _BV(PA2);
 	
-	i2c_init();                             // initialize I2C library
+	//i2c_init();                             // initialize I2C library
 
     while(1)
     {

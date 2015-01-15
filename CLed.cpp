@@ -12,12 +12,9 @@
 // default constructor
 CLed::CLed()
 {
+	i2c_init();                             // initialize I2C library
 } //CLed
 
-// default destructor
-CLed::~CLed()
-{
-} //~CLed
 
 void CLed::Set(bool RU, bool RD, bool Active, bool LU, bool LD, bool Camp, bool TravelWarn, bool TravelOK, uint8_t brightness)
 {

@@ -34,7 +34,7 @@
 class CSerial 
 {
 	public:
-		static CSerial &Instance()
+		static CSerial &is()
 		{
 			static CSerial serial;
 			
