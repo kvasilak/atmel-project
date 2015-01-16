@@ -24,7 +24,6 @@
 ****************************************************************************/
 
 #include <avr/io.h>              
-//#include "inavr.h"
 #include <avr/interrupt.h>
 #include "TWI_Master.h"
 
@@ -126,14 +125,14 @@ unsigned char TWI_Get_Data_From_Transceiver( unsigned char *msg, unsigned char m
 
   while ( TWI_Transceiver_Busy() );             // Wait until TWI is ready for next transmission.
 
-  if( TWI_statusReg.lastTransOK )               // Last transmission competed successfully.              
+  if( TWI_statusReg.OK_T.lastTransOK )               // Last transmission competed successfully.              
   {                                             
     for ( i=0; i<msgSize; i++ )                 // Copy data from Transceiver buffer.
     {
       msg[ i ] = TWI_buf[ i ];
     }
   }
-  return( TWI_statusReg.lastTransOK );                                   
+  return( TWI_statusReg.OK_T.lastTransOK );                                   
 }
 
 // ********** Interrupt Handlers ********** //
@@ -164,7 +163,7 @@ ISR(TWI_vect)
                (0<<TWWC);                                 //  
       }else                    // Send STOP after last byte
       {
-        TWI_statusReg.lastTransOK = TRUE;                 // Set status bits to completed successfully. 
+        TWI_statusReg.OK_T.lastTransOK = TRUE;                 // Set status bits to completed successfully. 
         TWCR = (1<<TWEN)|                                 // TWI Interface enabled
                (0<<TWIE)|(1<<TWINT)|                      // Disable TWI Interrupt and clear the flag
                (0<<TWEA)|(0<<TWSTA)|(1<<TWSTO)|           // Initiate a STOP condition.
@@ -190,7 +189,7 @@ ISR(TWI_vect)
       break; 
     case TWI_MRX_DATA_NACK:     // Data byte has been received and NACK tramsmitted
       TWI_buf[TWI_bufPtr] = TWDR;
-      TWI_statusReg.lastTransOK = TRUE;                 // Set status bits to completed successfully. 
+      TWI_statusReg.OK_T.lastTransOK = TRUE;                 // Set status bits to completed successfully. 
       TWCR = (1<<TWEN)|                                 // TWI Interface enabled
              (0<<TWIE)|(1<<TWINT)|                      // Disable TWI Interrupt and clear the flag
              (0<<TWEA)|(0<<TWSTA)|(1<<TWSTO)|           // Initiate a STOP condition.

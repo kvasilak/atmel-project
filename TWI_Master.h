@@ -42,10 +42,11 @@ union TWI_statusReg                       // Status byte holding flags.
     {
         unsigned char lastTransOK:1;      
         unsigned char unusedBits:7;
-    };
+    }OK_T;
 };
 
 extern union TWI_statusReg TWI_statusReg;
+
 
 /****************************************************************************
   Function definitions

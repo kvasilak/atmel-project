@@ -36,6 +36,19 @@ int main(void)
 	PORTA |= _BV(PA2);
 	
 	//i2c_init();                             // initialize I2C library
+	
+	LEDs.Init();
+	
+	LEDs.RightUpOn();
+	//LEDs.RightUpOff();
+	LEDs.LeftUpOn();
+	//LEDs.LeftUpOff();
+	LEDs.RightDownOn();
+	//LEDs.RightDownOff();
+	LEDs.LeftDownOn();
+	//LEDs.LeftDownOff();
+	
+	LEDs.GlobalBrightness(10);
 
     while(1)
     {
@@ -45,7 +58,8 @@ int main(void)
 			
 			start = CTimer::GetTick();
 			
-			LEDs.Set(1, 1, 1, 1, 1, 0, 0, 0, brightness);
+			//LEDs.Set1(1, 1, 1, 1, 1, 0, 0, 0, brightness);
+			LEDs.GlobalBrightness(brightness);
 			
 			if(dim)
 			{
