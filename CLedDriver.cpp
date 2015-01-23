@@ -29,7 +29,7 @@ extern "C" {
 
 
 // default constructor
-CLed::CLed():
+CLedDriver::CLedDriver():
 LEDReg1(0x0C),
 WhatsOn(32)
 {
@@ -37,7 +37,7 @@ WhatsOn(32)
 	TWI_Master_Initialise();
 } //CLed
 
-void CLed::Init()
+void CLedDriver::Init()
 {
 	  if(i2c_start_wait(0x40))
 	   if(i2c_write(0x80)==0)  //Control reg autoincrement starting at mode0
@@ -60,7 +60,7 @@ void CLed::Init()
 	  i2c_stop();
 }
 
-void CLed::Set(bool RU, bool RD, bool Active, bool LU, bool LD, bool Camp, bool TravelWarn, bool TravelOK, uint8_t brightness)
+void CLedDriver::Set(bool RU, bool RD, bool Active, bool LU, bool LD, bool Camp, bool TravelWarn, bool TravelOK, uint8_t brightness)
 {
 	uint8_t low;
 	//unsigned char messageBuf[4];
@@ -100,7 +100,7 @@ void CLed::Set(bool RU, bool RD, bool Active, bool LU, bool LD, bool Camp, bool 
 	  
 }
 
-void CLed::Set1(bool RU, bool RD, bool Active, bool LU, bool LD, bool Camp, bool TravelWarn, bool TravelOK, uint8_t brightness)
+void CLedDriver::Set1(bool RU, bool RD, bool Active, bool LU, bool LD, bool Camp, bool TravelWarn, bool TravelOK, uint8_t brightness)
 {
 	WriteReg(2, brightness);
 	
@@ -120,60 +120,60 @@ void CLed::Set1(bool RU, bool RD, bool Active, bool LU, bool LD, bool Camp, bool
 	  
 }
 
-void CLed::RightUpOn()
+void CLedDriver::RightUpOn()
 {
 	WhatsOn |= RUpOn;
 	WriteReg(LEDReg1, WhatsOn);
 }
 
-void CLed::RightUpOff()
+void CLedDriver::RightUpOff()
 {
 	WhatsOn &= RUpOff;
 	WriteReg(LEDReg1, WhatsOn);
 }
 
-void CLed::LeftUpOn()
+void CLedDriver::LeftUpOn()
 {
 	WhatsOn |= LUpOn;
 	WriteReg(LEDReg1, WhatsOn);
 }
 
-void CLed::LeftUpOff()
+void CLedDriver::LeftUpOff()
 {
 	WhatsOn &= LUpOff;
 	WriteReg(LEDReg1, WhatsOn);
 }
 
-void CLed::RightDownOn()
+void CLedDriver::RightDownOn()
 {
 	WhatsOn |= RDownOn;
 	WriteReg(LEDReg1, WhatsOn);
 }
 
-void CLed::RightDownOff()
+void CLedDriver::RightDownOff()
 {
 	WhatsOn &= RDownOff;
 	WriteReg(LEDReg1, WhatsOn);
 }
 
-void CLed::LeftDownOn()
+void CLedDriver::LeftDownOn()
 {
 	WhatsOn |= LDownOn;
 	WriteReg(LEDReg1, WhatsOn);
 }
 
-void CLed::LeftDownOff()
+void CLedDriver::LeftDownOff()
 {
 	WhatsOn &= LDownOff;
 	WriteReg(LEDReg1, WhatsOn);
 }
 
-void CLed::GlobalBrightness(uint8_t Brightness)
+void CLedDriver::GlobalBrightness(uint8_t Brightness)
 {
 	WriteReg(0X0A, Brightness);
 }
 
-void CLed::WriteReg(uint8_t LEDReg, uint8_t data)
+void CLedDriver::WriteReg(uint8_t LEDReg, uint8_t data)
 {
 	if(i2c_start_wait(0x40))
 	   if(i2c_write(LEDReg)==0) //Control reg single register

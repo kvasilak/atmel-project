@@ -13,19 +13,24 @@
 #include <inttypes.h>
 #include <avr/pgmspace.h>		//PGM space read
 
-class CLed
+class CLedDriver
 {
 
 //functions
 public:
-	static CLed &is()
+	static CLedDriver &is()
 	{
-		static CLed led;
+		static CLedDriver led;
 			
 		return led;
 	}
 	
 	void Init();
+	
+	void On(uint8_t led, bool on);
+	void Brightness(uint8_t led, uint8_t brightness);
+	void Dim(uint8_t brightness);
+	void Blink(uint8_t rate);
 	
 	void RightUpOn();
 	void RightUpOff();
@@ -43,10 +48,10 @@ public:
 	
 protected:
 private:
-	CLed();
+	CLedDriver();
 	
 	//CLed( const CLed &c );
-	CLed& operator=( const CLed &c );
+	CLedDriver& operator=( const CLedDriver &c );
 	
 	void WriteReg(uint8_t LEDReg, uint8_t data);
 	

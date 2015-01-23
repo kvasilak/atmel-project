@@ -27,8 +27,8 @@ int main(void)
 	
 	CTimer::Init();
 	uint32_t start = CTimer::GetTick();
-	CLed LEDs = CLed::is();
-	uint8_t brightness = 0;
+	CLedDriver LEDs = CLedDriver::is();
+	uint8_t brightness = 66;
 	bool dim = false;
 	
 	//Turn on 5v, PA2
@@ -54,7 +54,7 @@ int main(void)
     {
 		if(CTimer::IsTimedOut(100, start))
 		{
-			Serial <<  a++ << ", " << b-- << ", Hello World y!\r\n";
+			Serial <<  a++ << ", " << b-- << ", Hello World z!\r\n";
 			
 			start = CTimer::GetTick();
 			
@@ -66,6 +66,7 @@ int main(void)
 				if(brightness-- <= 2)
 				{
 					 dim = false;
+					 LEDs.LeftUpOn();
 				}
 			}
 			else
@@ -73,6 +74,7 @@ int main(void)
 				if(brightness++ >30)
 				{
 					 dim = true;
+					 LEDs.LeftUpOff();
 				}
 			}
 		}
