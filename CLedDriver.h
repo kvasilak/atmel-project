@@ -6,8 +6,8 @@
 */
 
 
-#ifndef __CLED_H__
-#define __CLED_H__
+#ifndef __CLEDDRIVER_H__
+#define __CLEDDRIVER_H__
 
 #include <avr/io.h>			//I/O
 #include <inttypes.h>
@@ -25,29 +25,15 @@ public:
 		return led;
 	}
 	
-	void Init();
-	
 	void On(uint8_t led, bool on);
 	void Brightness(uint8_t led, uint8_t brightness);
 	void Dim(uint8_t brightness);
 	void Blink(uint8_t rate);
 	
-	void RightUpOn();
-	void RightUpOff();
-	void LeftUpOn();
-	void LeftUpOff();
-	void RightDownOn();
-	void RightDownOff();
-	void LeftDownOn();
-	void LeftDownOff();
-	
-	void GlobalBrightness(uint8_t Brightness);
-	
-	void Set(bool RU,bool RD, bool Active, bool LU, bool LD, bool Camp, bool TravelWarn, bool TravelOK, uint8_t brightness);
-	void Set1(bool RU,bool RD, bool Active, bool LU, bool LD, bool Camp, bool TravelWarn, bool TravelOK, uint8_t brightness);
-	
+	protected:
+	void Init();
+
 protected:
-private:
 	CLedDriver();
 	
 	//CLed( const CLed &c );
@@ -59,6 +45,6 @@ private:
 	uint8_t WhatsOn;
 	
 
-}; //CLed
+}; //CLedDriver
 
-#endif //__CLED_H__
+#endif //__CLEDDRIVER_H__

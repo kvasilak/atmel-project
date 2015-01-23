@@ -11,7 +11,7 @@
 #include "CBlink.h"
 //#include "i2cmaster.h"
 #include <avr/io.h>
-#include "CLed.h"
+#include "CLeds.h"
 
 
 uint16_t a = 0;
@@ -27,7 +27,7 @@ int main(void)
 	
 	CTimer::Init();
 	uint32_t start = CTimer::GetTick();
-	CLedDriver LEDs = CLedDriver::is();
+	CLeds LEDs = CLeds::is();
 	uint8_t brightness = 66;
 	bool dim = false;
 	
@@ -48,7 +48,7 @@ int main(void)
 	LEDs.LeftDownOn();
 	//LEDs.LeftDownOff();
 	
-	LEDs.GlobalBrightness(10);
+	LEDs.Dim(10);
 
     while(1)
     {
@@ -59,7 +59,7 @@ int main(void)
 			start = CTimer::GetTick();
 			
 			//LEDs.Set1(1, 1, 1, 1, 1, 0, 0, 0, brightness);
-			LEDs.GlobalBrightness(brightness);
+			LEDs.Dim(brightness);
 			
 			if(dim)
 			{
