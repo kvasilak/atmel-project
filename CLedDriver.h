@@ -16,7 +16,6 @@
 class CLedDriver
 {
 
-//functions
 public:
 	static CLedDriver &is()
 	{
@@ -29,22 +28,16 @@ public:
 	void Brightness(uint8_t led, uint8_t brightness);
 	void Dim(uint8_t brightness);
 	void Blink(uint8_t rate);
-	
-	protected:
 	void Init();
 
 protected:
 	CLedDriver();
-	
-	//CLed( const CLed &c );
 	CLedDriver& operator=( const CLedDriver &c );
 	
 	void WriteReg(uint8_t LEDReg, uint8_t data);
 	
+	uint8_t LEDReg0;
 	uint8_t LEDReg1;
-	uint8_t WhatsOn;
-	
-
 }; //CLedDriver
 
 #endif //__CLEDDRIVER_H__

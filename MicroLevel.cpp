@@ -34,19 +34,15 @@ int main(void)
 	//Turn on 5v, PA2
 	DDRA |= _BV(DDA2);
 	PORTA |= _BV(PA2);
-	
-	//i2c_init();                             // initialize I2C library
-	
+
 	LEDs.Init();
 	
 	LEDs.RightUpOn();
-	//LEDs.RightUpOff();
 	LEDs.LeftUpOn();
-	//LEDs.LeftUpOff();
 	LEDs.RightDownOn();
-	//LEDs.RightDownOff();
 	LEDs.LeftDownOn();
-	//LEDs.LeftDownOff();
+	
+	LEDs.ActiveOn();
 	
 	LEDs.Dim(10);
 
@@ -57,8 +53,7 @@ int main(void)
 			Serial <<  a++ << ", " << b-- << ", Hello World z!\r\n";
 			
 			start = CTimer::GetTick();
-			
-			//LEDs.Set1(1, 1, 1, 1, 1, 0, 0, 0, brightness);
+
 			LEDs.Dim(brightness);
 			
 			if(dim)
