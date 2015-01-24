@@ -9,10 +9,9 @@
 #include "CSerial.h"
 #include "CTimer.h"
 #include "CBlink.h"
-//#include "i2cmaster.h"
 #include <avr/io.h>
 #include "CLeds.h"
-
+#include "CADC.h"
 
 uint16_t a = 0;
 uint8_t b = 0;
@@ -30,12 +29,16 @@ int main(void)
 	CLeds LEDs = CLeds::is();
 	uint8_t brightness = 66;
 	bool dim = false;
-	
+	uint16_t adc0;
+	uint16_t adc1;
+	//CADC adc = CADC::is();
+
 	//Turn on 5v, PA2
 	DDRA |= _BV(DDA2);
 	PORTA |= _BV(PA2);
 
 	LEDs.Init();
+	CADC::is().Init();
 	
 	LEDs.RightUpOn();
 	LEDs.LeftUpOn();
@@ -50,7 +53,11 @@ int main(void)
     {
 		if(CTimer::IsTimedOut(100, start))
 		{
-			Serial <<  a++ << ", " << b-- << ", Hello World z!\r\n";
+			adc0 = 3;
+			adc1 = 4;
+			adc0 = CADC::is().Read(0);
+			adc1 = CADC::is().Read(1);
+			Serial <<  a++ << ", " << b-- << ", Hello World; " << adc0 << ", " << adc1 << "\r\n";
 			
 			start = CTimer::GetTick();
 
@@ -58,7 +65,7 @@ int main(void)
 			
 			if(dim)
 			{
-				if(brightness-- <= 2)
+				if(brightness-- <= 4)
 				{
 					 dim = false;
 					 LEDs.LeftUpOn();
@@ -66,7 +73,7 @@ int main(void)
 			}
 			else
 			{
-				if(brightness++ >30)
+				if(brightness++ >50)
 				{
 					 dim = true;
 					 LEDs.LeftUpOff();

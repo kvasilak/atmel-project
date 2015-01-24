@@ -163,6 +163,18 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CADC.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="CADC.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="CDigital.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="CDigital.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="circularbuffer.h">
       <SubType>compile</SubType>
     </Compile>
@@ -191,12 +203,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="MicroLevel.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="CBlink.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="CBlink.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="common.h">
