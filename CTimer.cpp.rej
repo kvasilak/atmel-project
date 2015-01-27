@@ -1,0 +1,10 @@
+diff a/CTimer.cpp b/CTimer.cpp	(rejected hunks)
+@@ -11,7 +11,7 @@
+ #include "CTimer.h"
+ #include "mutex.h"
+ 
+-volatile uint16_t	CTimer::TimerTic =0; //1.024 ms per tic
++volatile uint32_t	CTimer::TimerTic =0; //1.024 ms per tic
+ 
+ 
+ void CTimer::Init()

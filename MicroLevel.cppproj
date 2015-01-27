@@ -169,6 +169,12 @@
     <Compile Include="CADC.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="CController.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="CController.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="CDigital.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -194,6 +200,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="CTimer.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Fsm.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="fsm.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="i2cmaster.c">

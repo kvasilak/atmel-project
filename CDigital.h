@@ -14,6 +14,43 @@
 
 class CDigital
 {
+/*outputs
+PA2	power up
+PA3	compressor
+
+PB4 right fill
+PB5 right dump
+PB6 left fill
+PB7 left dump
+
+inputs
+switches
+PD2 calibrate
+PD3 ignition
+PD4 down
+PD5 up
+PD6 travel
+PD7 camp
+
+
+Steering remote
+PB0 up
+PB1 down
+PB2 travel
+PB3 camp
+PC7 valid
+
+outside remote
+PA4 right up
+PA5 right down
+PA6 Left up
+PA7 left down
+PC6 valid
+
+
+
+
+*/
 
 //functions
 public:
