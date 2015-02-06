@@ -9,8 +9,13 @@
 #include "CController.h"
 
 // default constructor
-CController::CController()
+CController::CController() :
+m_stateCamp(*this), //call the state constructor with a pointer to the manager class ( this )
+m_stateManual(*this), 
+m_stateTravel(*this), 
+m_pCurrState(0)
 {
+	ChangeState(STATE_MANUAL);
 } //CController
 
 //switch to manual mode if user presses any manual button
@@ -24,155 +29,35 @@ void CController::GetMode()
 	
 }
 
-//determine if the mode change requires a state machine change
-void CController::CheckEvents()
+void CController::ScheduleEvent(EVENT evt)
 {
-	GetMode();
+	//cout << "Event received: " << events[evt] << endl;
+	m_pCurrState->HandleEvent(evt);
 }
 
-
-void CController::LeftUp()
+void CController::ChangeState(STATE newState)
 {
-	
-}
-
-void CController::LeftDown()
-{
-	
-}
-
-void CController::RightUp()
-{
-	
-}
-
-void CController::RightDown()
-{
-	
-}
-
-void CController::LeftHold()
-{
-	
-}
-
-void CController::RightHold()
-{
-	
-}
-
-void CController::Manual(FsmEvents const e)
-{
-	switch(e)
+	if(m_pCurrState)
 	{
-		case EventEntry:
-			break;
-		case EventExit:
-			break;
-		case UpEvent:
-			break;
-		case DownEvent:
-			break;
-		case HoldEvent:
-			break;
-		case LeftUpEvent:
-			break;
-		case LeftDownEvent:
-			break;
-		case RightUpEvent:
-			break;
-		case RightDownEvent:
-			break;
-		//case TravelEvent:
-		//	LeftHold();
-		//	RightHold();
-		//	//SetNextState(Travel);
-		//	break;
-		//case CampEvent:
-		//	LeftHold();
-		//	RightHold();
-			//SetNextState(Camp);
-		//	break;
+		m_pCurrState->OnExit();
+		m_prevStateID = m_pCurrState->GetID();
 	}
-}
-
-void CController::Travel(FsmEvents const e)
-{
-	switch(e)
+	
+	switch(newState)
 	{
-		case EventEntry:
-			break;
-		case EventExit:
-			break;
-		case UpEvent:
-			LeftUp();
-			RightUp();
-			//SetNextState(Manual);
-			break;
-		case DownEvent:
-			LeftDown();
-			RightDown();
-			//SetNextState(Manual);
-			break;
-		case LeftUpEvent:
-			LeftUp();
-			//SetNextState(Manual);
-			break;
-		case LeftDownEvent:
-			LeftDown();
-			//SetNextState(Manual);
-			break;
-		case RightUpEvent:
-			RightUp();
-			//SetNextState(Manual);
-			break;
-		case RightDownEvent:
-			RightDown();
-			//SetNextState(Manual);
-			break;
-		case HoldEvent:
-			LeftHold();
-			RightHold();
-			//SetNextState(Manual);
-			break;
-		//case CampEvent:
-			//SetNextState(Camp);
-		//	break;
+		case STATE_MANUAL:
+			m_pCurrState = &m_stateManual;
+		break;
+		case STATE_TRAVEL:
+			m_pCurrState = &m_stateTravel;
+		break;
+		case STATE_CAMP:
+			m_pCurrState = &m_stateCamp;
+		break;
+		default:
+			m_pCurrState = &m_stateManual;
 	}
-}
-
-void CController::Camp(FsmEvents const e)
-{
-	switch(e)
-	{
-		case EventEntry:
-			break;
-		case EventExit:
-			break;
-		case UpEvent:
-			//SetNextState(Manual);
-			break;
-		case DownEvent:
-			//SetNextState(Manual);
-			break;
-		case LeftUpEvent:
-			//SetNextState(Manual);
-			break;
-		case LeftDownEvent:
-			//SetNextState(Manual);
-			break;
-		case RightUpEvent:
-			//SetNextState(Manual);
-			break;
-		case RightDownEvent:
-			//SetNextState(Manual);
-			break;
-		case HoldEvent:
-			//SetNextState(Manual);
-			break;
-		//case TravelEvent:
-			//SetNextState(Travel);
-		//	break;
-	}
+	
+	//m_pCurrState->OnEntry();
 }
 

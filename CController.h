@@ -8,50 +8,46 @@
 
 #ifndef __CCONTROLLER_H__
 #define __CCONTROLLER_H__
-#include "Fsm.h"
+#include "fsm/Events.h"
+#include "fsm/States.h"
 
-//class ControllerEvents //: public FsmEvents
-//{
-	//public:
-	//enum
-	//{
-		//TimerEvent = 100,
-		//UpEvent,
-		//DownEvent,
-		//HoldEvent,
-		//LeftUpEvent,
-		//LeftDownEvent,
-		//RightUpEvent,
-		//RightDownEvent,
-		//TravelEvent,
-		//CampEvent,
-		//CalibrateEvent
-	//}Events;
-//};
+//include state classes
+#include "fsm/Camp.h"
+#include "fsm/Manual.h"
+#include "fsm/Travel.h"
 
-class CController : public CFsm
+class CController 
 {
 
 public:
 	CController();
-	~CController();
+	
+	void ScheduleEvent(EVENT evt);
 
-private:
-	CController( const CController &c );
-	CController& operator=( const CController &c );
-	
-	void GetMode();
-	void CheckEvents();
-	
-	void Run();
-	
-	//State functions
-	void Manual(FsmEvents const e); // state handlers
-	void Travel(FsmEvents const e);
-	void Camp(FsmEvents const e);
-	
 	private:
 	
+	//FSM specific //////////////////
+	friend class FsmCamp;
+	friend class FsmManual;
+	friend class FsmTravel;
+
+
+	FsmCamp m_stateCamp;
+	FsmManual m_stateManual;
+	FsmTravel m_stateTravel;
+	/////////////////////////////
+
+	CController(const CController&);
+	CController& operator=(const CController&);
+
+	CState* m_pCurrState;
+	STATE m_prevStateID;
+
+	void ChangeState(STATE newState);
+
+	void GetMode();
+	void CheckEvents();
+
 	void LeftUp();
 	void LeftDown();
 	void RightUp();

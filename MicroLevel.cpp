@@ -44,8 +44,10 @@ int main(void)
 	LEDs.LeftUpOn();
 	LEDs.RightDownOn();
 	LEDs.LeftDownOn();
-	
+	LEDs.CampOn();
 	LEDs.ActiveOn();
+	LEDs.TravelOKOn();
+	//LEDs.TravelWarnOn();
 	
 	LEDs.Dim(10);
 
