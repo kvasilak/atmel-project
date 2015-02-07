@@ -7,6 +7,8 @@
 
 #include "common.h"
 #include "CSerial.h"
+#include "CController.h"
+
 #include "CTimer.h"
 #include "CBlink.h"
 #include <avr/io.h>
@@ -18,9 +20,16 @@ uint8_t b = 0;
 uint8_t txbuf[100];
 uint8_t rxbuf[100];
 
+//error handler that is invoked when a pure virtual function is called.
+extern "C" void __cxa_pure_virtual()
+{
+	//reset!
+	while (1);
+}
 
 int main(void)
 {
+	CController Controller;
 	CSerial Serial = CSerial::is();
 	Serial.Init();
 	

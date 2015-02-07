@@ -11,7 +11,7 @@
 
 
 FsmCamp::FsmCamp(CController& SMManager) :
-CState(SMManager, STATE_MANUAL)
+CState(SMManager, STATE_CAMP)
 {
 }
 

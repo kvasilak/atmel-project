@@ -12,6 +12,8 @@
 
 class CController;
 
+
+
 class CState
 {
 	protected:

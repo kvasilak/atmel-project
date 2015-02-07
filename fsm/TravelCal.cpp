@@ -11,7 +11,7 @@
 
 
 FSMTravelCal::FSMTravelCal(CController& SMManager) :
-CState(SMManager, STATE_MANUAL)
+CState(SMManager, STATE_TRAVEL_CALIBRATE)
 {
 }
 

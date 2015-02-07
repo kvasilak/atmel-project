@@ -12,7 +12,7 @@
 #include "State.h"
 #include "States.h"
 
-class FsmCamp :public CState
+class FsmCamp :public virtual CState
 {
 	public:
 	FsmCamp(CController& FsmManager);

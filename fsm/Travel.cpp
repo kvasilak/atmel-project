@@ -11,7 +11,7 @@
 
 
 FsmTravel::FsmTravel(CController& SMManager) :
-CState(SMManager, STATE_MANUAL)
+CState(SMManager, STATE_TRAVEL)
 {
 }
 

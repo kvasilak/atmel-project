@@ -11,7 +11,7 @@
 
 
 FSMManualCal::FSMManualCal(CController& SMManager) :
-CState(SMManager, STATE_MANUAL)
+CState(SMManager, STATE_MANUAL_CALIBRATE)
 {
 }
 

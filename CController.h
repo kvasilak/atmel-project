@@ -30,35 +30,38 @@ public:
 	private:
 	
 	//FSM specific //////////////////
-	friend class FsmCamp;
+	
 	friend class FsmManual;
 	friend class FsmTravel;
-	friend class FSMCampCal;
-	friend class FSMTravelCal;
+	friend class FsmCamp;
 	friend class FSMManualCal;
+	friend class FSMTravelCal;
+	friend class FSMCampCal;
 	
 
-
-	FsmCamp			m_stateCamp;
+	
 	FsmManual		m_stateManual;
 	FsmTravel		m_stateTravel;
-	
-	FSMCampCal		m_stateCampCal;
-	FSMTravelCal	m_stateTravelCal;
-	FSMManualCal	m_stateManualCal;
+	FsmCamp			m_stateCamp;
 
+	FSMManualCal	m_stateManualCal;
+	FSMTravelCal	m_stateTravelCal;
+	FSMCampCal		m_stateCampCal;
+
+	//The list of states in the same order as in states.h
+	CState *m_StateList[6];
+	
 	/////////////////////////////
 
 	CController(const CController&);
 	CController& operator=(const CController&);
 
-	CState* m_pCurrState;
-	STATE m_prevStateID;
+	STATE m_CurrState;
 
 	void ChangeState(STATE newState);
 
 	void GetMode();
-	void CheckEvents();
+	void Run();
 
 	void LeftUp();
 	void LeftDown();
