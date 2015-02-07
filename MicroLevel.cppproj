@@ -209,6 +209,24 @@
     <Compile Include="fsm\Events.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="fsm\CampCal.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="fsm\CampCal.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="fsm\ManualCal.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="fsm\ManualCal.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="fsm\TravelCal.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="fsm\TravelCal.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="fsm\Manual.cpp">
       <SubType>compile</SubType>
     </Compile>

@@ -15,6 +15,9 @@
 #include "fsm/Camp.h"
 #include "fsm/Manual.h"
 #include "fsm/Travel.h"
+#include "fsm/CampCal.h"
+#include "fsm/ManualCal.h"
+#include "fsm/TravelCal.h"
 
 class CController 
 {
@@ -30,11 +33,20 @@ public:
 	friend class FsmCamp;
 	friend class FsmManual;
 	friend class FsmTravel;
+	friend class FSMCampCal;
+	friend class FSMTravelCal;
+	friend class FSMManualCal;
+	
 
 
-	FsmCamp m_stateCamp;
-	FsmManual m_stateManual;
-	FsmTravel m_stateTravel;
+	FsmCamp			m_stateCamp;
+	FsmManual		m_stateManual;
+	FsmTravel		m_stateTravel;
+	
+	FSMCampCal		m_stateCampCal;
+	FSMTravelCal	m_stateTravelCal;
+	FSMManualCal	m_stateManualCal;
+
 	/////////////////////////////
 
 	CController(const CController&);
@@ -57,5 +69,6 @@ public:
 
 	
 }; //CController
+
 
 #endif //__CCONTROLLER_H__

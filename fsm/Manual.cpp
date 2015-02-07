@@ -24,15 +24,14 @@ void FsmManual::HandleEvent(EVENT evt)
 {
 	switch(evt)
 	{
-		case UpEvent:
-		case DownEvent:
-			m_SMManager.ChangeState(STATE_MANUAL);
-		break;
 		case TravelEvent:
 			m_SMManager.ChangeState(STATE_TRAVEL);
 		break;
 		case CampEvent:
 			m_SMManager.ChangeState(STATE_CAMP);
+		break;
+		case CalibrateEvent:
+			m_SMManager.ChangeState(STATE_MANUAL_CALIBRATE);
 		break;
 		default:
 		break;

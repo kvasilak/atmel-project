@@ -4,14 +4,7 @@
 enum EVENT
 {
 	TimerEvent ,
-	UpEvent,
-	DownEvent,
-	LeftHoldEvent,
-	RightHoldEvent,
-	LeftUpEvent,
-	LeftDownEvent,
-	RightUpEvent,
-	RightDownEvent,
+	ManualEvent,
 	TravelEvent,
 	CampEvent,
 	CalibrateEvent

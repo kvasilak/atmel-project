@@ -24,13 +24,16 @@ void FsmCamp::HandleEvent(EVENT evt)
 {
 	switch(evt)
 	{
-		case UpEvent:
-		case DownEvent:
+		case TimerEvent:
+			//run camp FSM 
+		case ManualEvent:
 			m_SMManager.ChangeState(STATE_MANUAL);
 		break;
 		case TravelEvent:
 			m_SMManager.ChangeState(STATE_TRAVEL);
 		break;
+		case CalibrateEvent:
+			m_SMManager.ChangeState(STATE_CAMP_CALIBRATE);
 		default:
 		break;
 	}

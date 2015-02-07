@@ -13,6 +13,9 @@ CController::CController() :
 m_stateCamp(*this), //call the state constructor with a pointer to the manager class ( this )
 m_stateManual(*this), 
 m_stateTravel(*this), 
+m_stateCampCal(*this),
+m_stateTravelCal(*this),
+m_stateManualCal(*this),
 m_pCurrState(0)
 {
 	ChangeState(STATE_MANUAL);
@@ -37,27 +40,42 @@ void CController::ScheduleEvent(EVENT evt)
 
 void CController::ChangeState(STATE newState)
 {
+	//state order must match states.h
+	static CState *m_stateList[] = {&m_stateManual, &m_stateTravel, &m_stateCamp, &m_stateManualCal, &m_stateTravelCal, &m_stateCampCal,};
+		
 	if(m_pCurrState)
 	{
 		m_pCurrState->OnExit();
 		m_prevStateID = m_pCurrState->GetID();
 	}
 	
-	switch(newState)
-	{
-		case STATE_MANUAL:
-			m_pCurrState = &m_stateManual;
-		break;
-		case STATE_TRAVEL:
-			m_pCurrState = &m_stateTravel;
-		break;
-		case STATE_CAMP:
-			m_pCurrState = &m_stateCamp;
-		break;
-		default:
-			m_pCurrState = &m_stateManual;
-	}
+	m_pCurrState = m_stateList[newState];
 	
-	//m_pCurrState->OnEntry();
+	//switch(newState)
+	//{
+		//case STATE_MANUAL:
+			//m_pCurrState = &m_stateManual;
+		//break;
+		//case STATE_TRAVEL:
+			//m_pCurrState = &m_stateTravel;
+		//break;
+		//case STATE_CAMP:
+			//m_pCurrState = &m_stateCamp;
+		//break;
+		//case STATE_CAMP_CALIBRATE:
+			//m_pCurrState = &m_stateCampCal;
+		//break;
+		//case STATE_TRAVEL_CALIBRATE:
+			//m_pCurrState = &m_stateTravelCal;
+		//break;
+		//case STATE_MANUAL_CALIBRATE:
+			//m_pCurrState = &m_stateManualCal;
+		//break;
+		//default:
+			//m_pCurrState = &m_stateManual;
+	//}
+	
+	m_pCurrState->OnEntry();
+	
 }
 
