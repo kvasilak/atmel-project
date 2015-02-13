@@ -26,6 +26,8 @@ public:
 	CController();
 	
 	void ScheduleEvent(EVENT evt);
+	
+	void Run();
 
 	private:
 	
@@ -61,7 +63,6 @@ public:
 	void ChangeState(STATE newState);
 
 	void GetMode();
-	void Run();
 
 	void LeftUp();
 	void LeftDown();
@@ -70,6 +71,7 @@ public:
 	void LeftHold();
 	void RightHold();
 
+	bool IsTimedOut();
 	
 }; //CController
 

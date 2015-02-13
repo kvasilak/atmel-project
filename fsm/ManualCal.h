@@ -18,6 +18,20 @@ class FSMManualCal :public CState
 	void OnEntry();
 	void HandleEvent(EVENT evt);
 	void OnExit();
+	
+	private:
+	void Calibrate();
+	
+	enum CalStates
+	{
+		Fill,
+		Filling,
+		Dump,
+		Dumping,
+		Done
+	};
+		
+	CalStates State;
 
 }; //FSMManualCal
 

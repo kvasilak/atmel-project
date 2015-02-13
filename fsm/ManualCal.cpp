@@ -17,23 +17,19 @@ CState(SMManager, STATE_MANUAL_CALIBRATE)
 
 void FSMManualCal::OnEntry()
 {
-	//cout << "\nCStateIdle::OnEntry()" << endl;
+	//Always start by filling the bags to find the upper limits
 }
 
+//Manual calibration basically means finding the upper and lower 
+//suspension travel limits. These limits are used to determine if we 
+//should keep trying to adjust during travel or Camp mode
 void FSMManualCal::HandleEvent(EVENT evt)
 {
 	switch(evt)
 	{
 		case TimerEvent:
-		//run camp FSM
-		case ManualEvent:
-		m_SMManager.ChangeState(STATE_MANUAL);
+			Calibrate();
 		break;
-		case TravelEvent:
-		m_SMManager.ChangeState(STATE_TRAVEL);
-		break;
-		case CalibrateEvent:
-		m_SMManager.ChangeState(STATE_CAMP_CALIBRATE);
 		default:
 		break;
 	}
@@ -42,4 +38,38 @@ void FSMManualCal::HandleEvent(EVENT evt)
 void FSMManualCal::OnExit()
 {
 	//cout << "CStateIdle::OnExit()" << endl;
+}
+
+//calibration state machine
+void FSMManualCal::Calibrate()
+{
+	switch(State)
+	{
+		case Fill:
+			//open both fill valves
+		break;
+		case Filling:
+			//Wait for max height to be reached
+			if(true)
+			{
+				
+			}
+		break;
+		case Dump:
+			//open dump valves 
+		break;
+		case Dumping:
+			//wait for min height
+			if(true)
+			{
+				
+			}
+		break;
+		case Done:
+			//Save heights in EEPROM
+			
+			//back to manual mode
+			m_SMManager.ChangeState(STATE_MANUAL);
+		break;
+	}
 }

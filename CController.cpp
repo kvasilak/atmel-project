@@ -40,11 +40,27 @@ void CController::ScheduleEvent(EVENT evt)
 //Exit the old state, enter the new state
 void CController::ChangeState(STATE newState)
 {
-	m_StateList[m_CurrState]->OnExit();
+	// put up a warning if the function is called
+	//from the entry or exit function.. not legal! 
+	//(guard is not thread safe)
+	static bool entered = false;
+	if(entered)
+	{
+		;//DO NOT Call from OnEntry() or OnExit()!!
+	}
 	
-	m_CurrState = newState;
+	entered = true;
 	
-	m_StateList[m_CurrState]->OnEntry();
+	if(m_CurrState != newState)
+	{
+		m_StateList[m_CurrState]->OnExit();
+		
+		m_CurrState = newState;
+		
+		m_StateList[m_CurrState]->OnEntry();
+	}
+	
+	entered = false;
 }
 
 
@@ -57,10 +73,20 @@ void CController::ChangeState(STATE newState)
 void CController::GetMode()
 {
 	
+	//any change in rocker position shall result in a manual mode event
+	//if we are already in manual mode nothing changes
+	if(true)//Rocker.changed())
+	{
+		ScheduleEvent(ManualEvent);
+		//HandleRockerswitch();
+	}
+	
 }
 
+//called on a 100ms timer
 void CController::Run()
 {
 	ScheduleEvent(TimerEvent);
 }
+
 

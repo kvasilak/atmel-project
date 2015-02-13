@@ -64,6 +64,9 @@ int main(void)
     {
 		if(CTimer::IsTimedOut(100, start))
 		{
+			
+			Controller.Run();
+			
 			adc0 = 3;
 			adc1 = 4;
 			adc0 = CADC::is().Read(0);

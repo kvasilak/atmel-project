@@ -26,6 +26,7 @@ void FsmTravel::HandleEvent(EVENT evt)
 	{
 		case TimerEvent:
 			//run travel FSM
+			break;
 		case ManualEvent:
 			m_SMManager.ChangeState(STATE_MANUAL);
 		break;

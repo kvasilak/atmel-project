@@ -19,6 +19,9 @@ class FsmManual :public CState
 	void OnEntry();
 	void HandleEvent(EVENT evt);
 	void OnExit();
+	
+	private:
+	void Handleswitches();
 
 }; //Manual
 
