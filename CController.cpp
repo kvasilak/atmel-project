@@ -64,23 +64,76 @@ void CController::ChangeState(STATE newState)
 }
 
 
-//switch to manual mode if user presses any manual button
-//Manual buttons are; up, down, remote up, remote down, remote ru/lu/rd/ld
-//
-//switch to camp mode if user presses camp button and no manual button is pressed
-//
-//switch to travel mode if user presses travel button and no manual button is pressed
-void CController::GetMode()
+//check all inputs for a state change
+//We will generate Manual, Travel and camp events
+//Manual event anytime there is any change of the rocker or either remote
+//Travel event for any change of the travel button
+//Camp event for any change of the camp button
+void CController::CheckEvent()
 {
+/*	static bool OldRockerUp				= false;
+	static bool OldRockerDown			= false;
+	static bool OldInsideUp				= false;
+	static bool OldInsideDown			= false;
 	
-	//any change in rocker position shall result in a manual mode event
-	//if we are already in manual mode nothing changes
-	if(true)//Rocker.changed())
+	static bool OldOutsideLeftUp		= false;
+	static bool OldOutsideLeftDown		= false;
+	static bool OldOutsideRightUp		= false;
+	static bool OldOutsideRightDown		= false;
+	
+	static bool OldCamp					= false;
+	static bool OldInsideCamp			= false;
+	
+	static bool OldTravel				= false;
+	static bool OldInsideTravel			= false;
+	*/
+	
+/*	
+	//Manual inputs
+	bool ManualChanged  = OldRockerUp		!= RockerUp;
+	ManualChanged |= OldRockerDown			!= RockerDown;
+	ManualChanged |= OldInsideUp			!= InsideUp;
+	ManualChanged |= OldInsideDown			!= InsideDown;
+
+	ManualChanged |= OldOutsideLeftUp		!= OutsideLeftUp;
+	ManualChanged |= OldOutsideLeftDown		!= OutsideLeftDown;
+	ManualChanged |= OldOutsideRightUp		!= OutsideRightUp;
+	ManualChanged |= OldOutsideRightDown	!= OutsideRightDown;
+	
+	//Update old values
+	OldRockerUp			= RockerUp;
+	OldRockerDown		= RockerDown;
+	OldInsideUp			= InsideUp;
+	OldInsideDown		= InsideDown;
+	
+	OldOutsideLeftUp	= OutsideLeftUp;
+	OldOutsideLeftDown	= OutsideLeftDown;
+	OldOutsideRightUp	= OutsideRightUp;
+	OldOutsideRightDown	= OutsideRightDown;
+
+	if(ManualChanged)
 	{
 		ScheduleEvent(ManualEvent);
-		//HandleRockerswitch();
 	}
 	
+	//Camp inputs
+	bool CampChanged	= OldCamp			!= Camp;
+	CampChanged			|= OldInsideCamp	|= InsideCamp;
+	
+	if(CampChanged)
+	{
+		ScheduleEvent(CampEvent);
+	}
+	
+	//Travel inputs
+	bool TravelChanged	= OldTravel				!= Travel;
+	TravelChanged		|= OldInsideTravel		!= InsideTravel;
+	
+	if(TravelChanged)
+	{
+		ScheduleEvent(TravelEvent);
+	}
+	*/
 }
 
 //called on a 100ms timer
@@ -89,4 +142,23 @@ void CController::Run()
 	ScheduleEvent(TimerEvent);
 }
 
+/*
+//Switches				//Switches
+if(OldRockerUp != RockerUp)
 
+OldRockerDown				RockerDown
+
+
+
+//inside remote				//inside remote
+OldInsideUp					InsideUp
+OldInsideDown				InsideDown
+
+
+
+//Outside Remote				//Outside Remote
+OldOutsideLeftUp				OutsideLeftUp
+OldOutsideLeftDown				OutsideLeftDown
+OldOutsideRightUp				OutsideRightUp
+OldOutsideRightDown				OutsideRightDown
+*/

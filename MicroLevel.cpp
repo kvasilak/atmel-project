@@ -29,7 +29,7 @@ extern "C" void __cxa_pure_virtual()
 
 int main(void)
 {
-	CController Controller;
+	//CController Controller;
 	CSerial Serial = CSerial::is();
 	Serial.Init();
 	
@@ -43,7 +43,7 @@ int main(void)
 	//CADC adc = CADC::is();
 
 	//Turn on 5v, PA2
-	DDRA |= _BV(DDA2);
+	DDRA |= _BV(DDRA2); 
 	PORTA |= _BV(PA2);
 
 	LEDs.Init();
@@ -65,7 +65,7 @@ int main(void)
 		if(CTimer::IsTimedOut(100, start))
 		{
 			
-			Controller.Run();
+			//Controller.Run();
 			
 			adc0 = 3;
 			adc1 = 4;

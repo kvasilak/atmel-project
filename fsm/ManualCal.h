@@ -24,6 +24,7 @@ class FSMManualCal :public CState
 	
 	enum CalStates
 	{
+		Idle,
 		Fill,
 		Filling,
 		Dump,

@@ -26,14 +26,14 @@ void FsmManual::HandleEvent(EVENT evt)
 	{
 		case TravelEvent:
 			//change state if no manual buttons are active
-			if(true)
+			if(LeftState == Holding && RightState == Holding)
 			{
 				m_SMManager.ChangeState(STATE_TRAVEL);
 			}
 		break;
 		case CampEvent:
 			//change state if no manual buttons are active
-			if(true)
+			if(LeftState == Holding && RightState == Holding)
 			{
 				m_SMManager.ChangeState(STATE_CAMP);
 			}
@@ -58,7 +58,38 @@ void FsmManual::OnExit()
 }
 
 //check which button caused the event and decide if we need to act
+//Rocker up/down
+//inside remote up/down
+//outside left up/left down, right up/right down
 void FsmManual::Handleswitches()
 {
+	//figure out what changed
+	
+//Switches				//Switches
+// 	if(OldRockerUp != RockerUp)
+// 	{
+// 		
+// 	}
+
+
+// 
+// OldRockerDown				RockerDown
+// OldCamp				Camp
+// OldTravel				Travel
+// 	
+// //inside remote				//inside remote
+// OldInsideUp				InsideUp
+// OldInsideDown				InsideDown
+// OldInsideCamp				InsideCamp
+// OldInsideTravel				InsideTravel
+// 	
+// //Outside Remote				//Outside Remote
+// OldOutsideLeftUp				OutsideLeftUp
+// OldOutsideLeftDown				OutsideLeftDown
+// OldOutsideRightUp				OutsideRightUp
+// OldOutsideRightDown				OutsideRightDown
+// 	
+// 	
+	
 	
 }

@@ -62,7 +62,7 @@ public:
 
 	void ChangeState(STATE newState);
 
-	void GetMode();
+	void CheckEvent();
 
 	void LeftUp();
 	void LeftDown();
