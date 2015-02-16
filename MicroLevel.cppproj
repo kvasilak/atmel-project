@@ -181,6 +181,12 @@
     <Compile Include="CDigital.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Cio.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Cio.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="circularbuffer.h">
       <SubType>compile</SubType>
     </Compile>
@@ -200,6 +206,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="CTimer.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Debounced.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Debounced.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="fsm\Camp.cpp">

@@ -19,6 +19,8 @@
 #include "fsm/ManualCal.h"
 #include "fsm/TravelCal.h"
 
+#include "Cio.h"
+
 class CController 
 {
 

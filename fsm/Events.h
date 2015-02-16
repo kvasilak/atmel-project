@@ -10,11 +10,12 @@ enum EVENT
 	CalibrateEvent
 };
 
-//static string events[]  = {
-	//string("EVENT_IGNITE"),
-	//string("EVENT_ACCELERATE"),
-	//string("EVENT_BRAKE"),
-	//string("EVENT_TURN_OFF")
-//};
+// static string events[]  = {
+// 	string("TimerEvent"),
+// 	string("ManualEvent"),
+// 	string("TravelEvent"),
+// 	string("CampEvent"),
+// 	string("CalibrateEvent")
+// };
 
 #endif // EVENTS_H

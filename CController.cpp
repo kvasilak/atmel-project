@@ -7,6 +7,9 @@
 
 
 #include "CController.h"
+#include "CSerial.h"
+#include <avr/io.h>
+#include "common.h"
 
 
 // default constructor
@@ -33,7 +36,15 @@ m_CurrState(STATE_MANUAL)
 
 void CController::ScheduleEvent(EVENT evt)
 {
-	//cout << "Event received: " << events[evt] << endl;
+	static const char *events[]  = {
+		"TimerEvent",
+		"ManualEvent",
+		"TravelEvent",
+		"CampEvent",
+		"CalibrateEvent"
+	};
+
+	 CSerial::is() << "Event received: " << events[evt] << "\n";
 	m_StateList[m_CurrState]->HandleEvent(evt);
 }
 
@@ -46,7 +57,7 @@ void CController::ChangeState(STATE newState)
 	static bool entered = false;
 	if(entered)
 	{
-		;//DO NOT Call from OnEntry() or OnExit()!!
+		CSerial::is() << "DO NOT Call from OnEntry() or OnExit()!!\n";
 	}
 	
 	entered = true;
@@ -71,94 +82,31 @@ void CController::ChangeState(STATE newState)
 //Camp event for any change of the camp button
 void CController::CheckEvent()
 {
-/*	static bool OldRockerUp				= false;
-	static bool OldRockerDown			= false;
-	static bool OldInsideUp				= false;
-	static bool OldInsideDown			= false;
-	
-	static bool OldOutsideLeftUp		= false;
-	static bool OldOutsideLeftDown		= false;
-	static bool OldOutsideRightUp		= false;
-	static bool OldOutsideRightDown		= false;
-	
-	static bool OldCamp					= false;
-	static bool OldInsideCamp			= false;
-	
-	static bool OldTravel				= false;
-	static bool OldInsideTravel			= false;
-	*/
-	
-/*	
-	//Manual inputs
-	bool ManualChanged  = OldRockerUp		!= RockerUp;
-	ManualChanged |= OldRockerDown			!= RockerDown;
-	ManualChanged |= OldInsideUp			!= InsideUp;
-	ManualChanged |= OldInsideDown			!= InsideDown;
-
-	ManualChanged |= OldOutsideLeftUp		!= OutsideLeftUp;
-	ManualChanged |= OldOutsideLeftDown		!= OutsideLeftDown;
-	ManualChanged |= OldOutsideRightUp		!= OutsideRightUp;
-	ManualChanged |= OldOutsideRightDown	!= OutsideRightDown;
-	
-	//Update old values
-	OldRockerUp			= RockerUp;
-	OldRockerDown		= RockerDown;
-	OldInsideUp			= InsideUp;
-	OldInsideDown		= InsideDown;
-	
-	OldOutsideLeftUp	= OutsideLeftUp;
-	OldOutsideLeftDown	= OutsideLeftDown;
-	OldOutsideRightUp	= OutsideRightUp;
-	OldOutsideRightDown	= OutsideRightDown;
-
-	if(ManualChanged)
+	if(Cio::is().ManualChanged())
 	{
 		ScheduleEvent(ManualEvent);
 	}
-	
-	//Camp inputs
-	bool CampChanged	= OldCamp			!= Camp;
-	CampChanged			|= OldInsideCamp	|= InsideCamp;
-	
-	if(CampChanged)
-	{
-		ScheduleEvent(CampEvent);
-	}
-	
-	//Travel inputs
-	bool TravelChanged	= OldTravel				!= Travel;
-	TravelChanged		|= OldInsideTravel		!= InsideTravel;
-	
-	if(TravelChanged)
+
+ 	if(Cio::is().CampChanged())
+ 	{
+ 		ScheduleEvent(CampEvent);
+ 	}
+
+	if(Cio::is().TravelChanged())
 	{
 		ScheduleEvent(TravelEvent);
 	}
-	*/
+	
 }
 
 //called on a 100ms timer
 void CController::Run()
 {
-	ScheduleEvent(TimerEvent);
+	Cio::is().Run();
+	
+	CheckEvent();
+	
+	//ScheduleEvent(TimerEvent);
 }
 
-/*
-//Switches				//Switches
-if(OldRockerUp != RockerUp)
 
-OldRockerDown				RockerDown
-
-
-
-//inside remote				//inside remote
-OldInsideUp					InsideUp
-OldInsideDown				InsideDown
-
-
-
-//Outside Remote				//Outside Remote
-OldOutsideLeftUp				OutsideLeftUp
-OldOutsideLeftDown				OutsideLeftDown
-OldOutsideRightUp				OutsideRightUp
-OldOutsideRightDown				OutsideRightDown
-*/

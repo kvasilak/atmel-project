@@ -14,6 +14,7 @@
 #include <avr/io.h>
 #include "CLeds.h"
 #include "CADC.h"
+#include "Cio.h"
 
 uint16_t a = 0;
 uint8_t b = 0;
@@ -29,7 +30,7 @@ extern "C" void __cxa_pure_virtual()
 
 int main(void)
 {
-	//CController Controller;
+	CController Controller;
 	CSerial Serial = CSerial::is();
 	Serial.Init();
 	
@@ -41,6 +42,8 @@ int main(void)
 	uint16_t adc0;
 	uint16_t adc1;
 	//CADC adc = CADC::is();
+	
+	Cio::is().Init();
 
 	//Turn on 5v, PA2
 	DDRA |= _BV(DDRA2); 
@@ -65,7 +68,7 @@ int main(void)
 		if(CTimer::IsTimedOut(100, start))
 		{
 			
-			//Controller.Run();
+			Controller.Run();
 			
 			adc0 = 3;
 			adc1 = 4;

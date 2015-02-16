@@ -60,15 +60,15 @@ class CSerial
 		bool IsOpen;
 };
 //
-#ifdef UART_STREAMS
+//#ifdef UART_STREAMS
 CSerial &operator<<(CSerial &rs232, uint8_t val);
 CSerial &operator<<(CSerial &rs232, uint16_t val);
 CSerial &operator<<(CSerial &rs232, int val);
 CSerial &operator<<(CSerial &rs232, const char* val);
-#ifdef UART_PGM
+//#ifdef UART_PGM
 CSerial &operator<<(CSerial &rs232, void* val);
-#endif
-#endif
+//#endif
+//#endif
 
 #endif
 
