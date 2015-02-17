@@ -21,17 +21,6 @@ class FsmManual :public CState
 	void OnExit();
 	
 	private:
-	void Handleswitches();
-	
-	enum FillStates
-	{
-		Holding,
-		Filling,
-		Dumping
-	};
-	
-	FillStates LeftState;
-	FillStates RightState;
 
 }; //Manual
 

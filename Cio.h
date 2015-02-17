@@ -11,6 +11,13 @@
 
 #include "Debounced.h"
 
+enum FillStates
+{
+	SolenoidFilling,
+	SolenoidHolding,
+	SolenoidDumping
+};
+
 class Cio
 {
 public:
@@ -23,22 +30,26 @@ static Cio &is()
 void Init();
 void Run();
 
-//whats changed
-bool ManualChanged();
-bool CampChanged();
-bool TravelChanged();
+	//whats changed
+	bool ManualChanged();
+	bool CampChanged();
+	bool TravelChanged();
 
 //What to do
-
+	void LeftSwitches();
+	void RightSsitches();
+	
+	FillStates LeftState;
+	FillStates RightState;
 
 private:
-Cio();
-Cio& operator=( const Cio &c );
+	Cio();
+	Cio& operator=( const Cio &c );
 
-Debounced RockerUp;
-Debounced RockerDown;
-Debounced PushCamp;
-Debounced PushTravel;
+	Debounced RockerUp;
+	Debounced RockerDown;
+	Debounced PushCamp;
+	Debounced PushTravel;
 
 }; //Cio
 

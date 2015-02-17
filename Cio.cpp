@@ -156,3 +156,112 @@ bool Cio::TravelChanged()
 	
 	return TravelChanged;
 }
+
+void Cio::LeftSwitches()
+{
+	bool RockerSwitchUp = RockerUp.Level();
+	bool RemoteUp = PINB & _BV(0);
+	bool RemoteLeftUp = PINA & _BV(6);
+	
+	bool RockerSwitchDown = RockerDown.Level();
+	bool RemoteDown = PINB & _BV(1);
+	bool RemoteLeftDown =PINA & _BV(7) ;
+	
+	bool up = RockerSwitchUp | RemoteUp | RemoteLeftUp;
+	bool Down = RockerSwitchDown | RemoteDown | RemoteLeftDown;
+	
+	//hold if both up and down
+	if( up)
+	{
+		if( !Down)
+		{
+			//Fill valve on
+			PORTB |= _BV(6);
+			PORTB &= ~_BV(7);
+			
+			LeftState = SolenoidFilling;
+		}
+		else
+		{
+			//booth valves off
+			PORTB &= ~_BV(6);
+			PORTB &= ~_BV(7);
+			
+			LeftState = SolenoidHolding;
+		}
+	}
+	else
+	{
+		if(Down)
+		{
+			//dump valve on
+			PORTB |= _BV(6);
+			PORTB &= ~_BV(7);
+			
+			LeftState = SolenoidDumping;
+		}
+		else
+		{
+			//both valves off
+			PORTB &= ~_BV(6);
+			PORTB &= ~_BV(7);
+			
+			LeftState = SolenoidHolding;
+		}
+	}
+
+}
+
+void Cio::RightSsitches()
+{
+	bool RockerSwitchUp = RockerUp.Level();
+	bool RemoteUp = PINB & _BV(0);
+	bool RemoteRightUp = PINA & _BV(4);
+	
+	bool RockerSwitchDown = RockerDown.Level();
+	bool RemoteDown = PINB & _BV(1);
+	bool RemoteRightDown =PINA & _BV(5) ;
+	
+	bool up = RockerSwitchUp | RemoteUp | RemoteRightUp;
+	bool Down = RockerSwitchDown | RemoteDown | RemoteRightDown;
+	
+	//hold if both up and down
+	if( up)
+	{
+		if( !Down)
+		{
+			//Fill valve on
+			PORTB |= _BV(4);
+			PORTB &= ~_BV(5);
+			
+			RightState = SolenoidFilling;
+		}
+		else //should never happen!
+		{
+			//both valves off
+			PORTB &= ~_BV(4);
+			PORTB &= ~_BV(5);
+			
+			RightState = SolenoidHolding;
+		}
+	}
+	else
+	{
+		if(Down)
+		{
+			//dump valve on
+			PORTB |= _BV(5);
+			PORTB &= ~_BV(4);
+			
+			RightState = SolenoidDumping;
+		}
+		else
+		{
+			//both valves off
+			PORTB &= ~_BV(4);
+			PORTB &= ~_BV(5);
+			
+			RightState = SolenoidHolding;
+		}
+	}
+}

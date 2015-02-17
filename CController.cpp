@@ -85,6 +85,10 @@ void CController::CheckEvent()
 	if(Cio::is().ManualChanged())
 	{
 		ScheduleEvent(ManualEvent);
+		
+		//update the IO
+		Cio::is().LeftSwitches();
+		Cio::is().RightSsitches();
 	}
 
  	if(Cio::is().CampChanged())
