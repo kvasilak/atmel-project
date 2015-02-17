@@ -8,7 +8,8 @@
 
 #include "Travel.h"
 #include "..\CController.h"
-
+#include "..\CLeds.h"
+#include "..\CSerial.h"
 
 FsmTravel::FsmTravel(CController& SMManager) :
 CState(SMManager, STATE_TRAVEL)
@@ -17,7 +18,8 @@ CState(SMManager, STATE_TRAVEL)
 
 void FsmTravel::OnEntry()
 {
-	//cout << "\nCStateIdle::OnEntry()" << endl;
+	CSerial::is() << " FsmTravel::OnEntry()\r\n";
+	Cio::is().TravelSwitches();
 }
 
 void FsmTravel::HandleEvent(EVENT evt)
@@ -42,5 +44,6 @@ void FsmTravel::HandleEvent(EVENT evt)
 
 void FsmTravel::OnExit()
 {
-	//cout << "CStateIdle::OnExit()" << endl;
+	CSerial::is() << " FsmTravel::OnExit()\r\n";
+	Cio::is().TravelSwitches();
 }

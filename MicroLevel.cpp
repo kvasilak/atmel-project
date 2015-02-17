@@ -36,11 +36,12 @@ int main(void)
 	
 	CTimer::Init();
 	uint32_t start = CTimer::GetTick();
+	
 	CLeds LEDs = CLeds::is();
-	uint8_t brightness = 66;
-	bool dim = false;
-	uint16_t adc0;
-	uint16_t adc1;
+	//uint8_t brightness = 66;
+	//bool dim = false;
+	//uint16_t adc0;
+	//uint16_t adc1;
 	//CADC adc = CADC::is();
 	
 	Cio::is().Init();
@@ -50,18 +51,20 @@ int main(void)
 	PORTA |= _BV(PA2);
 
 	LEDs.Init();
+	LEDs.Dim(100);
+	
 	CADC::is().Init();
 	
-	LEDs.RightUpOn();
-	LEDs.LeftUpOn();
-	LEDs.RightDownOn();
-	LEDs.LeftDownOn();
-	LEDs.CampOn();
-	LEDs.ActiveOn();
-	LEDs.TravelOKOn();
+// 	LEDs. CLeds::is();RightUpOn();
+// 	LEDs.LeftUpOn();
+// 	LEDs.RightDownOn();
+// 	LEDs.LeftDownOn();
+// 	LEDs.CampOn();
+// 	LEDs.ActiveOn();
+// 	LEDs.TravelOKOn();
 	//LEDs.TravelWarnOn();
 	
-	LEDs.Dim(10);
+	//LEDs.Dim(10);
 
     while(1)
     {
@@ -70,32 +73,32 @@ int main(void)
 			
 			Controller.Run();
 			
-			adc0 = 3;
-			adc1 = 4;
-			adc0 = CADC::is().Read(0);
-			adc1 = CADC::is().Read(1);
-			Serial <<  a++ << ", " << b-- << ", Hello World; " << adc0 << ", " << adc1 << "\r\n";
+			//adc0 = 3;
+			//adc1 = 4;
+			//adc0 = CADC::is().Read(0);
+			//adc1 = CADC::is().Read(1);
+			//Serial <<  a++ << ", " << b-- << ", Hello World; " << adc0 << ", " << adc1 << "\r\n";
 			
 			start = CTimer::GetTick();
 
-			LEDs.Dim(brightness);
-			
-			if(dim)
-			{
-				if(brightness-- <= 4)
-				{
-					 dim = false;
-					 LEDs.LeftUpOn();
-				}
-			}
-			else
-			{
-				if(brightness++ >50)
-				{
-					 dim = true;
-					 LEDs.LeftUpOff();
-				}
-			}
+// 			LEDs.Dim(brightness);
+// 			
+// 			if(dim)
+// 			{
+// 				if(brightness-- <= 4)
+// 				{
+// 					 dim = false;
+// 					 LEDs.LeftUpOn();
+// 				}
+// 			}
+// 			else
+// 			{
+// 				if(brightness++ >50)
+// 				{
+// 					 dim = true;
+// 					 LEDs.LeftUpOff();
+// 				}
+// 			}
 		}
 		
 	

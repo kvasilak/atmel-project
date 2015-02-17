@@ -41,7 +41,7 @@ public:
 	Debounced();
 	void Attach(IO_Ports port, uint8_t pin);           // set the pin to use
 	void Update();					//update the pin state, call frequently
-	int Level() {return PinLevel;}
+	bool Level() {return PinLevel;}
 	operator int() const {return PinLevel;}  //Allow using the class like an int
 
   

@@ -34,14 +34,14 @@ void CLedDriver::Init()
 	   if(i2c_write(0x80)==0)  //Control reg autoincrement starting at mode0
 	    if(i2c_write(0x80)==0)  //mode1 auto inc
 	     if(i2c_write(0x00)==0)  //mode2
-	      if(i2c_write(30)==0)       //PWM0
-	       if(i2c_write(30)==0)       //PWM1
-	        if(i2c_write(30)==0)       //PWM2
-	         if(i2c_write(30)==0)       //PWM3
-	          if(i2c_write(30)==0)       //PWM4
-	           if(i2c_write(30)==0)       //PWM5
-	            if(i2c_write(30)==0)       //PWM6
-	             if(i2c_write(30)==0)       //PWM7
+	      if(i2c_write(0xFF)==0)       //PWM0
+	       if(i2c_write(0xFF)==0)       //PWM1
+	        if(i2c_write(0xFF)==0)       //PWM2
+	         if(i2c_write(0xFF)==0)       //PWM3
+	          if(i2c_write(0xFF)==0)       //PWM4
+	           if(i2c_write(0xFF)==0)       //PWM5
+	            if(i2c_write(0xFF)==0)       //PWM6
+	             if(i2c_write(0xFF)==0)       //PWM7
 	              if(i2c_write(0xFF)==0)    //GRPPWM
 	               if(i2c_write(0x00)==0)    //GRPFREQ
 	                if(i2c_write(0X00)==0)    //LEDOUT0

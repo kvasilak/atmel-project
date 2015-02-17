@@ -37,7 +37,9 @@ void Run();
 
 //What to do
 	void LeftSwitches();
-	void RightSsitches();
+	void RightSwitches();
+	void CampSwitches();
+	void TravelSwitches();
 	
 	FillStates LeftState;
 	FillStates RightState;

@@ -7,4 +7,5 @@ Micro level design issues
 * verify Cal LED current, Maybe too low
 * P1 has .5(?)mm pad spacing, while connector has 1mm, they seem to be different styles completely
 * atmega164 processoronly has 16k of memory, should be bigger, 1284 will be used
+* Left down solenoid apears to be the COMP output
 

@@ -8,7 +8,8 @@
 
 #include "Camp.h"
 #include "..\CController.h"
-
+#include "..\CLeds.h"
+#include "..\CSerial.h"
 
 FsmCamp::FsmCamp(CController& SMManager) :
 CState(SMManager, STATE_CAMP)
@@ -17,7 +18,8 @@ CState(SMManager, STATE_CAMP)
 
 void FsmCamp::OnEntry()
 {
-	//cout << "\nCStateIdle::OnEntry()" << endl;
+	CSerial::is() << " FsmCamp::OnEntry()\r\n";
+	Cio::is().CampSwitches();
 }
 
 void FsmCamp::HandleEvent(EVENT evt)
@@ -41,5 +43,6 @@ void FsmCamp::HandleEvent(EVENT evt)
 
 void FsmCamp::OnExit()
 {
-	//cout << "CStateIdle::OnExit()" << endl;
+	CSerial::is() << " FsmCamp::OnExit()\r\n";
+	Cio::is().CampSwitches();
 }

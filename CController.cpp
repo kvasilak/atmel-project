@@ -88,7 +88,7 @@ void CController::CheckEvent()
 		
 		//update the IO
 		Cio::is().LeftSwitches();
-		Cio::is().RightSsitches();
+		Cio::is().RightSwitches();
 	}
 
  	if(Cio::is().CampChanged())

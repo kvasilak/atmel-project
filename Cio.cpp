@@ -7,7 +7,7 @@
 
 #include <avr/io.h>
 #include "Cio.h"
-
+#include "CLeds.h"
 
 // default constructor
 Cio::Cio()
@@ -72,6 +72,11 @@ void Cio::Init()
 	PushTravel.Attach(IO_PORTD, PORTD6);
 	PushCamp.Attach(IO_PORTD, PORTD7);
 	
+	Run();
+	
+	LeftSwitches();
+	RightSwitches();
+	
 }
 
 //update switch states and debounce
@@ -124,16 +129,16 @@ bool Cio::ManualChanged()
 //camp on steering remote
 bool Cio::CampChanged()
 {
- 	static bool OldCamp					= false;
- 	static bool OldInsideCamp			= false;
+	static bool OldCamp					= false;
+	static bool OldInsideCamp			= false;
 	 
-	 bool camp = (PINB & _BV(PORTB3));
+	bool camp = (PINB & _BV(PORTB3));
  	
- 	bool CampChanged	= OldCamp			!= (bool)PushCamp;		//port D bit 7
- 	CampChanged			|= OldInsideCamp	!= camp;  //port B bit 3
+	bool CampChanged	= OldCamp			!= (bool)PushCamp;		//port D bit 7
+	CampChanged			|= OldInsideCamp	!= camp;  //port B bit 3
 	 
-	 OldCamp		= (bool)PushCamp;
-	 OldInsideCamp  = camp;
+	OldCamp		= (bool)PushCamp;
+	OldInsideCamp  = camp;
 	
 	return CampChanged;
 }
@@ -180,6 +185,9 @@ void Cio::LeftSwitches()
 			PORTB &= ~_BV(7);
 			
 			LeftState = SolenoidFilling;
+			
+			CLeds::is().LeftUpOn();
+			CLeds::is().LeftDownOff();
 		}
 		else
 		{
@@ -188,6 +196,9 @@ void Cio::LeftSwitches()
 			PORTB &= ~_BV(7);
 			
 			LeftState = SolenoidHolding;
+			
+			CLeds::is().LeftUpOff();
+			CLeds::is().LeftDownOff();
 		}
 	}
 	else
@@ -195,10 +206,13 @@ void Cio::LeftSwitches()
 		if(Down)
 		{
 			//dump valve on
-			PORTB |= _BV(6);
-			PORTB &= ~_BV(7);
+			PORTB |= _BV(7);
+			PORTB &= ~_BV(6);
 			
 			LeftState = SolenoidDumping;
+			
+			CLeds::is().LeftUpOff();
+			CLeds::is().LeftDownOn();
 		}
 		else
 		{
@@ -207,12 +221,15 @@ void Cio::LeftSwitches()
 			PORTB &= ~_BV(7);
 			
 			LeftState = SolenoidHolding;
+			
+			CLeds::is().LeftUpOff();
+			CLeds::is().LeftDownOff();
 		}
 	}
 
 }
 
-void Cio::RightSsitches()
+void Cio::RightSwitches()
 {
 	bool RockerSwitchUp = RockerUp.Level();
 	bool RemoteUp = PINB & _BV(0);
@@ -232,17 +249,23 @@ void Cio::RightSsitches()
 		{
 			//Fill valve on
 			PORTB |= _BV(4);
-			PORTB &= ~_BV(5);
+			PORTA &= ~_BV(3);
 			
 			RightState = SolenoidFilling;
+			
+			CLeds::is().RightUpOn();
+			CLeds::is().RightDownOff();
 		}
 		else //should never happen!
 		{
 			//both valves off
 			PORTB &= ~_BV(4);
-			PORTB &= ~_BV(5);
+			PORTA &= ~_BV(3);
 			
 			RightState = SolenoidHolding;
+			
+			CLeds::is().RightUpOff();
+			CLeds::is().RightDownOff();
 		}
 	}
 	else
@@ -250,18 +273,50 @@ void Cio::RightSsitches()
 		if(Down)
 		{
 			//dump valve on
-			PORTB |= _BV(5);
+			PORTA |= _BV(3);
 			PORTB &= ~_BV(4);
 			
 			RightState = SolenoidDumping;
+			
+			CLeds::is().RightUpOff();
+			CLeds::is().RightDownOn();
+			
 		}
 		else
 		{
 			//both valves off
 			PORTB &= ~_BV(4);
-			PORTB &= ~_BV(5);
+			PORTA &= ~_BV(3);
 			
 			RightState = SolenoidHolding;
+			
+			CLeds::is().RightUpOff();
+			CLeds::is().RightDownOff();
 		}
+	}
+}
+
+void Cio::CampSwitches()
+{
+	if(PushCamp.Level())
+	{
+		CLeds::is().CampOn();
+	}
+	else
+	{
+		CLeds::is().CampOff();
+	}
+}
+
+void Cio::TravelSwitches()
+{
+	if(PushTravel.Level())
+	{
+		CLeds::is().TravelOKOff();
+	}
+	else
+	{
+		
+		CLeds::is().TravelOKOn();
 	}
 }

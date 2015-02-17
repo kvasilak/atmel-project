@@ -9,6 +9,7 @@
 #include "Manual.h"
 #include "..\CController.h"
 #include "..\Cio.h"
+#include "..\CSerial.h"
 
 
 FsmManual::FsmManual(CController& SMManager) :
@@ -18,6 +19,7 @@ CState(SMManager, STATE_MANUAL)
 
 void FsmManual::OnEntry()
 {
+	CSerial::is() << " FsmManual::OnEntry()\r\n";
 	//Handleswitches();
 }
 
@@ -55,6 +57,6 @@ void FsmManual::HandleEvent(EVENT evt)
 
 void FsmManual::OnExit()
 {
-	//cout << "CStateIdle::OnExit()" << endl;
+	CSerial::is() << " FsmManual::OnExit()\r\n";
 }
 
