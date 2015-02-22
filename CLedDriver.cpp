@@ -9,15 +9,6 @@
 #include "CLedDriver.h"
 #include "i2cmaster.h"
 
-#ifdef __cplusplus
-extern "C" {
-	#endif
-#include "TWI_Master.h"
-
-#ifdef __cplusplus
-}
-#endif
-
 // default constructor
 CLedDriver::CLedDriver():
 LEDReg0(0x0C),
@@ -25,7 +16,7 @@ LEDReg1(0x0D)
 
 {
 	// initialize I2C library
-	TWI_Master_Initialise();
+	i2c_init();
 }
 
 void CLedDriver::Init()
