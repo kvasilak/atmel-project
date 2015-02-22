@@ -30,9 +30,13 @@ m_CurrState(STATE_MANUAL)
 	m_StateList[4] = &m_stateTravelCal;
 	m_StateList[5] = &m_stateCampCal;
 	
-	m_StateList[m_CurrState]->OnEntry();
+	
 } 
 
+void CController::Init()
+{
+	m_StateList[m_CurrState]->OnEntry();
+}
 
 void CController::ScheduleEvent(EVENT evt)
 {

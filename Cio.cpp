@@ -76,7 +76,9 @@ void Cio::Init()
 	
 	LeftSwitches();
 	RightSwitches();
-	
+	ManualChanged();
+	CampChanged();
+	TravelChanged();
 }
 
 //update switch states and debounce
@@ -96,7 +98,7 @@ void Cio::Run()
 bool Cio::ManualChanged()
 {
 	static const uint8_t PortAManualMask	= 0xF0;
-	static const uint8_t PortBManualMask	= 0x003;
+	static const uint8_t PortBManualMask	= 0x05;
 	
 	static bool OldPortAStatus = false;
 	static bool OldPortBStatus = false;
@@ -132,7 +134,7 @@ bool Cio::CampChanged()
 	static bool OldCamp					= false;
 	static bool OldInsideCamp			= false;
 	 
-	bool camp = (PINB & _BV(PORTB3));
+	bool camp = (PINB & _BV(PORTB1));
  	
 	bool CampChanged	= OldCamp			!= (bool)PushCamp;		//port D bit 7
 	CampChanged			|= OldInsideCamp	!= camp;  //port B bit 3
@@ -151,7 +153,7 @@ bool Cio::TravelChanged()
 	static bool OldTravel				= false;
 	static bool OldInsideTravel			= false;	
 	
-	bool trav = (PINB & _BV(PORTB2));
+	bool trav = (PINB & _BV(PORTB3));
 
 	bool TravelChanged	= OldTravel				!= (bool)PushTravel;		 //port D bit 6
 	TravelChanged		|= OldInsideTravel		!= trav; //port B bit 2
@@ -165,15 +167,15 @@ bool Cio::TravelChanged()
 void Cio::LeftSwitches()
 {
 	bool RockerSwitchUp = RockerUp.Level();
-	bool RemoteUp = PINB & _BV(0);
-	bool RemoteLeftUp = PINA & _BV(6);
+	bool RemoteUp = PINB & _BV(2);
+	bool RemoteLeftUp = PINA & _BV(4); //left down
 	
 	bool RockerSwitchDown = RockerDown.Level();
-	bool RemoteDown = PINB & _BV(1);
-	bool RemoteLeftDown =PINA & _BV(7) ;
+	bool RemoteDown = PINB & _BV(0);
+	bool RemoteLeftDown =PINA & _BV(6) ;//right down
 	
-	bool up = RockerSwitchUp | RemoteUp | RemoteLeftUp;
-	bool Down = RockerSwitchDown | RemoteDown | RemoteLeftDown;
+	bool up = RockerSwitchUp || RemoteUp || RemoteLeftUp;
+	bool Down = RockerSwitchDown || RemoteDown || RemoteLeftDown;
 	
 	//hold if both up and down
 	if( up)
@@ -232,15 +234,15 @@ void Cio::LeftSwitches()
 void Cio::RightSwitches()
 {
 	bool RockerSwitchUp = RockerUp.Level();
-	bool RemoteUp = PINB & _BV(0);
-	bool RemoteRightUp = PINA & _BV(4);
+	bool RemoteUp = PINB & _BV(2);
+	bool RemoteRightUp = PINA & _BV(5); //left up
 	
 	bool RockerSwitchDown = RockerDown.Level();
-	bool RemoteDown = PINB & _BV(1);
-	bool RemoteRightDown =PINA & _BV(5) ;
+	bool RemoteDown = PINB & _BV(0);
+	bool RemoteRightDown =PINA & _BV(7) ; //right up
 	
-	bool up = RockerSwitchUp | RemoteUp | RemoteRightUp;
-	bool Down = RockerSwitchDown | RemoteDown | RemoteRightDown;
+	bool up = RockerSwitchUp || RemoteUp || RemoteRightUp;
+	bool Down = RockerSwitchDown || RemoteDown || RemoteRightDown;
 	
 	//hold if both up and down
 	if( up)
@@ -249,7 +251,7 @@ void Cio::RightSwitches()
 		{
 			//Fill valve on
 			PORTB |= _BV(4);
-			PORTA &= ~_BV(3);
+			PORTB &= ~_BV(5);
 			
 			RightState = SolenoidFilling;
 			
@@ -260,7 +262,7 @@ void Cio::RightSwitches()
 		{
 			//both valves off
 			PORTB &= ~_BV(4);
-			PORTA &= ~_BV(3);
+			PORTB &= ~_BV(5);
 			
 			RightState = SolenoidHolding;
 			
@@ -273,7 +275,7 @@ void Cio::RightSwitches()
 		if(Down)
 		{
 			//dump valve on
-			PORTA |= _BV(3);
+			PORTB |= _BV(5);
 			PORTB &= ~_BV(4);
 			
 			RightState = SolenoidDumping;
@@ -286,7 +288,7 @@ void Cio::RightSwitches()
 		{
 			//both valves off
 			PORTB &= ~_BV(4);
-			PORTA &= ~_BV(3);
+			PORTB &= ~_BV(5);
 			
 			RightState = SolenoidHolding;
 			
@@ -300,11 +302,11 @@ void Cio::CampSwitches()
 {
 	if(PushCamp.Level())
 	{
-		CLeds::is().CampOn();
+		
 	}
 	else
 	{
-		CLeds::is().CampOff();
+		
 	}
 }
 
@@ -312,11 +314,11 @@ void Cio::TravelSwitches()
 {
 	if(PushTravel.Level())
 	{
-		CLeds::is().TravelOKOff();
+		
 	}
 	else
 	{
 		
-		CLeds::is().TravelOKOn();
+		
 	}
 }

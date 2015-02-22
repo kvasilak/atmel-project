@@ -10,7 +10,7 @@
 #include "..\CController.h"
 #include "..\Cio.h"
 #include "..\CSerial.h"
-
+#include "..\CLeds.h"
 
 FsmManual::FsmManual(CController& SMManager) :
 CState(SMManager, STATE_MANUAL)
@@ -19,8 +19,10 @@ CState(SMManager, STATE_MANUAL)
 
 void FsmManual::OnEntry()
 {
+	CLeds::is().CampOff();
+	CLeds::is().TravelOKOff();
+	
 	CSerial::is() << " FsmManual::OnEntry()\r\n";
-	//Handleswitches();
 }
 
 void FsmManual::HandleEvent(EVENT evt)

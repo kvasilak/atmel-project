@@ -45,6 +45,7 @@ int main(void)
 	//CADC adc = CADC::is();
 	
 	Cio::is().Init();
+	Controller.Init();
 
 	//Turn on 5v, PA2
 	DDRA |= _BV(DDRA2); 

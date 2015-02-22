@@ -30,7 +30,8 @@ public:
 	void ScheduleEvent(EVENT evt);
 	
 	void Run();
-
+	void Init();
+	
 	private:
 	
 	//FSM specific //////////////////

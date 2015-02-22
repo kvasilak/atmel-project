@@ -18,6 +18,9 @@ CState(SMManager, STATE_CAMP)
 
 void FsmCamp::OnEntry()
 {
+	CLeds::is().CampOn();
+	CLeds::is().TravelOKOff();
+	
 	CSerial::is() << " FsmCamp::OnEntry()\r\n";
 	Cio::is().CampSwitches();
 }
