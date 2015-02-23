@@ -76,6 +76,8 @@ public:
 
 	bool IsTimedOut();
 	
+	uint32_t Time;
+	
 }; //CController
 
 

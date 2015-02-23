@@ -10,6 +10,7 @@
 #include "CSerial.h"
 #include <avr/io.h>
 #include "common.h"
+#include "CTimer.h"
 
 
 // default constructor
@@ -36,6 +37,7 @@ m_CurrState(STATE_MANUAL)
 void CController::Init()
 {
 	m_StateList[m_CurrState]->OnEntry();
+	Time = CTimer::GetTick();
 }
 
 void CController::ScheduleEvent(EVENT evt)
@@ -48,7 +50,12 @@ void CController::ScheduleEvent(EVENT evt)
 		"CalibrateEvent"
 	};
 
-	 CSerial::is() << "Event received: " << events[evt] << "\n";
+	//Don't show timer events, too much noise
+	if(evt > TimerEvent)
+	{
+		CSerial::is() << "Event received: " << events[evt] << "\n";
+	}
+	
 	m_StateList[m_CurrState]->HandleEvent(evt);
 }
 
@@ -114,7 +121,11 @@ void CController::Run()
 	
 	CheckEvent();
 	
-	//ScheduleEvent(TimerEvent);
+	if(CTimer::IsTimedOut(100, Time))
+	{
+		ScheduleEvent(TimerEvent);
+		Time = CTimer::GetTick();
+	}
 }
 
 

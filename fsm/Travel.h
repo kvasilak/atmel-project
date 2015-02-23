@@ -10,6 +10,7 @@
 #define __TRAVEL_H__
 
 #include "State.h"
+#include "..\corner.h"
 
 class FsmTravel :public CState
 {
@@ -19,6 +20,9 @@ class FsmTravel :public CState
 	void HandleEvent(EVENT evt);
 	void OnExit();
 
+private:
+	CCorner LeftSide;
+	CCorner RightSide;
 }; //Travel
 
 #endif //__TRAVEL_H__

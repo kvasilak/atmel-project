@@ -6,13 +6,17 @@
 */
 
 
-#include "Travel.h"
+
 #include "..\CController.h"
 #include "..\CLeds.h"
 #include "..\CSerial.h"
 
+#include "Travel.h"
+
 FsmTravel::FsmTravel(CController& SMManager) :
-CState(SMManager, STATE_TRAVEL)
+CState(SMManager, STATE_TRAVEL),
+LeftSide(LeftRear),
+RightSide(RightRear)
 {
 }
 
@@ -31,6 +35,8 @@ void FsmTravel::HandleEvent(EVENT evt)
 	{
 		case TimerEvent:
 			//run travel FSM
+			LeftSide.Run(512);
+			RightSide.Run(512);
 			break;
 		case ManualEvent:
 			m_SMManager.ChangeState(STATE_MANUAL);
