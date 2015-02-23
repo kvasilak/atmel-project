@@ -31,23 +31,20 @@ extern "C" void __cxa_pure_virtual()
 int main(void)
 {
 	CController Controller;
-	CSerial Serial = CSerial::is();
-	Serial.Init();
 	
-	CTimer::Init();
-	//uint32_t start = CTimer::GetTick();
-	
-	CLeds LEDs = CLeds::is();
-
-	Cio::is().Init();
-	Controller.Init();
-
 	//Turn on 5v, PA2
 	DDRA |= _BV(DDRA2); 
 	PORTA |= _BV(PA2);
+	
+	CSerial::is().Init();
+	
+	CTimer::Init();
 
-	LEDs.Init();
-	LEDs.Dim(100);
+	CLeds::is().Init();
+	CLeds::is().Dim(100);
+	
+	Cio::is().Init();
+	Controller.Init();
 	
 	CADC::is().Init();
 
