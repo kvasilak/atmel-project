@@ -74,6 +74,7 @@ void Cio::Init()
 	
 	Run();
 	
+	//setup initial values
 	LeftSwitches();
 	RightSwitches();
 	ManualChanged();
@@ -100,8 +101,8 @@ bool Cio::ManualChanged()
 	static const uint8_t PortAManualMask	= 0xF0;
 	static const uint8_t PortBManualMask	= 0x05;
 	
-	static bool OldPortAStatus = false;
-	static bool OldPortBStatus = false;
+	static uint8_t OldPortAStatus = false;
+	static uint8_t OldPortBStatus = false;
 	static bool OldRockerDown = false;
 	static bool OldRockerUp = false;
 	
@@ -111,10 +112,10 @@ bool Cio::ManualChanged()
 	bool RD = (bool)RockerDown;
 	bool RU = (bool)RockerUp;
 
-	bool ManualChanged  = OldPortAStatus	!= portastatus;
-		ManualChanged  |= OldPortBStatus	!= portbstatus;		
-		ManualChanged  |= OldRockerDown		!= RD;
-		ManualChanged  |= OldRockerUp		!= RU;
+	bool ManualChanged  = (OldPortAStatus	!= portastatus);
+		ManualChanged  |= (OldPortBStatus	!= portbstatus);		
+		ManualChanged  |= (OldRockerDown	!= RD);
+		ManualChanged  |= (OldRockerUp		!= RU);
 	
 	OldPortAStatus = portastatus;
 	OldPortBStatus = portbstatus;
@@ -177,58 +178,60 @@ void Cio::LeftSwitches()
 	bool up = RockerSwitchUp || RemoteUp || RemoteLeftUp;
 	bool Down = RockerSwitchDown || RemoteDown || RemoteLeftDown;
 	
-	//hold if both up and down
 	if( up)
 	{
 		if( !Down)
 		{
 			//Fill valve on
-			PORTB |= _BV(6);
-			PORTB &= ~_BV(7);
+			LeftFillOn();
+			LeftDumpOff();
 			
 			LeftState = SolenoidFilling;
-			
-			CLeds::is().LeftUpOn();
-			CLeds::is().LeftDownOff();
 		}
-		else
+		else //both up and down switches active at the same time
 		{
-			//booth valves off
-			PORTB &= ~_BV(6);
-			PORTB &= ~_BV(7);
-			
-			LeftState = SolenoidHolding;
-			
-			CLeds::is().LeftUpOff();
-			CLeds::is().LeftDownOff();
+			if(RemoteLeftDown)
+			{
+				//remote over rides switch
+				LeftFillOff();
+				LeftDumpOn();
+				
+				LeftState = SolenoidDumping;
+			}
+			else if(RemoteLeftUp)
+			{
+				//remote over rides switch
+				LeftFillOn();
+				LeftDumpOff();
+				
+				LeftState = SolenoidFilling;
+			}
+			else // inside remote conflict
+			{
+				//both valves off
+				LeftFillOff();
+				LeftDumpOff();
+				
+				LeftState = SolenoidHolding;
+			}
 		}
+	}
+	else if(Down)
+	{
+		//dump valve on
+		LeftDumpOn();
+		LeftFillOff();
+			
+		LeftState = SolenoidDumping;
 	}
 	else
 	{
-		if(Down)
-		{
-			//dump valve on
-			PORTB |= _BV(7);
-			PORTB &= ~_BV(6);
+		//both valves off
+		LeftFillOff();
+		LeftDumpOff();
 			
-			LeftState = SolenoidDumping;
-			
-			CLeds::is().LeftUpOff();
-			CLeds::is().LeftDownOn();
-		}
-		else
-		{
-			//both valves off
-			PORTB &= ~_BV(6);
-			PORTB &= ~_BV(7);
-			
-			LeftState = SolenoidHolding;
-			
-			CLeds::is().LeftUpOff();
-			CLeds::is().LeftDownOff();
-		}
+		LeftState = SolenoidHolding;
 	}
-
 }
 
 void Cio::RightSwitches()
@@ -244,57 +247,61 @@ void Cio::RightSwitches()
 	bool up = RockerSwitchUp || RemoteUp || RemoteRightUp;
 	bool Down = RockerSwitchDown || RemoteDown || RemoteRightDown;
 	
-	//hold if both up and down
 	if( up)
 	{
 		if( !Down)
 		{
 			//Fill valve on
-			PORTB |= _BV(4);
-			PORTB &= ~_BV(5);
-			
+			RightFillOn();
+			RightDumpOff();
+
 			RightState = SolenoidFilling;
-			
-			CLeds::is().RightUpOn();
-			CLeds::is().RightDownOff();
 		}
-		else //should never happen!
+		else //both up and down switches active at the same time
 		{
-			//both valves off
-			PORTB &= ~_BV(4);
-			PORTB &= ~_BV(5);
-			
-			RightState = SolenoidHolding;
-			
-			CLeds::is().RightUpOff();
-			CLeds::is().RightDownOff();
+			//Rocker switch in up, remote in down
+			if(RemoteRightDown)
+			{
+				//remote over rides switch
+				RightFillOff();
+				RightDumpOn();
+				
+				RightState = SolenoidDumping;
+			}
+			//Rocker in down remote in up
+			else if(RemoteRightUp)
+			{
+				//remote over rides switch
+				RightFillOn();
+				RightDumpOff();
+				
+				LeftState = SolenoidFilling;
+			}
+			else
+			{
+				//both valves off
+				RightFillOff();
+				RightDumpOff();
+				
+				RightState = SolenoidHolding;
+			}
 		}
+	}
+	else if(Down)
+	{
+		//dump valve on
+		RightDumpOn();
+		RightFillOff();
+			
+		RightState = SolenoidDumping;
 	}
 	else
 	{
-		if(Down)
-		{
-			//dump valve on
-			PORTB |= _BV(5);
-			PORTB &= ~_BV(4);
-			
-			RightState = SolenoidDumping;
-			
-			CLeds::is().RightUpOff();
-			CLeds::is().RightDownOn();
-			
-		}
-		else
-		{
-			//both valves off
-			PORTB &= ~_BV(4);
-			PORTB &= ~_BV(5);
-			
-			RightState = SolenoidHolding;
-			
-			CLeds::is().RightUpOff();
-			CLeds::is().RightDownOff();
-		}
+		//both valves off
+		RightFillOff();
+		RightDumpOff();
+				
+		RightState = SolenoidHolding;
 	}
 }
 
@@ -322,3 +329,62 @@ void Cio::TravelSwitches()
 		
 	}
 }
+
+void Cio::AllOff()
+{
+	RightFillOff();
+	RightDumpOff();
+	LeftFillOff();
+	LeftDumpOff();
+}
+
+void Cio::RightFillOn()
+{
+	PORTB |= _BV(4);
+	CLeds::is().RightFillOn();
+}
+
+void Cio::RightFillOff()
+{
+	PORTB &= ~_BV(4);
+	CLeds::is().RightFillOff();
+}
+
+void Cio::RightDumpOn()
+{
+	PORTB |= _BV(5);
+	CLeds::is().RightDumpOn();
+}
+
+void Cio::RightDumpOff()
+{
+	PORTB &= ~_BV(5);
+	CLeds::is().RightDumpOff();
+}
+
+
+void Cio::LeftFillOn()
+{
+	PORTB |= _BV(6);
+	CLeds::is().LeftFillOn();
+}
+
+void Cio::LeftFillOff()
+{
+	PORTB &= ~_BV(6);
+	CLeds::is().LeftFillOff();
+}
+
+void Cio::LeftDumpOn()
+{
+	PORTB |= _BV(7);
+	CLeds::is().LeftDumpOn();
+}
+
+void Cio::LeftDumpOff()
+{
+	PORTB &= ~_BV(7);
+	CLeds::is().LeftDumpOff();
+}
+
+

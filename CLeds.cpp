@@ -33,26 +33,26 @@ void CLeds::Init()
 	CLedDriver::Init();
 }
 
-void CLeds::RightUpOn()
+void CLeds::RightFillOn()
 {
 	LEDout0 |= Led0On;
 	
 	WriteReg(LEDReg0, LEDout0);
 }
 
-void CLeds::RightUpOff()
+void CLeds::RightFillOff()
 {
 	LEDout0 &= Led0Off;
 	WriteReg(LEDReg0, LEDout0);
 }
 
-void CLeds::RightDownOn()
+void CLeds::RightDumpOn()
 {
 	LEDout0 |= Led1On;
 	WriteReg(LEDReg0, LEDout0);
 }
 
-void CLeds::RightDownOff()
+void CLeds::RightDumpOff()
 {
 	LEDout0 &= Led1Off;
 	WriteReg(LEDReg0, LEDout0);
@@ -71,25 +71,25 @@ void CLeds::ActiveOff()
 }
 
 
-void CLeds::LeftUpOn()
+void CLeds::LeftFillOn()
 {
 	LEDout0 |= Led3On;
 	WriteReg(LEDReg0, LEDout0);
 }
 
-void CLeds::LeftUpOff()
+void CLeds::LeftFillOff()
 {
 	LEDout0 &= Led3Off;
 	WriteReg(LEDReg0, LEDout0);
 }
 
-void CLeds::LeftDownOn()
+void CLeds::LeftDumpOn()
 {
 	LEDout1 |= Led0On;
 	WriteReg(LEDReg1, LEDout1);
 }
 
-void CLeds::LeftDownOff()
+void CLeds::LeftDumpOff()
 {
 	LEDout1 &= Led0Off;
 	WriteReg(LEDReg1, LEDout1);

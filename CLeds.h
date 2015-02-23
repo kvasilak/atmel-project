@@ -30,27 +30,27 @@ public:
 	
 	//LEDOUT0
 	//LED0
-	void RightUpOn();
-	void RightUpOff();
+	void RightFillOn();
+	void RightFillOff();
 	
 	//LED1
-	void RightDownOn();
-	void RightDownOff();
+	void RightDumpOn();
+	void RightDumpOff();
 	
 	//LED2
 	void ActiveOn();
 	void ActiveOff();
 	
 	//LED3
-	void LeftUpOn();
-	void LeftUpOff();
+	void LeftFillOn();
+	void LeftFillOff();
 	
 	
 	
 	//LEDOUT1
 	//LED0
-	void LeftDownOn();
-	void LeftDownOff();
+	void LeftDumpOn();
+	void LeftDumpOff();
 	
 	//LED1
 	void CampOn();

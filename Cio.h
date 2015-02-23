@@ -27,8 +27,18 @@ static Cio &is()
 	return a;
 }
 
-void Init();
-void Run();
+	void Init();
+	void Run();
+	
+	void AllOff();
+	void RightFillOn();
+	void RightFillOff();
+	void RightDumpOn();
+	void RightDumpOff();
+	void LeftFillOn();
+	void LeftFillOff();
+	void LeftDumpOn();
+	void LeftDumpOff();
 
 	//whats changed
 	bool ManualChanged();

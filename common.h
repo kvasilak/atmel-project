@@ -12,6 +12,11 @@
 #define F_CPU 16000000UL
 #define UART_STREAMS
 
+//create enums with printable string versions
+#define STRINGIFY(k) #k
+
+#define ENUMIFY(k)  k
+
 #ifndef cbi
 #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
 #endif
