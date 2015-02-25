@@ -95,33 +95,18 @@ void CController::CheckEvent()
 {
 	if(Cio::is().RockerChanged())
 	{
-		ScheduleEvent(ManualEvent);
-		
-		Cio::is().RockerSwitch();
+		ScheduleEvent(RockerEvent);
 	}
 	
 	if(Cio::is().OutSideRemoteChanged())
 	{
-		ScheduleEvent(ManualEvent);
-		
-		Cio::is().OutsideRemote();
+		ScheduleEvent(OutSideEvent);
 	}
 	
 	if(Cio::is().SteeringRemoteChanged())
 	{
-		ScheduleEvent(ManualEvent);
-		
-		Cio::is().SteeringRemote();
+		ScheduleEvent(SteeringEvent);
 	}
-	
-// 	if(Cio::is().ManualChanged())
-// 	{
-// 		ScheduleEvent(ManualEvent);
-// 		
-// 		//update the IO
-// 		Cio::is().LeftSwitches();
-// 		Cio::is().RightSwitches();
-// 	}
 
  	if(Cio::is().CampChanged())
  	{

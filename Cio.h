@@ -44,7 +44,6 @@ static Cio &is()
 	bool RockerChanged();
 	bool OutSideRemoteChanged();
 	bool SteeringRemoteChanged();
-	bool ManualChanged();
 	bool CampChanged();
 	bool TravelChanged();
 
@@ -53,8 +52,6 @@ static Cio &is()
 	void OutsideRemote();
 	void SteeringRemote();
 
-	void LeftSwitches();
-	void RightSwitches();
 	void CampSwitches();
 	void TravelSwitches();
 	

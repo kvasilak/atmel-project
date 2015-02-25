@@ -38,7 +38,9 @@ void FsmTravel::HandleEvent(EVENT evt)
 			LeftSide.Run(512);
 			RightSide.Run(512);
 			break;
-		case ManualEvent:
+		case RockerEvent:
+		case OutSideEvent:
+		case SteeringEvent:
 			m_SMManager.ChangeState(STATE_MANUAL);
 		break;
 		case CampEvent:

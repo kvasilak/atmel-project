@@ -23,6 +23,10 @@ void FsmManual::OnEntry()
 	CLeds::is().TravelOKOff();
 	
 	CSerial::is() << " FsmManual::OnEntry()\r\n";
+	
+	Cio::is().RockerSwitch();
+	Cio::is().OutsideRemote();
+	Cio::is().SteeringRemote();
 }
 
 void FsmManual::HandleEvent(EVENT evt)
@@ -43,8 +47,14 @@ void FsmManual::HandleEvent(EVENT evt)
 				m_SMManager.ChangeState(STATE_CAMP);
 			}
 		break;
-		case ManualEvent:
-			//nothing to do here
+		case RockerEvent:
+			Cio::is().RockerSwitch();
+		break;
+		case OutSideEvent:
+			Cio::is().OutsideRemote();
+		break;
+		case SteeringEvent:
+			Cio::is().SteeringRemote();
 		break;
 		case CalibrateEvent:
 			m_SMManager.ChangeState(STATE_MANUAL_CALIBRATE);

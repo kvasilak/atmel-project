@@ -4,7 +4,9 @@
 enum EVENT
 {
 	TimerEvent ,
-	ManualEvent,
+	RockerEvent,
+	OutSideEvent,
+	SteeringEvent,
 	TravelEvent,
 	CampEvent,
 	CalibrateEvent

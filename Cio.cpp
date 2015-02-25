@@ -75,9 +75,9 @@ void Cio::Init()
 	Run();
 	
 	//setup initial values
-	LeftSwitches();
-	RightSwitches();
-	ManualChanged();
+	RockerSwitch();
+	OutsideRemote();
+	SteeringRemote();
 	CampChanged();
 	TravelChanged();
 }
@@ -130,39 +130,6 @@ bool Cio::SteeringRemoteChanged()
 	return changed;
 }
 
-//returns true is any manual button has changed state.
-//up/down switch
-//up/down steering remote
-//up/down  left and right outside remote
-bool Cio::ManualChanged()
-{
-	static const uint8_t PortAManualMask	= 0xF0;
-	static const uint8_t PortBManualMask	= 0x05;
-	
-	static uint8_t OldPortAStatus = false;
-	static uint8_t OldPortBStatus = false;
-	static bool OldRockerDown = false;
-	static bool OldRockerUp = false;
-	
-	uint8_t portastatus = PINA & PortAManualMask;
-	uint8_t portbstatus = PINB & PortBManualMask;
-	
-	bool RD = (bool)RockerDown;
-	bool RU = (bool)RockerUp;
-
-	bool ManualChanged  = (OldPortAStatus	!= portastatus);
-		ManualChanged  |= (OldPortBStatus	!= portbstatus);		
-		ManualChanged  |= (OldRockerDown	!= RD);
-		ManualChanged  |= (OldRockerUp		!= RU);
-	
-	OldPortAStatus = portastatus;
-	OldPortBStatus = portbstatus;
-	OldRockerDown = RD;
-	OldRockerUp = RU;
-	
-	
-	return ManualChanged;
-}
 
 
 //returns true if any camp mode button has changed state
@@ -282,145 +249,7 @@ void Cio::SteeringRemote()
 	}
 }
 
-void Cio::LeftSwitches()
-{
-	bool RockerSwitchUp = RockerUp.Level();
-	bool RemoteUp = PINB & _BV(2);
-	bool RemoteLeftUp = PINA & _BV(4); //left down
-	
-	bool RockerSwitchDown = RockerDown.Level();
-	bool RemoteDown = PINB & _BV(0);
-	bool RemoteLeftDown =PINA & _BV(6) ;//right down
-	
-	bool up = RockerSwitchUp || RemoteUp || RemoteLeftUp;
-	bool Down = RockerSwitchDown || RemoteDown || RemoteLeftDown;
-	
-	if( up)
-	{
-		if( !Down)
-		{
-			//Fill valve on
-			LeftFillOn();
-			LeftDumpOff();
-			
-			LeftState = SolenoidFilling;
-		}
-		else //both up and down switches active at the same time
-		{
-			if(RemoteLeftDown)
-			{
-				//remote over rides switch
-				LeftFillOff();
-				LeftDumpOn();
-				
-				LeftState = SolenoidDumping;
-			}
-			else if(RemoteLeftUp)
-			{
-				//remote over rides switch
-				LeftFillOn();
-				LeftDumpOff();
-				
-				LeftState = SolenoidFilling;
-			}
-			else // inside remote conflict
-			{
-				//both valves off
-				LeftFillOff();
-				LeftDumpOff();
-				
-				LeftState = SolenoidHolding;
-			}
-		}
-	}
-	else if(Down)
-	{
-		//dump valve on
-		LeftDumpOn();
-		LeftFillOff();
-			
-		LeftState = SolenoidDumping;
-	}
-	else
-	{
-		//both valves off
-		LeftFillOff();
-		LeftDumpOff();
-			
-		LeftState = SolenoidHolding;
-	}
-}
 
-void Cio::RightSwitches()
-{
-	bool RockerSwitchUp = RockerUp.Level();
-	bool RemoteUp = PINB & _BV(2);
-	bool RemoteRightUp = PINA & _BV(5); //left up
-	
-	bool RockerSwitchDown = RockerDown.Level();
-	bool RemoteDown = PINB & _BV(0);
-	bool RemoteRightDown =PINA & _BV(7) ; //right up
-	
-	bool up = RockerSwitchUp || RemoteUp || RemoteRightUp;
-	bool Down = RockerSwitchDown || RemoteDown || RemoteRightDown;
-	
-	if( up)
-	{
-		if( !Down)
-		{
-			//Fill valve on
-			RightFillOn();
-			RightDumpOff();
-
-			RightState = SolenoidFilling;
-		}
-		else //both up and down switches active at the same time
-		{
-			//Rocker switch in up, remote in down
-			if(RemoteRightDown)
-			{
-				//remote over rides switch
-				RightFillOff();
-				RightDumpOn();
-				
-				RightState = SolenoidDumping;
-			}
-			//Rocker in down remote in up
-			else if(RemoteRightUp)
-			{
-				//remote over rides switch
-				RightFillOn();
-				RightDumpOff();
-				
-				LeftState = SolenoidFilling;
-			}
-			else
-			{
-				//both valves off
-				RightFillOff();
-				RightDumpOff();
-				
-				RightState = SolenoidHolding;
-			}
-		}
-	}
-	else if(Down)
-	{
-		//dump valve on
-		RightDumpOn();
-		RightFillOff();
-			
-		RightState = SolenoidDumping;
-	}
-	else
-	{
-		//both valves off
-		RightFillOff();
-		RightDumpOff();
-				
-		RightState = SolenoidHolding;
-	}
-}
 
 void Cio::CampSwitches()
 {
