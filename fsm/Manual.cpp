@@ -31,14 +31,14 @@ void FsmManual::HandleEvent(EVENT evt)
 	{
 		case TravelEvent:
 			//change state if no manual buttons are active
-			if(Cio::is().LeftState == SolenoidHolding && Cio::is().RightState == SolenoidHolding)
+			if(Cio::is().IsHolding())
 			{
 				m_SMManager.ChangeState(STATE_TRAVEL);
 			}
 		break;
 		case CampEvent:
 			//change state if no manual buttons are active
-			if(Cio::is().LeftState == SolenoidHolding && Cio::is().RightState == SolenoidHolding)
+			if(Cio::is().IsHolding())
 			{
 				m_SMManager.ChangeState(STATE_CAMP);
 			}

@@ -93,14 +93,35 @@ void CController::ChangeState(STATE newState)
 //Camp event for any change of the camp button
 void CController::CheckEvent()
 {
-	if(Cio::is().ManualChanged())
+	if(Cio::is().RockerChanged())
 	{
 		ScheduleEvent(ManualEvent);
 		
-		//update the IO
-		Cio::is().LeftSwitches();
-		Cio::is().RightSwitches();
+		Cio::is().RockerSwitch();
 	}
+	
+	if(Cio::is().OutSideRemoteChanged())
+	{
+		ScheduleEvent(ManualEvent);
+		
+		Cio::is().OutsideRemote();
+	}
+	
+	if(Cio::is().SteeringRemoteChanged())
+	{
+		ScheduleEvent(ManualEvent);
+		
+		Cio::is().SteeringRemote();
+	}
+	
+// 	if(Cio::is().ManualChanged())
+// 	{
+// 		ScheduleEvent(ManualEvent);
+// 		
+// 		//update the IO
+// 		Cio::is().LeftSwitches();
+// 		Cio::is().RightSwitches();
+// 	}
 
  	if(Cio::is().CampChanged())
  	{

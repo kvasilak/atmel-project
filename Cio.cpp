@@ -92,6 +92,44 @@ void Cio::Run()
 	PushCamp.Update();
 }
 
+bool Cio::RockerChanged()
+{
+	static bool OldRockerDown = false;
+	static bool OldRockerUp = false;
+
+	bool changed   = (OldRockerDown	!= (bool)RockerDown);
+		 changed  |= (OldRockerUp	!= (bool)RockerUp);
+	
+	OldRockerDown = (bool)RockerDown;
+	OldRockerUp = (bool)RockerUp;
+	
+	return changed;
+}
+
+bool Cio::OutSideRemoteChanged()
+{
+	static uint8_t OldPortA = false;
+	uint8_t porta = PINA & 0xF0;
+	
+	bool changed = OldPortA != porta;
+	
+	OldPortA = porta;
+	
+	return changed;
+}
+
+bool Cio::SteeringRemoteChanged()
+{
+	static uint8_t OldPortB = false;
+	uint8_t portb = PINB & 0x05;
+
+	bool changed = OldPortB != portb;
+
+	OldPortB = portb;
+
+	return changed;
+}
+
 //returns true is any manual button has changed state.
 //up/down switch
 //up/down steering remote
@@ -163,6 +201,85 @@ bool Cio::TravelChanged()
 	OldInsideTravel = trav;
 	
 	return TravelChanged;
+}
+
+void Cio::RockerSwitch()
+{
+	if(RockerUp.Level())
+	{
+		LeftFillOn();
+		RightFillOn();
+	}
+	else if(RockerDown.Level())
+	{
+		LeftDumpOn();
+		RightDumpOn();
+	}
+	else
+	{
+		LeftDumpOff();
+		RightDumpOff();
+		
+		LeftFillOff();
+		RightFillOff();
+	}
+}
+
+void Cio::OutsideRemote()
+{
+	bool RemoteLeftUp = PINA & _BV(4);		//left down
+	bool RemoteLeftDown =PINA & _BV(6);		//right down
+	bool RemoteRightUp = PINA & _BV(5);		//left up
+	bool RemoteRightDown =PINA & _BV(7);	//right down
+	
+	if(RemoteLeftUp)
+		LeftFillOn();
+	else
+		LeftFillOff();
+		
+	if(RemoteRightUp)
+		RightFillOn();
+	else
+		RightFillOff();
+		
+	if(RemoteLeftDown)
+		LeftDumpOn();
+	else
+		LeftDumpOff();
+		
+	if(RemoteRightDown)
+		RightDumpOn();
+	else
+		RightDumpOff();
+	
+}
+
+void Cio::SteeringRemote()
+{
+	bool RemoteUp = PINB & _BV(2);
+	bool RemoteDown = PINB & _BV(0);
+	
+	if(RemoteUp)
+	{
+		LeftFillOn();
+		RightFillOn();
+	}
+	else
+	{
+		LeftFillOff();
+		RightFillOff();
+	}
+	
+	if(RemoteDown)
+	{
+		LeftDumpOn();
+		RightDumpOn();
+	}
+	else
+	{
+		LeftDumpOff();
+		RightDumpOff();
+	}
 }
 
 void Cio::LeftSwitches()
@@ -388,3 +505,14 @@ void Cio::LeftDumpOff()
 }
 
 
+bool Cio::IsHolding()
+{
+	bool hold = true;
+	
+	if(RockerUp.Level() || RockerDown.Level())
+	{
+		hold = false;
+	}
+	
+	return hold;
+}

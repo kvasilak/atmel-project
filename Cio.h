@@ -41,15 +41,24 @@ static Cio &is()
 	void LeftDumpOff();
 
 	//whats changed
+	bool RockerChanged();
+	bool OutSideRemoteChanged();
+	bool SteeringRemoteChanged();
 	bool ManualChanged();
 	bool CampChanged();
 	bool TravelChanged();
 
 //What to do
+	void RockerSwitch();
+	void OutsideRemote();
+	void SteeringRemote();
+
 	void LeftSwitches();
 	void RightSwitches();
 	void CampSwitches();
 	void TravelSwitches();
+	
+	bool IsHolding();
 	
 	FillStates LeftState;
 	FillStates RightState;
