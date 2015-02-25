@@ -3,6 +3,7 @@
 
 enum EVENT
 {
+	NoEvent,
 	TimerEvent ,
 	RockerEvent,
 	OutSideEvent,
@@ -12,12 +13,5 @@ enum EVENT
 	CalibrateEvent
 };
 
-// static string events[]  = {
-// 	string("TimerEvent"),
-// 	string("ManualEvent"),
-// 	string("TravelEvent"),
-// 	string("CampEvent"),
-// 	string("CalibrateEvent")
-// };
 
 #endif // EVENTS_H
