@@ -43,11 +43,14 @@ void CController::Init()
 void CController::ScheduleEvent(EVENT evt)
 {
 	static const char *events[]  = {
-		"TimerEvent",
-		"ManualEvent",
-		"TravelEvent",
-		"CampEvent",
-		"CalibrateEvent"
+		"No Event",
+		"Timer Event",
+		"Rocker Event",
+		"Outside Event",
+		"Steering Event",
+		"Travel Event",
+		"Camp Event",
+		"Calibrate Event"
 	};
 
 	//Don't show timer events, too much noise
@@ -60,7 +63,7 @@ void CController::ScheduleEvent(EVENT evt)
 }
 
 //Exit the old state, enter the new state
-void CController::ChangeState(STATE newState)
+void CController::ChangeState(STATE newState, EVENT evt)
 {
 	// put up a warning if the function is called
 	//from the entry or exit function.. not legal! 
@@ -80,6 +83,11 @@ void CController::ChangeState(STATE newState)
 		m_CurrState = newState;
 		
 		m_StateList[m_CurrState]->OnEntry();
+		
+		if(evt != NoEvent)
+		{
+			m_StateList[m_CurrState]->HandleEvent(evt);
+		}
 	}
 	
 	entered = false;

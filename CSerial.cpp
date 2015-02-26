@@ -95,8 +95,15 @@ void CSerial::put_p(const char *text)
 }
 
 #endif
+
+void CSerial::put32(int32_t number)
+{
+	put16(number & 0x00FF);
+	put16((number & 0xFF00) > 16);
+}
+
 //Put number on UART
-void CSerial::put(int16_t number) 
+void CSerial::put16(int16_t number) 
 {
 	char buf[16] = {0};
 	register int i = 14;
@@ -148,18 +155,23 @@ uint8_t CSerial::get()
 
 CSerial &operator<<(CSerial &rs232, uint8_t val)
 {
-	rs232.put(val);
+	rs232.put16(val);
 	return rs232;
 }
 
 CSerial &operator<<(CSerial &rs232, uint16_t val) {
-	rs232.put(val);
+	rs232.put16((int16_t)val);
+	return rs232;
+}
+
+CSerial &operator<<(CSerial &rs232, int32_t val){
+	rs232.put32(val);
 	return rs232;
 }
 
 CSerial &operator<<(CSerial &rs232, int val)
 {
-	rs232.put(val);
+	rs232.put16(val);
 	return rs232;
 }
 

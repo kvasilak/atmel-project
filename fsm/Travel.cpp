@@ -22,11 +22,17 @@ RightSide(RightRear)
 
 void FsmTravel::OnEntry()
 {
-	CLeds::is().CampOff();
-	CLeds::is().TravelOKOn();
+	static bool inited;
+	
+	if(!inited)
+	{
+		LeftSide.Init(LeftRear);
+		RightSide.Init(RightRear);
+		
+		inited = true;
+	}
 	
 	CSerial::is() << " FsmTravel::OnEntry()\r\n";
-	Cio::is().TravelSwitches();
 }
 
 void FsmTravel::HandleEvent(EVENT evt)
@@ -35,19 +41,22 @@ void FsmTravel::HandleEvent(EVENT evt)
 	{
 		case TimerEvent:
 			//run travel FSM
-			LeftSide.Run(512);
+			//LeftSide.Run(512);
 			RightSide.Run(512);
 			break;
 		case RockerEvent:
 		case OutSideEvent:
 		case SteeringEvent:
-			m_SMManager.ChangeState(STATE_MANUAL);
+			m_SMManager.ChangeState(STATE_MANUAL, evt);
 		break;
 		case CampEvent:
-			m_SMManager.ChangeState(STATE_CAMP);
+			m_SMManager.ChangeState(STATE_CAMP, evt);
+		break;
+		case TravelEvent:
+			Cio::is().TravelSwitches();
 		break;
 		case CalibrateEvent:
-			m_SMManager.ChangeState(STATE_TRAVEL_CALIBRATE);
+			m_SMManager.ChangeState(STATE_TRAVEL_CALIBRATE, evt);
 		default:
 		break;
 	}
@@ -56,5 +65,4 @@ void FsmTravel::HandleEvent(EVENT evt)
 void FsmTravel::OnExit()
 {
 	CSerial::is() << " FsmTravel::OnExit()\r\n";
-	Cio::is().TravelSwitches();
 }

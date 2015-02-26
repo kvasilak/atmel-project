@@ -142,13 +142,13 @@ bool Cio::CampChanged()
 	 
 	bool camp = (PINB & _BV(PORTB1));
  	
-	bool CampChanged	= OldCamp			!= (bool)PushCamp;		//port D bit 7
-	CampChanged			|= OldInsideCamp	!= camp;  //port B bit 3
+	bool Changed	= OldCamp			!= (bool)PushCamp;		//port D bit 7
+	Changed			|= OldInsideCamp	!= camp;  //port B bit 3
 	 
 	OldCamp		= (bool)PushCamp;
 	OldInsideCamp  = camp;
-	
-	return CampChanged;
+
+	return Changed;
 }
 
 //returns true if the travel mode buttons have changed state
@@ -161,13 +161,13 @@ bool Cio::TravelChanged()
 	
 	bool trav = (PINB & _BV(PORTB3));
 
-	bool TravelChanged	= OldTravel				!= (bool)PushTravel;		 //port D bit 6
-	TravelChanged		|= OldInsideTravel		!= trav; //port B bit 2
+	bool Changed	= OldTravel				!= (bool)PushTravel;		 //port D bit 6
+		 Changed	|= OldInsideTravel		!= trav; //port B bit 2
 	
 	OldTravel		= (bool)PushTravel;
 	OldInsideTravel = trav;
 	
-	return TravelChanged;
+	return Changed;
 }
 
 void Cio::RockerSwitch()
@@ -250,30 +250,24 @@ void Cio::SteeringRemote()
 }
 
 
-
 void Cio::CampSwitches()
 {
-	if(PushCamp.Level())
+	if(!PushCamp.Level())
 	{
-		
+		CLeds::is().CampOn();
+		CLeds::is().TravelOKOff();
 	}
-	else
-	{
-		
-	}
+
 }
 
 void Cio::TravelSwitches()
 {
-	if(PushTravel.Level())
+	if(!PushTravel.Level())
 	{
-		
+		CLeds::is().CampOff();
+		CLeds::is().TravelOKOn();
 	}
-	else
-	{
-		
-		
-	}
+
 }
 
 void Cio::AllOff()

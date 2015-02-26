@@ -46,7 +46,8 @@ class CSerial
 		void put_p(const char *text);	//PUT TEXT FROM PGM SPACE
 		#endif
 		
-		void put(int16_t number);		//PUT NUMBER ON LCD
+		void put16(int16_t number);		//PUT NUMBER ON LCD
+		void put32(int32_t number);
 		#ifdef UART_RECIVE
 		uint8_t get();				//Get single byte
 		#endif
@@ -63,6 +64,7 @@ class CSerial
 //#ifdef UART_STREAMS
 CSerial &operator<<(CSerial &rs232, uint8_t val);
 CSerial &operator<<(CSerial &rs232, uint16_t val);
+CSerial &operator<<(CSerial &rs232, int32_t val);
 CSerial &operator<<(CSerial &rs232, int val);
 CSerial &operator<<(CSerial &rs232, const char* val);
 //#ifdef UART_PGM

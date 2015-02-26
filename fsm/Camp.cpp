@@ -18,11 +18,7 @@ CState(SMManager, STATE_CAMP)
 
 void FsmCamp::OnEntry()
 {
-	CLeds::is().CampOn();
-	CLeds::is().TravelOKOff();
-	
 	CSerial::is() << " FsmCamp::OnEntry()\r\n";
-	Cio::is().CampSwitches();
 }
 
 void FsmCamp::HandleEvent(EVENT evt)
@@ -31,16 +27,20 @@ void FsmCamp::HandleEvent(EVENT evt)
 	{
 		case TimerEvent:
 			//run camp FSM 
+		break;
 		case RockerEvent:
 		case OutSideEvent:
 		case SteeringEvent:
-			m_SMManager.ChangeState(STATE_MANUAL);
+			m_SMManager.ChangeState(STATE_MANUAL, evt);
+		break;
+		case CampEvent:
+			Cio::is().CampSwitches();
 		break;
 		case TravelEvent:
-			m_SMManager.ChangeState(STATE_TRAVEL);
+			m_SMManager.ChangeState(STATE_TRAVEL, evt);
 		break;
 		case CalibrateEvent:
-			m_SMManager.ChangeState(STATE_CAMP_CALIBRATE);
+			m_SMManager.ChangeState(STATE_CAMP_CALIBRATE, evt);
 		default:
 		break;
 	}
@@ -49,5 +49,4 @@ void FsmCamp::HandleEvent(EVENT evt)
 void FsmCamp::OnExit()
 {
 	CSerial::is() << " FsmCamp::OnExit()\r\n";
-	Cio::is().CampSwitches();
 }

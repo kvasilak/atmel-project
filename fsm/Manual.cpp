@@ -23,10 +23,6 @@ void FsmManual::OnEntry()
 	CLeds::is().TravelOKOff();
 	
 	CSerial::is() << " FsmManual::OnEntry()\r\n";
-	
-	Cio::is().RockerSwitch();
-	Cio::is().OutsideRemote();
-	Cio::is().SteeringRemote();
 }
 
 void FsmManual::HandleEvent(EVENT evt)
@@ -37,14 +33,14 @@ void FsmManual::HandleEvent(EVENT evt)
 			//change state if no manual buttons are active
 			if(Cio::is().IsHolding())
 			{
-				m_SMManager.ChangeState(STATE_TRAVEL);
+				m_SMManager.ChangeState(STATE_TRAVEL, evt);
 			}
 		break;
 		case CampEvent:
 			//change state if no manual buttons are active
 			if(Cio::is().IsHolding())
 			{
-				m_SMManager.ChangeState(STATE_CAMP);
+				m_SMManager.ChangeState(STATE_CAMP, evt);
 			}
 		break;
 		case RockerEvent:
@@ -57,7 +53,7 @@ void FsmManual::HandleEvent(EVENT evt)
 			Cio::is().SteeringRemote();
 		break;
 		case CalibrateEvent:
-			m_SMManager.ChangeState(STATE_MANUAL_CALIBRATE);
+			m_SMManager.ChangeState(STATE_MANUAL_CALIBRATE, evt);
 		break;
 		case TimerEvent:
 			//run travel FSM?

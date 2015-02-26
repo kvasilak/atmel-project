@@ -8,6 +8,7 @@
 
 #ifndef __CCONTROLLER_H__
 #define __CCONTROLLER_H__
+#include <stddef.h>
 #include "fsm/Events.h"
 #include "fsm/States.h"
 
@@ -63,7 +64,7 @@ public:
 
 	STATE m_CurrState;
 
-	void ChangeState(STATE newState);
+	void ChangeState(STATE newState, EVENT evt = NoEvent);
 
 	void CheckEvent();
 
