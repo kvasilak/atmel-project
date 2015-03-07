@@ -8,6 +8,7 @@
 #include <avr/io.h>
 #include "Cio.h"
 #include "CLeds.h"
+#include "CSerial.h"
 
 // default constructor
 Cio::Cio()
@@ -17,54 +18,112 @@ Cio::Cio()
 //setup IO lines
 //Read using  PINx
 //Write using PORTx
+void Cio::Direction()
+{
+		//port A
+		DDRA = 0x0C;
+		
+		//0		ADC		Left Height
+		//1		ADC		Right height
+		//2		Out		power up
+		//3		OUt		Compressor
+		//4		in		Remote RU
+		//5		in		Remote RD
+		//6		in		Remote LU
+		//7		in		Remote LD
+		
+		
+		DDRB = 0xF0;
+		
+		//port B
+		//0		in		Remote up
+		//1		in		Remote Down
+		//2		in		Remote Travel
+		//3		in		Remote Camp
+		//4		Out		Right Up
+		//5		Out		Right Down
+		//6		Out		Left up
+		//7		Out		Left Down
+		
+		//DDRC = 0x;
+		//Port C
+		//0		SCL
+		//1		SDA
+		//2		JTAG
+		//3		JTAG
+		//4		JTAG
+		//5		JTAG
+		//6		in		Outside valid
+		//7		in		Steering Valid
+		
+		DDRD = 0x02;
+		//Port D
+		//0		RX		Debug serial
+		//1		TX		Debug serial
+		//2		in		Calibrate
+		//3		in		Ignition On
+		//4		in		switch Down
+		//5		in		switch Up
+		//6		in		switch Travel
+		//7		in		switch Camp
+}
+
+void Cio::Pullups()
+{
+		//port A
+//		PORTA = 0x00;
+		
+		//0		ADC		Left Height
+		//1		ADC		Right height
+		//2		Out		power up
+		//3		OUt		Compressor
+		//4		in		Remote RU
+		//5		in		Remote RD
+		//6		in		Remote LU
+		//7		in		Remote LD
+		
+		
+		PORTB = 0x00;
+		
+		//port B
+		//0		in		Remote up
+		//1		in		Remote Down
+		//2		in		Remote Travel
+		//3		in		Remote Camp
+		//4		Out		Right Up
+		//5		Out		Right Down
+		//6		Out		Left up
+		//7		Out		Left Down
+		
+		//DDRC = 0x;
+		//Port C
+		//0		SCL
+		//1		SDA
+		//2		JTAG
+		//3		JTAG
+		//4		JTAG
+		//5		JTAG
+		//6		in		Outside valid
+		//7		in		Steering Valid
+		
+		PORTD = 0x00;
+		//Port D
+		//0		RX		Debug serial
+		//1		TX		Debug serial
+		//2		in		Calibrate
+		//3		in		Ignition On
+		//4		in		switch Down
+		//5		in		switch Up
+		//6		in		switch Travel
+		//7		in		switch Camp
+}
+
+
+
 void Cio::Init()
 {
-	//port A
-	DDRA = 0x0C;
-	
-	//0		ADC		Left Height
-	//1		ADC		Right height
-	//2		Out		power up
-	//3		OUt		Compressor
-	//4		in		Remote RU
-	//5		in		Remote RD
-	//6		in		Remote LU
-	//7		in		Remote LD
-	
-	
-	DDRB = 0xF0;
-	
-	//port B
-	//0		in		Remote up
-	//1		in		Remote Down
-	//2		in		Remote Travel
-	//3		in		Remote Camp
-	//4		Out		Right Up
-	//5		Out		Right Down
-	//6		Out		Left up
-	//7		Out		Left Down
-	
-	//DDRC = 0x;
-	//Port C
-	//0		SCL		
-	//1		SDA		
-	//2		JTAG		
-	//3		JTAG		
-	//4		JTAG		
-	//5		JTAG		
-	//6		in		Outside valid
-	//7		in		Steering Valid
-	
-	DDRD = 0x02;
-	//Port D
-	//0		RX		Debug serial
-	//1		TX		Debug serial
-	//2		in		Calibrate
-	//3		in		Ignition On
-	//4		in		switch Down
-	//5		in		switch Up
-	//6		in		switch Travel
-	//7		in		switch Camp
+	Direction();
+	Pullups();
 	
 	//use to debounce switch inputs
 	RockerDown.Attach(IO_PORTD, PORTD4);
@@ -174,16 +233,26 @@ void Cio::RockerSwitch()
 {
 	if(RockerUp.Level())
 	{
+		CSerial::is() << "RockerUp.Level()\n";
 		LeftFillOn();
 		RightFillOn();
+		
+		LeftDumpOff();
+		RightDumpOff();
 	}
 	else if(RockerDown.Level())
 	{
+		CSerial::is() <<  "RockerDown.Level()\n";
 		LeftDumpOn();
 		RightDumpOn();
+		
+		LeftFillOff();
+		RightFillOff();
 	}
 	else
 	{
+		CSerial::is() << "all off\n";
+		
 		LeftDumpOff();
 		RightDumpOff();
 		
@@ -338,4 +407,10 @@ bool Cio::IsHolding()
 	}
 	
 	return hold;
+}
+
+void Cio::PowerOn()
+{
+	//Turn on 5v, PA2
+	PORTA |= _BV(PA2);
 }

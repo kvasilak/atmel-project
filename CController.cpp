@@ -56,7 +56,7 @@ void CController::ScheduleEvent(EVENT evt)
 	//Don't show timer events, too much noise
 	if(evt > TimerEvent)
 	{
-		CSerial::is() << "Event received: " << events[evt] << "\n";
+		CSerial::is() << events[evt] << "\n";
 	}
 	
 	m_StateList[m_CurrState]->HandleEvent(evt);

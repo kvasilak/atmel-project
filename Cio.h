@@ -60,6 +60,7 @@ static Cio &is()
 	FillStates LeftState;
 	FillStates RightState;
 
+	void PowerOn();
 private:
 	Cio();
 	Cio& operator=( const Cio &c );
@@ -68,6 +69,9 @@ private:
 	Debounced RockerDown;
 	Debounced PushCamp;
 	Debounced PushTravel;
+	
+	void Direction();
+	void Pullups();
 
 }; //Cio
 

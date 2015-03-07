@@ -31,10 +31,10 @@ extern "C" void __cxa_pure_virtual()
 int main(void)
 {
 	CController Controller;
+
+	Cio::is().Init();
 	
-	//Turn on 5v, PA2
-	DDRA |= _BV(DDRA2); 
-	PORTA |= _BV(PA2);
+	Cio::is().PowerOn();
 	
 	CSerial::is().Init();
 	
@@ -43,21 +43,12 @@ int main(void)
 	CLeds::is().Init();
 	CLeds::is().Dim(100);
 	
-	Cio::is().Init();
 	Controller.Init();
 	
 	CADC::is().Init();
 
     while(1)
     {
-		//if(CTimer::IsTimedOut(100, start))
-		//{
-			
-			Controller.Run();
-
-		//	start = CTimer::GetTick();
-		//}
-		
-	
+		Controller.Run();
     }
 }
