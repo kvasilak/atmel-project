@@ -33,8 +33,8 @@
 #include "cserial.h"
 #include "circularbuffer.h"
 
-static CircularBuffer <uint8_t, 100> TxBuf;
-static CircularBuffer <uint8_t, 100> RxBuf;
+static CircularBuffer <uint8_t, 300> TxBuf;
+static CircularBuffer <uint8_t, 50> RxBuf;
 
 __extension__ typedef int __guard __attribute__((mode (__DI__)));
 

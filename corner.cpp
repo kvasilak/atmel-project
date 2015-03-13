@@ -43,26 +43,10 @@ CCorner::CCorner(Position p):
 	IsAtHeight(false)
 {
 
-	LastTime 		= CTimer::GetTick();//millis();
+	LastTime 		= CTimer::GetTick();
 	filter_reg 		= GetHeight() << FILTER_SHIFT;
-
-//     pinMode(PINDUMP_RIGHTREAR, OUTPUT);
-//     digitalWrite(PINDUMP_RIGHTREAR, LOW);
-//     
-//     pinMode(PINDUMP_LEFTREAR, OUTPUT);
-//     digitalWrite(PINDUMP_LEFTREAR, LOW);
-//     
-//     pinMode(PINFILL_RIGHTREAR, OUTPUT);
-//     digitalWrite(PINFILL_RIGHTREAR, LOW);
-//     
-//     pinMode(PINFILL_LEFTREAR, OUTPUT);
-//     digitalWrite(PINFILL_LEFTREAR, LOW);
-    
-    UpdateTime = CTimer::GetTick();//millis();
-    
-    //analog in pins need no setup
-	
-	//Init(p);
+   
+    UpdateTime = CTimer::GetTick();
 }
 
 void CCorner::Init(Position p)
@@ -70,7 +54,7 @@ void CCorner::Init(Position p)
     int i;
     int32_t height = GetHeight();
     
-    //initalize filters
+    //initialize filters
     for(i=0; i<10; i++)
     {
         SmoothAvg[i] = height;      
@@ -90,7 +74,7 @@ void CCorner::Init(Position p)
     
     HeightSpeed = 0;
     OldHeight = height;
-    SpeedTime = CTimer::GetTick();//millis();
+    SpeedTime = CTimer::GetTick();
 }
 void CCorner::Limits(int16_t Low, int16_t high)
 {
@@ -106,12 +90,10 @@ int32_t CCorner::GetHeight()
     switch(corner)
    {
         case LeftRear:
-            //height = (int32_t)analogRead(PINLRHEIGHT); 
 			height = CADC::is().Read(0);
 			//
             break;
         case RightRear:
-            //height = (int32_t)analogRead(PINRRHEIGHT);
 			height = CADC::is().Read(1);
             break;
    }   
@@ -129,7 +111,7 @@ int32_t CCorner::GetHeight()
         }
         
         OldHeight = height;
-        SpeedTime = CTimer::GetTick();//millis();
+        SpeedTime = CTimer::GetTick();
    }
    
    return height;
@@ -206,14 +188,14 @@ void CCorner::FillExit()
     FillOff();
     SetState(ValveHoldEntry);
 
-    HoldOffTime = CTimer::GetTick();//millis();
+    HoldOffTime = CTimer::GetTick();
 }
 
 void CCorner::DumpExit()
 {
     DumpOff();
     SetState(ValveHoldEntry);
-    HoldOffTime = CTimer::GetTick();//millis();
+    HoldOffTime = CTimer::GetTick();
 }
 
 uint16_t CCorner::Average(uint16_t value)
@@ -325,42 +307,42 @@ void CCorner::DoHeight(int32_t height, int32_t setpoint)
             slowheight = (filter_reg >> FILTER_SHIFT);
         }
 
-		LastTime = CTimer::GetTick();//millis();        
+		LastTime = CTimer::GetTick();       
         
         if(CTimer::IsTimedOut(250, UpdateTime))
         {
            switch(corner)
            {
                 case LeftRear:
-                    CSerial::is() << ">Corner, LError,";
+                    CSerial::is() << ">Cnr, L_Err,";
                     CSerial::is() << uint16_t(height - setpoint);
                     CSerial::is() << "<";
 
-                    CSerial::is() << ">Corner, LeftHeight,";
+                    CSerial::is() << ">Cnr, L_Hght,";
                     CSerial::is() << uint16_t(height);
                     CSerial::is() << "<";
 
-                    CSerial::is() << ">Corner, LeftSlow,";
+                    CSerial::is() << ">Cnr, L_Slow,";
                     CSerial::is() << uint16_t(slowheight - setpoint);
                     CSerial::is() << "<\r\n";
 
                     break;
                 case RightRear:
-                    CSerial::is() << ">Corner, RError,";
+                    CSerial::is() << ">Cnr, R_Err,";
                     CSerial::is() << uint16_t(height - setpoint);
                     CSerial::is() << "<";
 
-                    CSerial::is() << ">Corner, RightHeight,";
+                    CSerial::is() << ">Cnr, R_Hght,";
                     CSerial::is() << uint16_t(height);
                     CSerial::is() << "<";
 
-                    CSerial::is() << ">Corner, RightSlow,";
+                    CSerial::is() << ">Cnr, R_Slow,";
                     CSerial::is() << uint16_t(slowheight - setpoint);
                     CSerial::is() << "<\r\n";                
 
                     break;
            } 
-           UpdateTime = CTimer::GetTick();//millis();
+           UpdateTime = CTimer::GetTick();
         }
     }
 }
@@ -391,7 +373,7 @@ void CCorner::Run(int32_t setpoint)
             DumpOff();
             SetState(ValveHolding);
             //filter_reg = (height << FILTER_SHIFT);
-            HoldOffTime = CTimer::GetTick();//millis();
+            HoldOffTime = CTimer::GetTick();
             break;
         case ValveHoldEntry:
             if(CTimer::IsTimedOut(1000, HoldOffTime))
@@ -405,7 +387,7 @@ void CCorner::Run(int32_t setpoint)
                     HeightAvg[i] = height;      
                 }
 
-                HoldOffTime = CTimer::GetTick();//millis();
+                HoldOffTime = CTimer::GetTick();
                 DoPulse = false;
                 CycleTime = 100;
                 SetState(ValveHolding);
@@ -433,7 +415,7 @@ void CCorner::Run(int32_t setpoint)
                         //calc total pulse time as a multiple of deadbands from setpoint
                         //we know height < setpoint or we wouldn't be here
                         PulseTotal =(abs(setpoint - height) / DeadBand) * PulseTime; // pulsetime = 250ms
-                        PulseStart = CTimer::GetTick();//millis();
+                        PulseStart = CTimer::GetTick();
 
                         SetState(ValveFillPulse);
                     }
@@ -456,7 +438,7 @@ void CCorner::Run(int32_t setpoint)
                         //calc total pulse time as a multiple of deadbands from setpoint
                         //we know height > setpoint or we wouldn't be here
                         PulseTotal = (abs(height - setpoint) / DeadBand) * PulseTime; // pulsetime = 250ms
-                        PulseStart = CTimer::GetTick();//millis();
+                        PulseStart = CTimer::GetTick();
 
                         SetState(ValveDumpPulse);
                     }
@@ -499,7 +481,7 @@ void CCorner::Run(int32_t setpoint)
             FillOff();
             DumpOff();
             SetState(ValveHoldEntry);
-            HoldOffTime = CTimer::GetTick();//millis();
+            HoldOffTime = CTimer::GetTick();
     }
 }
 

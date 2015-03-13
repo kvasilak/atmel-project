@@ -41,7 +41,7 @@ void FsmTravel::HandleEvent(EVENT evt)
 	{
 		case TimerEvent:
 			//run travel FSM
-			//LeftSide.Run(512);
+			LeftSide.Run(512);
 			RightSide.Run(512);
 			break;
 		case RockerEvent:
