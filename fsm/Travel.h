@@ -17,7 +17,7 @@ class FsmTravel :public CState
 	public:
 	FsmTravel(CController& FsmManager);
 	void OnEntry();
-	void HandleEvent(EVENT evt);
+	void HandleEvent(eEvents evt);
 	void OnExit();
 
 private:

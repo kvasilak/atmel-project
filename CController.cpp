@@ -21,7 +21,7 @@ m_stateCamp(*this),
 m_stateManualCal(*this),
 m_stateTravelCal(*this),
 m_stateCampCal(*this),
-m_CurrState(STATE_MANUAL)
+m_CurrState(eStates::STATE_MANUAL)
 {
 	//this order determines the state machine order
 	m_StateList[0] = &m_stateManual;
@@ -36,11 +36,11 @@ m_CurrState(STATE_MANUAL)
 
 void CController::Init()
 {
-	m_StateList[m_CurrState]->OnEntry();
+	m_StateList[(int)m_CurrState]->OnEntry();
 	Time = CTimer::GetTick();
 }
 
-void CController::ScheduleEvent(EVENT evt)
+void CController::ScheduleEvent(eEvents evt)
 {
 	static const char *events[]  = {
 		"No Event",
@@ -54,16 +54,16 @@ void CController::ScheduleEvent(EVENT evt)
 	};
 
 	//Don't show timer events, too much noise
-	if(evt > TimerEvent)
+	if(evt > eEvents::TimerEvent)
 	{
-		CSerial::is() << events[evt] << "\n";
+		CSerial::is() << events[(int)evt] << "\n";
 	}
 	
-	m_StateList[m_CurrState]->HandleEvent(evt);
+	m_StateList[(int)m_CurrState]->HandleEvent(evt);
 }
 
 //Exit the old state, enter the new state
-void CController::ChangeState(STATE newState, EVENT evt)
+void CController::ChangeState(eStates newState, eEvents evt)
 {
 	// put up a warning if the function is called
 	//from the entry or exit function.. not legal! 
@@ -78,15 +78,15 @@ void CController::ChangeState(STATE newState, EVENT evt)
 	
 	if(m_CurrState != newState)
 	{
-		m_StateList[m_CurrState]->OnExit();
+		m_StateList[(int)m_CurrState]->OnExit();
 		
 		m_CurrState = newState;
 		
-		m_StateList[m_CurrState]->OnEntry();
+		m_StateList[(int)m_CurrState]->OnEntry();
 		
-		if(evt != NoEvent)
+		if(evt != eEvents::NoEvent)
 		{
-			m_StateList[m_CurrState]->HandleEvent(evt);
+			m_StateList[(int)m_CurrState]->HandleEvent(evt);
 		}
 	}
 	
@@ -103,27 +103,27 @@ void CController::CheckEvent()
 {
 	if(Cio::is().RockerChanged())
 	{
-		ScheduleEvent(RockerEvent);
+		ScheduleEvent(eEvents::RockerEvent);
 	}
 	
 	if(Cio::is().OutSideRemoteChanged())
 	{
-		ScheduleEvent(OutSideEvent);
+		ScheduleEvent(eEvents::OutSideEvent);
 	}
 	
 	if(Cio::is().SteeringRemoteChanged())
 	{
-		ScheduleEvent(SteeringEvent);
+		ScheduleEvent(eEvents::SteeringEvent);
 	}
 
  	if(Cio::is().CampChanged())
  	{
- 		ScheduleEvent(CampEvent);
+ 		ScheduleEvent(eEvents::CampEvent);
  	}
 
 	if(Cio::is().TravelChanged())
 	{
-		ScheduleEvent(TravelEvent);
+		ScheduleEvent(eEvents::TravelEvent);
 	}
 	
 }
@@ -137,7 +137,7 @@ void CController::Run()
 	
 	if(CTimer::IsTimedOut(100, Time))
 	{
-		ScheduleEvent(TimerEvent);
+		ScheduleEvent(eEvents::TimerEvent);
 		Time = CTimer::GetTick();
 	}
 }

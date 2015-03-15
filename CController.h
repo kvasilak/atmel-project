@@ -28,7 +28,7 @@ class CController
 public:
 	CController();
 	
-	void ScheduleEvent(EVENT evt);
+	void ScheduleEvent(eEvents evt);
 	
 	void Run();
 	void Init();
@@ -62,9 +62,9 @@ public:
 	CController(const CController&);
 	CController& operator=(const CController&);
 
-	STATE m_CurrState;
+	eStates m_CurrState;
 
-	void ChangeState(STATE newState, EVENT evt = NoEvent);
+	void ChangeState(eStates newState, eEvents evt = eEvents::NoEvent);
 
 	void CheckEvent();
 

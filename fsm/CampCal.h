@@ -16,7 +16,7 @@ class FSMCampCal :public CState
 	public:
 	FSMCampCal(CController& FsmManager);
 	void OnEntry();
-	void HandleEvent(EVENT evt);
+	void HandleEvent(eEvents evt);
 	void OnExit();
 
 }; //FSMCampCal

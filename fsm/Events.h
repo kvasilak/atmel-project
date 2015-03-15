@@ -1,7 +1,7 @@
 #ifndef EVENTS_H
 #define EVENTS_H
 
-enum EVENT
+enum class eEvents
 {
 	NoEvent,
 	TimerEvent ,

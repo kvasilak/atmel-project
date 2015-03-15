@@ -11,7 +11,7 @@
 
 
 FSMManualCal::FSMManualCal(CController& SMManager) :
-CState(SMManager, STATE_MANUAL_CALIBRATE), 
+CState(SMManager, eStates::STATE_MANUAL_CALIBRATE), 
 State(Idle)
 {
 }
@@ -25,11 +25,11 @@ void FSMManualCal::OnEntry()
 //Manual calibration basically means finding the upper and lower 
 //suspension travel limits. These limits are used to determine if we 
 //should keep trying to adjust during travel or Camp mode
-void FSMManualCal::HandleEvent(EVENT evt)
+void FSMManualCal::HandleEvent(eEvents evt)
 {
 	switch(evt)
 	{
-		case TimerEvent:
+		case eEvents::TimerEvent:
 			Calibrate();
 		break;
 		default:
@@ -74,7 +74,7 @@ void FSMManualCal::Calibrate()
 			//Save heights in EEPROM
 			
 			//back to manual mode
-			m_SMManager.ChangeState(STATE_MANUAL);
+			m_SMManager.ChangeState(eStates::STATE_MANUAL);
 			
 			State = Idle;
 		break;

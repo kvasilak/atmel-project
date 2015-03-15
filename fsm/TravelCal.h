@@ -16,7 +16,7 @@ class FSMTravelCal :public CState
 	public:
 	FSMTravelCal(CController& FsmManager);
 	void OnEntry();
-	void HandleEvent(EVENT evt);
+	void HandleEvent(eEvents evt);
 	void OnExit();
 
 }; //FSMTravelCal

@@ -12,7 +12,7 @@
 #include "..\CSerial.h"
 
 FsmCamp::FsmCamp(CController& SMManager) :
-CState(SMManager, STATE_CAMP)
+CState(SMManager, eStates::STATE_CAMP)
 {
 }
 
@@ -21,26 +21,26 @@ void FsmCamp::OnEntry()
 	CSerial::is() << " FsmCamp::OnEntry()\r\n";
 }
 
-void FsmCamp::HandleEvent(EVENT evt)
+void FsmCamp::HandleEvent(eEvents evt)
 {
 	switch(evt)
 	{
-		case TimerEvent:
+		case eEvents::TimerEvent:
 			//run camp FSM 
 		break;
-		case RockerEvent:
-		case OutSideEvent:
-		case SteeringEvent:
-			m_SMManager.ChangeState(STATE_MANUAL, evt);
+		case eEvents::RockerEvent:
+		case eEvents::OutSideEvent:
+		case eEvents::SteeringEvent:
+			m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
 		break;
-		case CampEvent:
+		case eEvents::CampEvent:
 			Cio::is().CampSwitches();
 		break;
-		case TravelEvent:
-			m_SMManager.ChangeState(STATE_TRAVEL, evt);
+		case eEvents::TravelEvent:
+			m_SMManager.ChangeState(eStates::STATE_TRAVEL, evt);
 		break;
-		case CalibrateEvent:
-			m_SMManager.ChangeState(STATE_CAMP_CALIBRATE, evt);
+		case eEvents::CalibrateEvent:
+			m_SMManager.ChangeState(eStates::STATE_CAMP_CALIBRATE, evt);
 		default:
 		break;
 	}

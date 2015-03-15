@@ -17,7 +17,7 @@ class FsmManual :public CState
 	public:
 	FsmManual(CController& FsmManager);
 	void OnEntry();
-	void HandleEvent(EVENT evt);
+	void HandleEvent(eEvents evt);
 	void OnExit();
 	
 	private:

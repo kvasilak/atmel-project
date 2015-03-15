@@ -13,7 +13,7 @@
 #include "..\CLeds.h"
 
 FsmManual::FsmManual(CController& SMManager) :
-CState(SMManager, STATE_MANUAL)
+CState(SMManager, eStates::STATE_MANUAL)
 {
 }
 
@@ -25,37 +25,37 @@ void FsmManual::OnEntry()
 	CSerial::is() << " FsmManual::OnEntry()\r\n";
 }
 
-void FsmManual::HandleEvent(EVENT evt)
+void FsmManual::HandleEvent(eEvents evt)
 {
 	switch(evt)
 	{
-		case TravelEvent:
+		case eEvents::TravelEvent:
 			//change state if no manual buttons are active
 			if(Cio::is().IsHolding())
 			{
-				m_SMManager.ChangeState(STATE_TRAVEL, evt);
+				m_SMManager.ChangeState(eStates::STATE_TRAVEL, evt);
 			}
 		break;
-		case CampEvent:
+		case eEvents::CampEvent:
 			//change state if no manual buttons are active
 			if(Cio::is().IsHolding())
 			{
-				m_SMManager.ChangeState(STATE_CAMP, evt);
+				m_SMManager.ChangeState(eStates::STATE_CAMP, evt);
 			}
 		break;
-		case RockerEvent:
+		case eEvents::RockerEvent:
 			Cio::is().RockerSwitch();
 		break;
-		case OutSideEvent:
+		case eEvents::OutSideEvent:
 			Cio::is().OutsideRemote();
 		break;
-		case SteeringEvent:
+		case eEvents::SteeringEvent:
 			Cio::is().SteeringRemote();
 		break;
-		case CalibrateEvent:
-			m_SMManager.ChangeState(STATE_MANUAL_CALIBRATE, evt);
+		case eEvents::CalibrateEvent:
+			m_SMManager.ChangeState(eStates::STATE_MANUAL_CALIBRATE, evt);
 		break;
-		case TimerEvent:
+		case eEvents::TimerEvent:
 			//run travel FSM?
 		break;
 		default:

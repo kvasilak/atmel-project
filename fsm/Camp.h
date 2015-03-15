@@ -17,7 +17,7 @@ class FsmCamp :public virtual CState
 	public:
 	FsmCamp(CController& FsmManager);
 	void OnEntry();
-	void HandleEvent(EVENT evt);
+	void HandleEvent(eEvents evt);
 	void OnExit();
 
 }; //Camp

@@ -20,16 +20,16 @@ class CState
 	// States inherited from this class can access State Manager
 	// through this member
 	CController& m_SMManager;
-	STATE m_nID;
+	eStates m_nID;
 	
 	public:
-	CState(CController& CController, STATE nID) : m_SMManager(CController), m_nID(nID){}
-	const STATE GetID() const {return m_nID;}
+	CState(CController& CController, eStates nID) : m_SMManager(CController), m_nID(nID){}
+	const eStates GetID() const {return m_nID;}
 	
 	virtual void OnEntry() = 0;
 	
 	// this function is executed each time current state receives some event
-	virtual void HandleEvent(EVENT evt) = 0;
+	virtual void HandleEvent(eEvents evt) = 0;
 	
 	virtual void OnExit() = 0;
 };

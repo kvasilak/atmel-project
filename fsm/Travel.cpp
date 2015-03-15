@@ -14,7 +14,7 @@
 #include "Travel.h"
 
 FsmTravel::FsmTravel(CController& SMManager) :
-CState(SMManager, STATE_TRAVEL),
+CState(SMManager, eStates::STATE_TRAVEL),
 LeftSide(LeftRear),
 RightSide(RightRear)
 {
@@ -35,28 +35,28 @@ void FsmTravel::OnEntry()
 	CSerial::is() << " FsmTravel::OnEntry()\r\n";
 }
 
-void FsmTravel::HandleEvent(EVENT evt)
+void FsmTravel::HandleEvent(eEvents evt)
 {
 	switch(evt)
 	{
-		case TimerEvent:
+		case eEvents::TimerEvent:
 			//run travel FSM
 			LeftSide.Run(512);
 			RightSide.Run(512);
 			break;
-		case RockerEvent:
-		case OutSideEvent:
-		case SteeringEvent:
-			m_SMManager.ChangeState(STATE_MANUAL, evt);
+		case eEvents::RockerEvent:
+		case eEvents::OutSideEvent:
+		case eEvents::SteeringEvent:
+			m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
 		break;
-		case CampEvent:
-			m_SMManager.ChangeState(STATE_CAMP, evt);
+		case eEvents::CampEvent:
+			m_SMManager.ChangeState(eStates::STATE_CAMP, evt);
 		break;
-		case TravelEvent:
+		case eEvents::TravelEvent:
 			Cio::is().TravelSwitches();
 		break;
-		case CalibrateEvent:
-			m_SMManager.ChangeState(STATE_TRAVEL_CALIBRATE, evt);
+		case eEvents::CalibrateEvent:
+			m_SMManager.ChangeState(eStates::STATE_TRAVEL_CALIBRATE, evt);
 		default:
 		break;
 	}

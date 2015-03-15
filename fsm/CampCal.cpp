@@ -11,7 +11,7 @@
 
 
 FSMCampCal::FSMCampCal(CController& SMManager) :
-CState(SMManager, STATE_MANUAL)
+CState(SMManager, eStates::STATE_MANUAL)
 {
 }
 
@@ -20,22 +20,22 @@ void FSMCampCal::OnEntry()
 	//cout << "\nCStateIdle::OnEntry()" << endl;
 }
 
-void FSMCampCal::HandleEvent(EVENT evt)
+void FSMCampCal::HandleEvent(eEvents evt)
 {
 	switch(evt)
 	{
-		case TimerEvent:
+		case eEvents::TimerEvent:
 		//run camp FSM
-		case RockerEvent:
-		case OutSideEvent:
-		case SteeringEvent:
-		m_SMManager.ChangeState(STATE_MANUAL);
+		case eEvents::RockerEvent:
+		case eEvents::OutSideEvent:
+		case eEvents::SteeringEvent:
+		m_SMManager.ChangeState(eStates::STATE_MANUAL);
 		break;
-		case TravelEvent:
-		m_SMManager.ChangeState(STATE_TRAVEL);
+		case eEvents::TravelEvent:
+		m_SMManager.ChangeState(eStates::STATE_TRAVEL);
 		break;
-		case CalibrateEvent:
-		m_SMManager.ChangeState(STATE_CAMP_CALIBRATE);
+		case eEvents::CalibrateEvent:
+		m_SMManager.ChangeState(eStates::STATE_CAMP_CALIBRATE);
 		default:
 		break;
 	}
