@@ -46,6 +46,7 @@ int main(void)
 	Controller.Init();
 	
 	CADC::is().Init();
+	
 
     while(1)
     {

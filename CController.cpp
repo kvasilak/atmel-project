@@ -30,14 +30,15 @@ m_CurrState(eStates::STATE_MANUAL)
 	m_StateList[3] = &m_stateManualCal;
 	m_StateList[4] = &m_stateTravelCal;
 	m_StateList[5] = &m_stateCampCal;
-	
-	
 } 
 
 void CController::Init()
 {
 	m_StateList[(int)m_CurrState]->OnEntry();
 	Time = CTimer::GetTick();
+	
+	//update the rocker switch state
+	ScheduleEvent(eEvents::RockerEvent);
 }
 
 void CController::ScheduleEvent(eEvents evt)

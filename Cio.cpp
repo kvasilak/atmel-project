@@ -10,6 +10,7 @@
 #include "CLeds.h"
 #include "CSerial.h"
 
+
 // default constructor
 Cio::Cio()
 {
@@ -71,7 +72,7 @@ void Cio::Direction()
 void Cio::Pullups()
 {
 		//port A
-//		PORTA = 0x00;
+		PORTA = 0xf0;
 		
 		//0		ADC		Left Height
 		//1		ADC		Right height
@@ -83,7 +84,7 @@ void Cio::Pullups()
 		//7		in		Remote LD
 		
 		
-		PORTB = 0x00;
+		PORTB = 0x0F;
 		
 		//port B
 		//0		in		Remote up
@@ -130,15 +131,13 @@ void Cio::Init()
 	RockerUp.Attach(IO_PORTD, PORTD5);
 	PushTravel.Attach(IO_PORTD, PORTD6);
 	PushCamp.Attach(IO_PORTD, PORTD7);
-	
-	Run();
-	
+
 	//setup initial values
-	RockerSwitch();
-	OutsideRemote();
-	SteeringRemote();
 	CampChanged();
 	TravelChanged();
+	RockerChanged();
+	SteeringRemoteChanged();
+	OutSideRemoteChanged();
 }
 
 //update switch states and debounce
