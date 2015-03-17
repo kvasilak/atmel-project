@@ -320,7 +320,9 @@ void Cio::SteeringRemote()
 
 void Cio::CampSwitches()
 {
-	if(!PushCamp.Level())
+	bool SteeringCamp = PINB & _BV(1);
+	
+	if(!PushCamp.Level() || SteeringCamp)
 	{
 		CLeds::is().CampOn();
 		CLeds::is().TravelOKOff();
@@ -330,7 +332,9 @@ void Cio::CampSwitches()
 
 void Cio::TravelSwitches()
 {
-	if(!PushTravel.Level())
+	bool SteeringTravel = PINB & _BV(3);
+	
+	if(!PushTravel.Level() || SteeringTravel)
 	{
 		CLeds::is().CampOff();
 		CLeds::is().TravelOKOn();
