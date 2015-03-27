@@ -15,6 +15,7 @@
 #include "CLeds.h"
 #include "CADC.h"
 #include "Cio.h"
+#include "MMA8451.h"
 
 uint16_t a = 0;
 uint8_t b = 0;
@@ -47,6 +48,7 @@ int main(void)
 	
 	CADC::is().Init();
 	
+	CMMA8451::is().Init();
 
     while(1)
     {

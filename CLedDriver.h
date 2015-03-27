@@ -19,9 +19,9 @@ class CLedDriver
 public:
 	static CLedDriver &is()
 	{
-		static CLedDriver led;
+		static CLedDriver me;
 			
-		return led;
+		return me;
 	}
 	
 	void On(uint8_t led, bool on);

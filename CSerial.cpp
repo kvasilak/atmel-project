@@ -42,7 +42,7 @@ int __cxa_guard_acquire(__guard *g) {return !*(char *)(g);}
 void __cxa_guard_release (__guard *g) {*(char *)g = 1;}
 
 CSerial::CSerial():
-m_Base(10),
+m_Base(16),
 IsOpen(false)
 {
 }
