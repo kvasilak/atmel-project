@@ -23,18 +23,19 @@ public:
 	}
 	
 	bool Init();
-	void Read(uint16_t &X, uint16_t &y, uint16_t &z);
+	void ReadXYZ();//uint16_t &X, uint16_t &y, uint16_t &z);
 	
 	bool readRegister8(uint8_t reg, uint8_t *data);
+	
+	uint8_t readRegister8(uint8_t reg);
+	
+	void writeRegister8(uint8_t reg, uint8_t data);
 
 protected:
 private:
 	CMMA8451();
 	CMMA8451( const CMMA8451 &c );
 	CMMA8451& operator=( const CMMA8451 &c );
-	
-	//bool readRegister8(uint8_t reg, uint8_t *data);
-	void writeRegister8(uint8_t reg, uint8_t data);
 
 }; //MMA8451
 

@@ -13,7 +13,7 @@
 /*=========================================================================
     I2C ADDRESS/BITS
     -----------------------------------------------------------------------*/
-    #define MMA8451_ADDRESS                 (0x38)    // if A is 38, its 0x3a
+    #define MMA8451_ADDRESS                 (0x38)    // 0x3a if A input is high
 /*=========================================================================*/
 
 #define MMA8451_REG_OUT_X_MSB     0x01
@@ -44,10 +44,10 @@
 //   MMA8451_RANGE_4_G           = 0b01,   // +/- 4g
 //   MMA8451_RANGE_2_G           = 0b00    // +/- 2g (default value)
 // } mma8451_range_t;
-
+// 
 
 /* Used with register 0x2A (MMA8451_REG_CTRL_REG1) to set bandwidth */
-// enum
+//enum
 // {
 //   MMA8451_DATARATE_800_HZ     = 0b000, //  400Hz 
 //   MMA8451_DATARATE_400_HZ     = 0b001, //  200Hz
@@ -57,7 +57,7 @@
 //   MMA8451_DATARATE_12_5_HZ    = 0b101, // 6.25Hz
 //   MMA8451_DATARATE_6_25HZ     = 0b110, // 3.13Hz
 //   MMA8451_DATARATE_1_56_HZ    = 0b111, // 1.56Hz
-// } mma8451_dataRate_t;
+// } mma8451_dataRate_
 
 
 // default constructor
@@ -80,13 +80,16 @@ bool CMMA8451::Init()
 		{
 			// MMA8451 detected 
 			CSerial::is() << "found MMA8451\n";
+			
+			 writeRegister8(MMA8451_REG_CTRL_REG2, 0x40); // reset
+
+			while (readRegister8(MMA8451_REG_CTRL_REG2) & 0x40);
+    
+			writeRegister8(MMA8451_REG_CTRL_REG1, 1);
+
 			success = true;
 		}
-		else
-		{
-			CSerial::is() << "unknown device; " << deviceid << "\n";
-		}
-	}// 
+		else		{			CSerial::is() << "unknown device; " << deviceid << "\n";		}	}
 	else
 	{
 		CSerial::is() << "read failed\n";
@@ -100,9 +103,56 @@ bool CMMA8451::Init()
 	return success;
 }
 
-void CMMA8451::Read(uint16_t &X, uint16_t &y, uint16_t &z)
+void CMMA8451::ReadXYZ()//uint16_t &X, uint16_t &y, uint16_t &z)
 {
+	uint8_t high;
+	uint8_t low;
+	int16_t X;
+	int16_t Y;
+	int16_t Z;
 	
+	if(i2c_start(MMA8451_ADDRESS)==0)// if A is 38, its 0x3a
+	{
+		if(i2c_write(MMA8451_REG_OUT_X_MSB)==0) //Control reg single register
+		{
+			if(i2c_rep_start(MMA8451_ADDRESS + I2C_READ)==0)
+			{
+				high = i2c_readAck();
+				low =  i2c_readAck();
+				X = high << 8;
+				X |= low;
+				X >>= 2;
+
+				
+				high = i2c_readAck();
+				low =  i2c_readAck();
+				Y = high << 8;
+				Y |= low;
+				Y >>= 2;
+								
+				high = i2c_readAck();
+				low =  i2c_readNak();
+				i2c_stop();
+				
+				Z = high << 8;
+				Z |= low;
+				Z >>= 2;
+				
+				CSerial::is() << "XYZ, " << X <<", " << Y << ", " << Z << "\n";
+			}
+		}
+	}
+
+}
+
+uint8_t CMMA8451::readRegister8(uint8_t reg)
+{
+	uint8_t d;
+	
+	readRegister8(reg, &d);
+	
+	return d;
+
 }
 
 bool CMMA8451::readRegister8(uint8_t reg, uint8_t *data) 
@@ -127,14 +177,13 @@ bool CMMA8451::readRegister8(uint8_t reg, uint8_t *data)
 
 void CMMA8451::writeRegister8(uint8_t reg, uint8_t data) 
 {
-	if(i2c_start_wait(0x40))
+	if(i2c_start(MMA8451_ADDRESS)==0)
 	{
 	   if(i2c_write(reg)==0) //Control reg single register
 	   {
 	      if(i2c_write(data)==0)
 		  {
 			  i2c_stop();
-			  CSerial::is() << "Leedsie" << data << "\n";
 		  }
 	   }
 	}
