@@ -153,6 +153,12 @@ uint8_t CSerial::get()
 
 #ifdef UART_STREAMS
 
+CSerial &operator<<(CSerial &rs232, float val)
+{
+	rs232.put32((int32_t)val);
+	return rs232;
+}
+
 CSerial &operator<<(CSerial &rs232, uint8_t val)
 {
 	rs232.put16(val);

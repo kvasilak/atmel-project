@@ -8,6 +8,8 @@
 
 #ifndef __FSMMANUALCAL_H__
 #define __FSMMANUALCAL_H__
+
+#include <stdint.h>
 #include "State.h"
 #include "States.h"
 
@@ -33,6 +35,8 @@ class FSMManualCal :public CState
 	};
 		
 	CalStates State;
+	
+	uint32_t Start;
 
 }; //FSMManualCal
 

@@ -8,7 +8,11 @@
 
 #include "TravelCal.h"
 #include "..\CController.h"
-
+#include "..\CController.h"
+#include "..\Cio.h"
+#include "..\CSerial.h"
+#include "..\CLeds.h"
+#include "..\CTimer.h"
 
 FSMTravelCal::FSMTravelCal(CController& SMManager) :
 CState(SMManager, eStates::STATE_TRAVEL_CALIBRATE)
@@ -17,7 +21,8 @@ CState(SMManager, eStates::STATE_TRAVEL_CALIBRATE)
 
 void FSMTravelCal::OnEntry()
 {
-	//cout << "\nCStateIdle::OnEntry()" << endl;
+	CSerial::is() << " FSMTravelCal::OnEntry()\r\n";
+	Start = CTimer::GetTick();
 }
 
 void FSMTravelCal::HandleEvent(eEvents evt)
@@ -25,17 +30,18 @@ void FSMTravelCal::HandleEvent(eEvents evt)
 	switch(evt)
 	{
 		case eEvents::TimerEvent:
-		//run camp FSM
-		case eEvents::RockerEvent:
+			//run camp FSM
+			break;
 		case eEvents::OutSideEvent:
-		case eEvents::SteeringEvent:
-		m_SMManager.ChangeState(eStates::STATE_MANUAL);
-		break;
-		case eEvents::TravelEvent:
-		m_SMManager.ChangeState(eStates::STATE_TRAVEL);
-		break;
+			CSerial::is() << "Travel cal, outside event\n";
+			Cio::is().OutsideRemote();
+			break;
 		case eEvents::CalibrateEvent:
-		m_SMManager.ChangeState(eStates::STATE_CAMP_CALIBRATE);
+			if(CTimer::IsTimedOut(5000, Start))
+			{
+				CSerial::is() << "Manual cal, Cal event\n";
+				m_SMManager.ChangeState(eStates::STATE_TRAVEL);
+			}
 		default:
 		break;
 	}
@@ -43,5 +49,5 @@ void FSMTravelCal::HandleEvent(eEvents evt)
 
 void FSMTravelCal::OnExit()
 {
-	//cout << "CStateIdle::OnExit()" << endl;
+	CSerial::is() << " FSMTravelCal::OnExit()\r\n";
 }

@@ -46,6 +46,7 @@ static Cio &is()
 	bool SteeringRemoteChanged();
 	bool CampChanged();
 	bool TravelChanged();
+	bool CalibrateChanged();
 
 //What to do
 	void RockerSwitch();
@@ -69,6 +70,7 @@ private:
 	Debounced RockerDown;
 	Debounced PushCamp;
 	Debounced PushTravel;
+	Debounced PushCalibrate;
 	
 	void Direction();
 	void Pullups();

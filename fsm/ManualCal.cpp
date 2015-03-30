@@ -8,6 +8,10 @@
 
 #include "ManualCal.h"
 #include "..\CController.h"
+#include "..\Cio.h"
+#include "..\CSerial.h"
+#include "..\CLeds.h"
+#include "..\CTimer.h"
 
 
 FSMManualCal::FSMManualCal(CController& SMManager) :
@@ -18,6 +22,9 @@ State(Idle)
 
 void FSMManualCal::OnEntry()
 {
+	CSerial::is() << " FSMManualCal::OnEntry()\r\n";
+	Start = CTimer::GetTick();
+	
 	//Always start by filling the bags to find the upper limits
 	State = Fill;
 }
@@ -31,15 +38,26 @@ void FSMManualCal::HandleEvent(eEvents evt)
 	{
 		case eEvents::TimerEvent:
 			Calibrate();
-		break;
+			break;
+		case eEvents::CalibrateEvent:
+			//Pressing the calibrate button a second time, 
+			//at least 5 seconds after the first press will cancel the calibration
+			if(CTimer::IsTimedOut(5000, Start))
+			{
+				CSerial::is() << "Manual cal, Cal event\n";
+				m_SMManager.ChangeState(eStates::STATE_MANUAL);
+			}
+			
+			break;
 		default:
-		break;
+			CSerial::is() << "Manual cal, Default\n";
+			break;
 	}
 }
 
 void FSMManualCal::OnExit()
 {
-	//cout << "CStateIdle::OnExit()" << endl;
+	CSerial::is() << "FSMManualCal::OnExit()\r\n";
 }
 
 //calibration state machine
@@ -74,7 +92,7 @@ void FSMManualCal::Calibrate()
 			//Save heights in EEPROM
 			
 			//back to manual mode
-			m_SMManager.ChangeState(eStates::STATE_MANUAL);
+			//m_SMManager.ChangeState(eStates::STATE_MANUAL);
 			
 			State = Idle;
 		break;

@@ -127,10 +127,12 @@ void Cio::Init()
 	Pullups();
 	
 	//use to debounce switch inputs
+	PushCalibrate.Attach(IO_PORTD, PORTD2);
 	RockerDown.Attach(IO_PORTD, PORTD4);
 	RockerUp.Attach(IO_PORTD, PORTD5);
 	PushTravel.Attach(IO_PORTD, PORTD6);
 	PushCamp.Attach(IO_PORTD, PORTD7);
+	
 
 	//setup initial values
 	CampChanged();
@@ -138,6 +140,7 @@ void Cio::Init()
 	RockerChanged();
 	SteeringRemoteChanged();
 	OutSideRemoteChanged();
+	CalibrateChanged();
 }
 
 //update switch states and debounce
@@ -148,6 +151,7 @@ void Cio::Run()
 	RockerUp.Update();
 	PushTravel.Update();
 	PushCamp.Update();
+	PushCalibrate.Update();
 }
 
 bool Cio::RockerChanged()
@@ -219,13 +223,28 @@ bool Cio::TravelChanged()
 	
 	bool trav = (PINB & _BV(PORTB3));
 
-	bool Changed	= OldTravel				!= (bool)PushTravel;		 //port D bit 6
-		 Changed	|= OldInsideTravel		!= trav; //port B bit 2
+	bool Changed	= OldTravel				!= (bool)PushTravel;
+		 Changed	|= OldInsideTravel		!= trav; 
 	
 	OldTravel		= (bool)PushTravel;
 	OldInsideTravel = trav;
 	
 	return Changed;
+}
+
+bool Cio::CalibrateChanged()
+{
+	static bool OldCal	= false;
+	bool changed = false;
+	
+	//only consider a press a change a release isn't a change
+	if(PushCalibrate > 0)
+	{
+		changed = OldCal != (bool)PushCalibrate;
+	}
+	OldCal = (bool)PushCalibrate;
+	
+	return changed;
 }
 
 void Cio::RockerSwitch()
