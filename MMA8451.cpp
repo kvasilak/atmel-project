@@ -4,7 +4,7 @@
 * Created: 3/21/2015 8:42:28 PM
 * Author: keith
 */
-
+#include <math.h>
 #include "common.h"
 #include "MMA8451.h"
 #include "CSerial.h"
@@ -59,6 +59,9 @@
 //   MMA8451_DATARATE_1_56_HZ    = 0b111, // 1.56Hz
 // } mma8451_dataRate_
 
+#define SENSITIVITY_2G		  4096
+
+#define PI					  3.14159
 
 // default constructor
 CMMA8451::CMMA8451()
@@ -103,13 +106,45 @@ bool CMMA8451::Init()
 	return success;
 }
 
-void CMMA8451::ReadXYZ()//uint16_t &X, uint16_t &y, uint16_t &z)
+void CMMA8451::PitchRoll()
 {
-	uint8_t high;
-	uint8_t low;
+	int16_t x;
+	int16_t y;
+	int16_t z;
+	
+	ReadXYZ(x, y, z);
+	
+	float Xout_g = ((float) x) / SENSITIVITY_2G;		// Compute X-axis output value in g's
+	float Yout_g = ((float) y) / SENSITIVITY_2G;		// Compute Y-axis output value in g's
+	float Zout_g = ((float) z) / SENSITIVITY_2G;		// Compute Z-axis output value in g's
+			
+	float Pitch = atan2 (-Xout_g, sqrt (Yout_g*Yout_g + Zout_g*Zout_g)) * 180 / PI;		// Equation 37 in the AN3461
+		
+	float Roll;
+		
+	if (Zout_g > 0)																	// Equation 38 in the AN3461
+		Roll = atan2 (Yout_g, sqrt (0.01*Xout_g*Xout_g + Zout_g*Zout_g)) * 180 / PI;
+	else
+		Roll = atan2 (Yout_g, - sqrt (0.01*Xout_g*Xout_g + Zout_g*Zout_g)) * 180 / PI;
+		
+	CSerial::is() << "P, R; " << Pitch << ", " << Roll << "\n";
+}
+
+void CMMA8451::ReadXYZ()
+{
+
 	int16_t X;
 	int16_t Y;
 	int16_t Z;
+	ReadXYZ(X,Y,Z);
+	
+	CSerial::is() << "XYZ, " << X <<", " << Y << ", " << Z << "\n";
+}
+
+void CMMA8451::ReadXYZ(int16_t &X, int16_t &Y, int16_t &Z)
+{
+		uint8_t high;
+	uint8_t low;
 	
 	if(i2c_start(MMA8451_ADDRESS)==0)// if A is 38, its 0x3a
 	{
@@ -137,8 +172,6 @@ void CMMA8451::ReadXYZ()//uint16_t &X, uint16_t &y, uint16_t &z)
 				Z = high << 8;
 				Z |= low;
 				Z >>= 2;
-				
-				CSerial::is() << "XYZ, " << X <<", " << Y << ", " << Z << "\n";
 			}
 		}
 	}

@@ -62,6 +62,7 @@ class CSerial
 };
 //
 //#ifdef UART_STREAMS
+CSerial &operator<<(CSerial &rs232, float val);
 CSerial &operator<<(CSerial &rs232, uint8_t val);
 CSerial &operator<<(CSerial &rs232, uint16_t val);
 CSerial &operator<<(CSerial &rs232, int32_t val);

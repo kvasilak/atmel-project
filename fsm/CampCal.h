@@ -8,6 +8,8 @@
 
 #ifndef __FSMCAMPCAL_H__
 #define __FSMCAMPCAL_H__
+
+#include <stdint.h>
 #include "State.h"
 #include "States.h"
 
@@ -18,6 +20,9 @@ class FSMCampCal :public CState
 	void OnEntry();
 	void HandleEvent(eEvents evt);
 	void OnExit();
+	
+	private:
+	uint32_t Start;
 
 }; //FSMCampCal
 

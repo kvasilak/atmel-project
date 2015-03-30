@@ -23,13 +23,17 @@ public:
 	}
 	
 	bool Init();
-	void ReadXYZ();//uint16_t &X, uint16_t &y, uint16_t &z);
+	void ReadXYZ();
+	void ReadXYZ(int16_t &X, int16_t &y, int16_t &z);
 	
 	bool readRegister8(uint8_t reg, uint8_t *data);
 	
 	uint8_t readRegister8(uint8_t reg);
 	
 	void writeRegister8(uint8_t reg, uint8_t data);
+	
+	
+	void PitchRoll();
 
 protected:
 private:

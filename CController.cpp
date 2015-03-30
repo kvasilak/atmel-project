@@ -37,7 +37,6 @@ void CController::Init()
 {
 	m_StateList[(int)m_CurrState]->OnEntry();
 	Time = CTimer::GetTick();
-	t2 = CTimer::GetTick();
 	
 	//update the rocker switch state
 	ScheduleEvent(eEvents::RockerEvent);
@@ -129,6 +128,11 @@ void CController::CheckEvent()
 		ScheduleEvent(eEvents::TravelEvent);
 	}
 	
+	if(Cio::is().CalibrateChanged())
+	{
+		ScheduleEvent(eEvents::CalibrateEvent);
+	}
+	
 }
 
 //called on a 100ms timer
@@ -143,19 +147,6 @@ void CController::Run()
 	{
 		ScheduleEvent(eEvents::TimerEvent);
 		Time = CTimer::GetTick();
-	}
-	
-	if(CTimer::IsTimedOut(1000, t2))
-	{
-		
-		CMMA8451::is().ReadXYZ();
-
-		
-		CMMA8451::is().writeRegister8(0x2A, 0x3d); //slow rate, low noise, Active
-		
-		CMMA8451::is().writeRegister8(0x2B, 2); //high res
-		
-		t2 = CTimer::GetTick();
 	}
 }
 
