@@ -40,6 +40,7 @@ void FSMTravelCal::HandleEvent(eEvents evt)
 			if(CTimer::IsTimedOut(5000, Start))
 			{
 				CSerial::is() << "Manual cal, Cal event\n";
+
 				m_SMManager.ChangeState(eStates::STATE_TRAVEL);
 			}
 		default:

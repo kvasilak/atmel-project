@@ -36,6 +36,7 @@ void FSMCampCal::HandleEvent(eEvents evt)
 			{
 				CSerial::is() << "Manual cal, Cal event\n";
 				m_SMManager.ChangeState(eStates::STATE_CAMP);
+
 			}
 		default:
 		break;
