@@ -51,6 +51,9 @@ int main(void)
 	CMMA8451::is().Init();
 	
 	CLeds::is().ActiveOn();
+	
+	Cio::is().CompressorOn();
+	
 
     while(1)
     {

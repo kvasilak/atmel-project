@@ -436,3 +436,15 @@ void Cio::PowerOn()
 	//Turn on 5v, PA2
 	PORTA |= _BV(PA2);
 }
+
+void Cio::CompressorOn()
+{
+	//Turn on 5v, PA2
+	PORTA |= _BV(PA3);
+}
+
+void Cio::CompressorOff()
+{
+	//Turn on 5v, PA2
+	PORTA |= _BV(PA3);
+}

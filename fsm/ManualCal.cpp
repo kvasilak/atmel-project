@@ -63,6 +63,7 @@ void FSMManualCal::HandleEvent(eEvents evt)
 		case eEvents::CalibrateEvent:
 			//Pressing the calibrate button a second time, 
 			//at least 5 seconds after the first press will cancel the calibration
+			//otherwise it will run through raise and lower then calibrate will be complete
 			if(CTimer::IsTimedOut(5000, Blink))
 			{
 				CSerial::is() << "Manual cal, Cal event\n";
@@ -96,7 +97,7 @@ void FSMManualCal::Calibrate()
 		break;
 		case Filling:
 			//Wait for max height to be reached
-			if(true)
+			if(true) //IsMoving())
 			{
 				State = Dump;
 			}

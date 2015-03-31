@@ -39,6 +39,9 @@ static Cio &is()
 	void LeftFillOff();
 	void LeftDumpOn();
 	void LeftDumpOff();
+	
+	void CompressorOn();
+	void CompressorOff();
 
 	//whats changed
 	bool RockerChanged();
