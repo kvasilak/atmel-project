@@ -22,7 +22,7 @@ class FSMCampCal :public CState
 	void OnExit();
 	
 	private:
-	uint32_t Start;
+	uint32_t Blink;
 
 }; //FSMCampCal
 

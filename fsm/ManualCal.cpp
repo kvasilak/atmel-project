@@ -23,7 +23,7 @@ State(Idle)
 void FSMManualCal::OnEntry()
 {
 	CSerial::is() << " FSMManualCal::OnEntry()\r\n";
-	Start = CTimer::GetTick();
+	Blink = CTimer::GetTick();
 	
 	//Always start by filling the bags to find the upper limits
 	State = Fill;
@@ -34,15 +34,34 @@ void FSMManualCal::OnEntry()
 //should keep trying to adjust during travel or Camp mode
 void FSMManualCal::HandleEvent(eEvents evt)
 {
+	static bool Active = false;
 	switch(evt)
 	{
 		case eEvents::TimerEvent:
 			Calibrate();
+			
+			//blink active LED
+			if(CTimer::IsTimedOut(250, Blink))
+			{
+				if(Active)
+				{
+					CLeds::is().ActiveOn();
+					Active = !Active;
+				}
+				else
+				{
+					CLeds::is().ActiveOff();
+					Active = !Active;
+				}
+				
+				Blink = CTimer::GetTick();
+			}
+			
 			break;
 		case eEvents::CalibrateEvent:
 			//Pressing the calibrate button a second time, 
 			//at least 5 seconds after the first press will cancel the calibration
-			if(CTimer::IsTimedOut(5000, Start))
+			if(CTimer::IsTimedOut(5000, Blink))
 			{
 				CSerial::is() << "Manual cal, Cal event\n";
 				m_SMManager.ChangeState(eStates::STATE_MANUAL);
@@ -67,6 +86,9 @@ void FSMManualCal::Calibrate()
 	{
 		case Fill:
 			//open both fill valves
+			Cio::is().RightFillOn();
+			Cio::is().LeftFillOn();
+			
 			State = Filling;
 		break;
 		case Filling:
@@ -77,7 +99,14 @@ void FSMManualCal::Calibrate()
 			}
 		break;
 		case Dump:
+			//Close fill
+			Cio::is().RightFillOff();
+			Cio::is().LeftFillOff();
+			
 			//open dump valves 
+			Cio::is().RightDumpOn();
+			Cio::is().LeftDumpOn();
+			
 			State = Dumping;
 		break;
 		case Dumping:
@@ -89,6 +118,8 @@ void FSMManualCal::Calibrate()
 		break;
 		case Done:
 			//Close Valves
+			Cio::is().AllOff();
+			
 			//Save heights in EEPROM
 			
 			//back to manual mode

@@ -49,6 +49,8 @@ int main(void)
 	CADC::is().Init();
 	
 	CMMA8451::is().Init();
+	
+	CLeds::is().ActiveOn();
 
     while(1)
     {

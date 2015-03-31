@@ -22,27 +22,42 @@ CState(SMManager, eStates::STATE_TRAVEL_CALIBRATE)
 void FSMTravelCal::OnEntry()
 {
 	CSerial::is() << " FSMTravelCal::OnEntry()\r\n";
-	Start = CTimer::GetTick();
+	Blink = CTimer::GetTick();
 }
 
 void FSMTravelCal::HandleEvent(eEvents evt)
 {
+	static bool Active = false;
+	
 	switch(evt)
 	{
 		case eEvents::TimerEvent:
-			//run camp FSM
+			if(CTimer::IsTimedOut(250, Blink))
+			{
+				if(Active)
+				{
+					CLeds::is().ActiveOn();
+					Active = !Active;
+				}
+				else
+				{
+					CLeds::is().ActiveOff();
+					Active = !Active;
+				}
+				
+				Blink = CTimer::GetTick();
+			}
+			break;
 			break;
 		case eEvents::OutSideEvent:
 			CSerial::is() << "Travel cal, outside event\n";
 			Cio::is().OutsideRemote();
 			break;
 		case eEvents::CalibrateEvent:
-			if(CTimer::IsTimedOut(5000, Start))
-			{
-				CSerial::is() << "Manual cal, Cal event\n";
-
-				m_SMManager.ChangeState(eStates::STATE_TRAVEL);
-			}
+			//user pressed the the cal button again, save settings
+			CSerial::is() << "Travel cal, Cal event\n";
+			
+			m_SMManager.ChangeState(eStates::STATE_TRAVEL);
 		default:
 		break;
 	}

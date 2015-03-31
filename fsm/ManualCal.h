@@ -36,7 +36,7 @@ class FSMManualCal :public CState
 		
 	CalStates State;
 	
-	uint32_t Start;
+	uint32_t Blink;
 
 }; //FSMManualCal
 
