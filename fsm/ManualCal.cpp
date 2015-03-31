@@ -25,6 +25,8 @@ void FSMManualCal::OnEntry()
 	CSerial::is() << " FSMManualCal::OnEntry()\r\n";
 	Blink = CTimer::GetTick();
 	
+	Cio::is().AllOff();
+	
 	//Always start by filling the bags to find the upper limits
 	State = Fill;
 }
@@ -76,6 +78,7 @@ void FSMManualCal::HandleEvent(eEvents evt)
 
 void FSMManualCal::OnExit()
 {
+	CLeds::is().ActiveOn();
 	CSerial::is() << "FSMManualCal::OnExit()\r\n";
 }
 

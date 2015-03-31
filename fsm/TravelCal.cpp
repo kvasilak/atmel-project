@@ -23,6 +23,8 @@ void FSMTravelCal::OnEntry()
 {
 	CSerial::is() << " FSMTravelCal::OnEntry()\r\n";
 	Blink = CTimer::GetTick();
+	
+	Cio::is().AllOff();
 }
 
 void FSMTravelCal::HandleEvent(eEvents evt)
@@ -48,7 +50,6 @@ void FSMTravelCal::HandleEvent(eEvents evt)
 				Blink = CTimer::GetTick();
 			}
 			break;
-			break;
 		case eEvents::OutSideEvent:
 			CSerial::is() << "Travel cal, outside event\n";
 			Cio::is().OutsideRemote();
@@ -65,5 +66,6 @@ void FSMTravelCal::HandleEvent(eEvents evt)
 
 void FSMTravelCal::OnExit()
 {
+	CLeds::is().ActiveOn();
 	CSerial::is() << " FSMTravelCal::OnExit()\r\n";
 }

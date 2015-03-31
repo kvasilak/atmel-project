@@ -53,7 +53,7 @@ void FsmManual::HandleEvent(eEvents evt)
 			Cio::is().SteeringRemote();
 		break;
 		case eEvents::CalibrateEvent:
-			m_SMManager.ChangeState(eStates::STATE_MANUAL_CALIBRATE, evt);
+			m_SMManager.ChangeState(eStates::STATE_MANUAL_CALIBRATE);
 		break;
 		case eEvents::TimerEvent:
 			//run travel FSM?

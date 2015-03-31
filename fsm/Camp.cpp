@@ -51,7 +51,7 @@ void FsmCamp::HandleEvent(eEvents evt)
 			m_SMManager.ChangeState(eStates::STATE_TRAVEL, evt);
 		break;
 		case eEvents::CalibrateEvent:
-			m_SMManager.ChangeState(eStates::STATE_CAMP_CALIBRATE, evt);
+			m_SMManager.ChangeState(eStates::STATE_CAMP_CALIBRATE);
 		default:
 		break;
 	}

@@ -56,7 +56,7 @@ void FsmTravel::HandleEvent(eEvents evt)
 			Cio::is().TravelSwitches();
 		break;
 		case eEvents::CalibrateEvent:
-			m_SMManager.ChangeState(eStates::STATE_TRAVEL_CALIBRATE, evt);
+			m_SMManager.ChangeState(eStates::STATE_TRAVEL_CALIBRATE);
 		default:
 		break;
 	}

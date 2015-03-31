@@ -22,6 +22,8 @@ void FSMCampCal::OnEntry()
 {
 	CSerial::is() << " FSMTravelCal::OnEntry()\r\n";
 	Blink = CTimer::GetTick();
+	
+	Cio::is().AllOff();
 }
 
 void FSMCampCal::HandleEvent(eEvents evt)
@@ -63,6 +65,7 @@ void FSMCampCal::HandleEvent(eEvents evt)
 
 void FSMCampCal::OnExit()
 {
+	CLeds::is().ActiveOn();
 	CSerial::is() << " FSMTravelCal::OnExit()\r\n";
 
 }
