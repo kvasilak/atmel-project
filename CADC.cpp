@@ -45,3 +45,13 @@ uint16_t CADC::Read(uint8_t ch)
 
 	return ADC;
 }
+
+uint16_t CADC::GetLeftHeight()
+{
+	return Read(0);
+}
+
+uint16_t CADC::GetRightHeight()
+{
+	return Read(1);
+}

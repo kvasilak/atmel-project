@@ -12,6 +12,8 @@
 #include "..\CSerial.h"
 #include "..\CLeds.h"
 #include "..\CTimer.h"
+#include "..\CADC.h"
+#include "..\nvm.h"
 
 
 FSMManualCal::FSMManualCal(CController& SMManager) :
@@ -29,6 +31,14 @@ void FSMManualCal::OnEntry()
 	
 	//Always start by filling the bags to find the upper limits
 	State = Fill;
+	
+	//setup t find min and maxs
+	leftmax = 0;
+	rightmax = 0;
+	leftmin = 1024;
+	rightmin = 1024;
+	
+	SpeedTime = CTimer::GetTick();
 }
 
 //Manual calibration basically means finding the upper and lower 
@@ -83,6 +93,51 @@ void FSMManualCal::OnExit()
 	CSerial::is() << "FSMManualCal::OnExit()\r\n";
 }
 
+void FSMManualCal::CalcSpeed()
+{
+static uint16_t oldleft= CADC::is().GetLeftHeight();
+static uint16_t oldright= CADC::is().GetRightHeight();
+
+	//calculate speed, counts/second
+	if(CTimer::IsTimedOut(1000, SpeedTime))
+	{
+		uint16_t left = CADC::is().GetLeftHeight();
+		uint16_t right = CADC::is().GetRightHeight();
+	
+		if(left > oldleft)
+		{
+			LeftSpeed = left - oldleft;
+		}
+		else
+		{
+			LeftSpeed = oldleft - left;
+		}
+	
+		if(right > oldright)
+		{
+			RightSpeed = right - oldright;
+		}
+		else
+		{
+			RightSpeed = oldright - right;
+		}
+
+		SpeedTime = CTimer::GetTick();
+	}
+}
+
+bool FSMManualCal::IsMoving()
+{
+	bool moving = false;
+	
+	if( (LeftSpeed > 2) || (RightSpeed > 2))
+	{
+		moving = true;
+	}
+	
+	return moving;
+}
+
 //calibration state machine
 void FSMManualCal::Calibrate()
 {
@@ -93,12 +148,20 @@ void FSMManualCal::Calibrate()
 			Cio::is().RightFillOn();
 			Cio::is().LeftFillOn();
 			
-			State = Filling;
+			State = StartFilling;
+		break;
+		case StartFilling:
+			if(true == IsMoving())
+			{
+				State = Filling;
+			}
 		break;
 		case Filling:
 			//Wait for max height to be reached
-			if(true) //IsMoving())
+			if(false == IsMoving())
 			{
+				leftmax = CADC::is().GetLeftHeight();
+				rightmax = CADC::is().GetRightHeight();
 				State = Dump;
 			}
 		break;
@@ -111,23 +174,37 @@ void FSMManualCal::Calibrate()
 			Cio::is().RightDumpOn();
 			Cio::is().LeftDumpOn();
 			
-			State = Dumping;
+			State = StartDumping;
+		break;
+		case StartDumping:
+			if(true == IsMoving())
+			{
+				State = Filling;
+			}
 		break;
 		case Dumping:
 			//wait for min height
-			if(true)
+			if(false == IsMoving())
 			{
+				leftmin = CADC::is().GetLeftHeight();
+				rightmin = CADC::is().GetRightHeight();
 				State = Done;
 			}
 		break;
 		case Done:
 			//Close Valves
 			Cio::is().AllOff();
-			
+
 			//Save heights in EEPROM
+			nvm::is().SetLeftMax(leftmax);
+			nvm::is().SetRightMax(rightmax);
+			nvm::is().SetLeftMin(leftmin);
+			nvm::is().SetRightMin(rightmin);
+			
+			nvm::is().Save();
 			
 			//back to manual mode
-			//m_SMManager.ChangeState(eStates::STATE_MANUAL);
+			m_SMManager.ChangeState(eStates::STATE_MANUAL);
 			
 			State = Idle;
 		break;

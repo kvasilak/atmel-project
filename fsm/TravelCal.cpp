@@ -5,7 +5,7 @@
 * Author: keith
 */
 
-
+#include <avr/eeprom.h>
 #include "TravelCal.h"
 #include "..\CController.h"
 #include "..\CController.h"
@@ -21,7 +21,7 @@ CState(SMManager, eStates::STATE_TRAVEL_CALIBRATE)
 
 void FSMTravelCal::OnEntry()
 {
-	CSerial::is() << " FSMTravelCal::OnEntry()\r\n";
+	CSerial::is() << PSTR("FSMTravelCal::OnEntry()\r\n");
 	Blink = CTimer::GetTick();
 	
 	Cio::is().AllOff();
@@ -51,12 +51,12 @@ void FSMTravelCal::HandleEvent(eEvents evt)
 			}
 			break;
 		case eEvents::OutSideEvent:
-			CSerial::is() << "Travel cal, outside event\n";
+			CSerial::is() << PSTR("Travel cal, outside event\n");
 			Cio::is().OutsideRemote();
 			break;
 		case eEvents::CalibrateEvent:
 			//user pressed the the cal button again, save settings
-			CSerial::is() << "Travel cal, Cal event\n";
+			CSerial::is() << PSTR("Travel cal, Cal event\n");
 			
 			m_SMManager.ChangeState(eStates::STATE_TRAVEL);
 		default:
@@ -67,5 +67,5 @@ void FSMTravelCal::HandleEvent(eEvents evt)
 void FSMTravelCal::OnExit()
 {
 	CLeds::is().ActiveOn();
-	CSerial::is() << " FSMTravelCal::OnExit()\r\n";
+	CSerial::is() << PSTR(" FSMTravelCal::OnExit()\r\n");
 }

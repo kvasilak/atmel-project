@@ -292,6 +292,12 @@
     <Compile Include="mutex.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="nvm.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="nvm.h">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="fsm" />

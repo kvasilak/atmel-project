@@ -23,6 +23,9 @@ public:
 
 	void Init();
 	uint16_t Read(uint8_t ch);
+	
+	uint16_t GetRightHeight();
+	uint16_t GetLeftHeight();
 
 private:
 CADC();

@@ -21,11 +21,11 @@ enum FillStates
 class Cio
 {
 public:
-static Cio &is()
-{
-	static Cio a;
-	return a;
-}
+	static Cio &is()
+	{
+		static Cio a;
+		return a;
+	}
 
 	void Init();
 	void Run();
@@ -65,6 +65,8 @@ static Cio &is()
 	FillStates RightState;
 
 	void PowerOn();
+	
+
 private:
 	Cio();
 	Cio& operator=( const Cio &c );
@@ -77,6 +79,7 @@ private:
 	
 	void Direction();
 	void Pullups();
+
 
 }; //Cio
 

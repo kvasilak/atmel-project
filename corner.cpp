@@ -90,11 +90,11 @@ int32_t CCorner::GetHeight()
     switch(corner)
    {
         case LeftRear:
-			height = CADC::is().Read(0);
+			height = CADC::is().GetLeftHeight();
 			//
             break;
         case RightRear:
-			height = CADC::is().Read(1);
+			height = CADC::is().GetRightHeight();
             break;
    }   
    
