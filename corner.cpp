@@ -270,7 +270,7 @@ bool CCorner::AtHeight()
 
 //Uses the low pass IIR filter described in "Simple Software Lowpass Filter.pdf"
 //And two simple FIR filters
-void CCorner::DoHeight(int32_t height, int32_t setpoint)
+void CCorner::FilterHeight(int32_t height, int32_t setpoint)
 {
 	//sample Slowly
 	if(CTimer::IsTimedOut(CycleTime, LastTime) )
@@ -364,7 +364,7 @@ void CCorner::Run(int32_t setpoint)
         setpoint = LimitLow;
     } 
     
-    DoHeight(height, setpoint);
+    FilterHeight(height, setpoint);
 
     switch (State)
     {

@@ -86,7 +86,7 @@ class CCorner
     void AtHeight(bool at);
     bool AtHeight();
     int32_t GetHeight();
-    void DoHeight(int32_t height, int32_t setpoint);
+    void FilterHeight(int32_t height, int32_t setpoint);
     bool IsMoving();
   
 	private:

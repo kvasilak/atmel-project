@@ -7,13 +7,13 @@
 
 
 #include "ManualCal.h"
-#include "..\CController.h"
-#include "..\Cio.h"
-#include "..\CSerial.h"
-#include "..\CLeds.h"
-#include "..\CTimer.h"
-#include "..\CADC.h"
-#include "..\nvm.h"
+#include "CController.h"
+#include "Cio.h"
+#include "CSerial.h"
+#include "CLeds.h"
+#include "CTimer.h"
+#include "CADC.h"
+#include "nvm.h"
 
 
 FSMManualCal::FSMManualCal(CController& SMManager) :
@@ -218,7 +218,7 @@ void FSMManualCal::Calibrate()
 			
 			nvm::is().Save();
 			
-			CSerial::is() << "Saved!\n";
+			CSerial::is() << "Saving; " << "LMax, " << leftmax << " RMax, " << rightmax << " LMin, " << leftmin << " RMin, " << rightmin << "\n";
 			
 			//back to manual mode
 			m_SMManager.ChangeState(eStates::STATE_MANUAL);

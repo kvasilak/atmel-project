@@ -16,6 +16,7 @@
 #include "CADC.h"
 #include "Cio.h"
 #include "MMA8451.h"
+#include "nvm.h"
 
 uint16_t a = 0;
 uint8_t b = 0;
@@ -54,6 +55,7 @@ int main(void)
 	
 	Cio::is().CompressorOn();
 	
+	nvm::is().init();
 
     while(1)
     {

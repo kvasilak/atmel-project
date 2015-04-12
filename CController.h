@@ -13,12 +13,12 @@
 #include "fsm/States.h"
 
 //include state classes
-#include "fsm/Camp.h"
-#include "fsm/Manual.h"
-#include "fsm/Travel.h"
-#include "fsm/CampCal.h"
-#include "fsm/ManualCal.h"
-#include "fsm/TravelCal.h"
+#include "Camp.h"
+#include "Manual.h"
+#include "Travel.h"
+#include "CampCal.h"
+#include "ManualCal.h"
+#include "TravelCal.h"
 
 #include "Cio.h"
 

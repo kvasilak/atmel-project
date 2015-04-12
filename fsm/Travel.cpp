@@ -7,11 +7,12 @@
 
 
 
-#include "..\CController.h"
-#include "..\CLeds.h"
-#include "..\CSerial.h"
+#include "CController.h"
+#include "CLeds.h"
+#include "CSerial.h"
 
 #include "Travel.h"
+#include "nvm.h"
 
 FsmTravel::FsmTravel(CController& SMManager) :
 CState(SMManager, eStates::STATE_TRAVEL),
@@ -22,17 +23,14 @@ RightSide(RightRear)
 
 void FsmTravel::OnEntry()
 {
-	static bool inited;
-	
-	if(!inited)
-	{
-		LeftSide.Init(LeftRear);
-		RightSide.Init(RightRear);
-		
-		inited = true;
-	}
+	LeftSide.Init(LeftRear);
+	RightSide.Init(RightRear);
+
+	LeftSide.Limits(nvm::is().GetLeftMin(), nvm::is().GetLeftMax()); 
+	RightSide.Limits(nvm::is().GetRightMin(), nvm::is().GetRightMax());
 	
 	CSerial::is() << " FsmTravel::OnEntry()\r\n";
+	CSerial::is() << "Travel Cal vals; Left, " << nvm::is().GetLeftTravel() << ", Right, " << nvm::is().GetRightTravel() << "\n";
 }
 
 void FsmTravel::HandleEvent(eEvents evt)
@@ -41,8 +39,8 @@ void FsmTravel::HandleEvent(eEvents evt)
 	{
 		case eEvents::TimerEvent:
 			//run travel FSM
-			LeftSide.Run(512);
-			RightSide.Run(512);
+			LeftSide.Run(nvm::is().GetLeftTravel());
+			RightSide.Run(nvm::is().GetRightTravel());
 			break;
 		case eEvents::RockerEvent:
 		case eEvents::OutSideEvent:

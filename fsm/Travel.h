@@ -10,7 +10,7 @@
 #define __TRAVEL_H__
 
 #include "State.h"
-#include "..\corner.h"
+#include "corner.h"
 
 class FsmTravel :public CState
 {
