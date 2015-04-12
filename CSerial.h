@@ -65,6 +65,7 @@ class CSerial
 CSerial &operator<<(CSerial &rs232, float val);
 CSerial &operator<<(CSerial &rs232, uint8_t val);
 CSerial &operator<<(CSerial &rs232, uint16_t val);
+CSerial &operator<<(CSerial &rs232, uint32_t val);
 CSerial &operator<<(CSerial &rs232, int32_t val);
 CSerial &operator<<(CSerial &rs232, int val);
 CSerial &operator<<(CSerial &rs232, const char* val);

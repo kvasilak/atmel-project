@@ -50,6 +50,8 @@ void FSMManualCal::HandleEvent(eEvents evt)
 	switch(evt)
 	{
 		case eEvents::TimerEvent:
+		
+			CalcSpeed();
 			Calibrate();
 			
 			//blink active LED
@@ -121,6 +123,11 @@ static uint16_t oldright= CADC::is().GetRightHeight();
 		{
 			RightSpeed = oldright - right;
 		}
+		
+		oldright = right;
+		oldleft = left;
+		
+		CSerial::is() << "speed,  " << RightSpeed << ", " << LeftSpeed << "\n";
 
 		SpeedTime = CTimer::GetTick();
 	}
@@ -149,10 +156,13 @@ void FSMManualCal::Calibrate()
 			Cio::is().LeftFillOn();
 			
 			State = StartFilling;
+			
+			CSerial::is() << "start filling\n";
 		break;
 		case StartFilling:
 			if(true == IsMoving())
 			{
+				CSerial::is() << "filling\n";
 				State = Filling;
 			}
 		break;
@@ -160,6 +170,8 @@ void FSMManualCal::Calibrate()
 			//Wait for max height to be reached
 			if(false == IsMoving())
 			{
+				CSerial::is() << "Max Height\n";
+				
 				leftmax = CADC::is().GetLeftHeight();
 				rightmax = CADC::is().GetRightHeight();
 				State = Dump;
@@ -175,17 +187,20 @@ void FSMManualCal::Calibrate()
 			Cio::is().LeftDumpOn();
 			
 			State = StartDumping;
+			CSerial::is() << "start dumping\n";
 		break;
 		case StartDumping:
 			if(true == IsMoving())
 			{
-				State = Filling;
+				State = Dumping;
 			}
 		break;
 		case Dumping:
 			//wait for min height
 			if(false == IsMoving())
 			{
+				CSerial::is() << "Min height\n";
+				
 				leftmin = CADC::is().GetLeftHeight();
 				rightmin = CADC::is().GetRightHeight();
 				State = Done;
@@ -202,6 +217,8 @@ void FSMManualCal::Calibrate()
 			nvm::is().SetRightMin(rightmin);
 			
 			nvm::is().Save();
+			
+			CSerial::is() << "Saved!\n";
 			
 			//back to manual mode
 			m_SMManager.ChangeState(eStates::STATE_MANUAL);

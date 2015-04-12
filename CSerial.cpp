@@ -175,6 +175,12 @@ CSerial &operator<<(CSerial &rs232, int32_t val){
 	return rs232;
 }
 
+CSerial &operator<<(CSerial &rs232, uint32_t val)
+{
+	rs232.put32((int32_t)val);
+	return rs232;
+}
+
 CSerial &operator<<(CSerial &rs232, int val)
 {
 	rs232.put16(val);
