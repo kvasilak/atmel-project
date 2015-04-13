@@ -1,9 +1,11 @@
 /* *****************************************************************************
-*  A templated circular buffer. 
+*  A templated circular buffer.
+*  Copyright 2015 Keith Vasilakes
 *  ***************************************************************************** */
 
-#pragma once
-#define __PROG_TYPES_COMPAT__
+#ifndef __CIRCULAR_BUFFER_H
+#define __CIRCULAR_BUFFER_H
+
 #include <stdint.h>
 #include <stddef.h>
 
