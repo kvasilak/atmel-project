@@ -247,7 +247,7 @@
     <Compile Include="fsm\Dance.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="fsm\Dancel.h">
+    <Compile Include="fsm\Dance.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="fsm\TravelCal.cpp">
