@@ -46,10 +46,10 @@ void FSMDance::HandleEvent(eEvents evt)
 		case eEvents::TimerEvent:
 		
 			CalcSpeed();
-			Calibrate();
+			ShakeIt();
 			
 			//blink active LED
-			if(CTimer::IsTimedOut(250, Blink))
+			if(CTimer::IsTimedOut(150, Blink))
 			{
 				if(Active)
 				{
@@ -129,14 +129,16 @@ bool FSMDance::IsMoving()
 }
 
 //calibration state machine
-void FSMDance::Calibrate()
+void FSMDance::ShakeIt()
 {
 	switch(State)
 	{
+		case Idle:
+		break;
 		case Fill:
 			//open both fill valves
-			Cio::is().RightFillOn();
-			Cio::is().LeftFillOn();
+			Cio::is().Right(eValveStates::Fill);
+			Cio::is().Left(eValveStates::Fill);
 			
 			State = StartFilling;
 			
@@ -155,40 +157,114 @@ void FSMDance::Calibrate()
 			{
 				CSerial::is() << "Max Height\n";
 				
-				State = Dump;
+				State = TiltLeft;
+				Cio::is().Right(eValveStates::Hold);
+				Cio::is().Left(eValveStates::Dump);
+				rolls = 0;
 			}
 		break;
-		case Dump:
-			//Close fill
-			Cio::is().RightFillOff();
-			Cio::is().LeftFillOff();
-			
-			//open dump valves 
-			Cio::is().RightDumpOn();
-			Cio::is().LeftDumpOn();
-			
-			State = StartDumping;
-			CSerial::is() << "start dumping\n";
-		break;
-		case StartDumping:
-			if(true == IsMoving())
+		case TiltLeft:
+			if(CTimer::IsTimedOut(1000, DanceTime))
 			{
-				State = Dumping;
+				DanceTime = CTimer::GetTick();
+				
+				State = TiltRight;
+				Cio::is().Right(eValveStates::Dump);
+				Cio::is().Left(eValveStates::Hold);
 			}
 		break;
-		case Dumping:
-			//wait for min height
-			if(false == IsMoving())
+		case TiltRight: //complete
+			if(CTimer::IsTimedOut(1000, DanceTime))
 			{
-				CSerial::is() << "Min height\n";
-
+				DanceTime = CTimer::GetTick();
+				
+				State = FillLeft;
+				Cio::is().Right(eValveStates::Hold);
+				Cio::is().Left(eValveStates::Fill);
+			}
+		break;
+		case FillLeft:
+			if(CTimer::IsTimedOut(1000, DanceTime))
+			{
+				DanceTime = CTimer::GetTick();
+				
+				State = FillRight;
+				Cio::is().Right(eValveStates::Fill);
+				Cio::is().Left(eValveStates::Hold);
+			}
+		break;
+		case FillRight:
+			if(CTimer::IsTimedOut(1000, DanceTime))
+			{
+				DanceTime = CTimer::GetTick();
+				
+				//Hip Roll 3 times
+				if(rolls < 3)
+				{
+					State = TiltLeft;
+					Cio::is().Right(eValveStates::Hold);
+					Cio::is().Left(eValveStates::Dump);
+				}
+				else
+				{
+					State = Dump1;
+					Cio::is().Right(eValveStates::Dump);
+					Cio::is().Left(eValveStates::Dump);
+				}
+				
+				rolls++;
+			}
+		break;
+		case Dump1:
+			if(CTimer::IsTimedOut(500, DanceTime))
+			{
+				DanceTime = CTimer::GetTick();
+				
+				State = Fill1;
+				Cio::is().Right(eValveStates::Fill);
+				Cio::is().Left(eValveStates::Fill);
+			}
+		break;
+		case Fill1:
+			if(CTimer::IsTimedOut(2000, DanceTime))
+			{
+				DanceTime = CTimer::GetTick();
+				
+				State = Dump2;
+				Cio::is().Right(eValveStates::Dump);
+				Cio::is().Left(eValveStates::Dump);
+			}
+		break;
+		case Dump2:
+			if(CTimer::IsTimedOut(750, DanceTime))
+			{
+				DanceTime = CTimer::GetTick();
+				
+				State = Fill2;
+				Cio::is().Right(eValveStates::Fill);
+				Cio::is().Left(eValveStates::Fill);
+			}
+		break;
+		case Fill2:
+			if(CTimer::IsTimedOut(1500, DanceTime))
+			{
+				DanceTime = CTimer::GetTick();
+				
+				State = Dump3;
+				Cio::is().Right(eValveStates::Dump);
+				Cio::is().Left(eValveStates::Dump);
+			}
+		break;
+		case Dump3:
+			if(CTimer::IsTimedOut(2000, DanceTime))
+			{
+				DanceTime = CTimer::GetTick();
+				
 				State = Done;
+				Cio::is().AllOff();
 			}
 		break;
 		case Done:
-			//Close Valves
-			Cio::is().AllOff();
-
 			//back to manual mode
 			m_SMManager.ChangeState(eStates::STATE_MANUAL);
 			

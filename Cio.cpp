@@ -369,6 +369,51 @@ void Cio::AllOff()
 	LeftDumpOff();
 }
 
+void Cio::Right(eValveStates s)
+{
+	switch(s)
+	{
+		case eValveStates::Dump:
+			RightFillOff();
+			RightDumpOn();
+		break;
+		case eValveStates::Fill:
+			RightDumpOff();
+			RightFillOn();
+		break;
+		case eValveStates::Hold:
+			RightFillOff();
+			RightDumpOff();
+		break;
+		default:
+			RightFillOff();
+			RightDumpOff();
+	}
+}
+
+void Cio::Left(eValveStates s)
+{
+	switch(s)
+	{
+		case eValveStates::Dump:
+			LeftFillOff();
+			LeftDumpOn();
+		break;
+		case eValveStates::Fill:
+			LeftFillOn();
+			LeftDumpOff();
+		break;
+
+		case eValveStates::Hold:
+			LeftFillOff();
+			LeftDumpOff();
+		break;
+		default:
+			LeftFillOff();
+			LeftDumpOff();
+	}
+}
+
 void Cio::RightFillOn()
 {
 	PORTB |= _BV(4);

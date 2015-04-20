@@ -11,6 +11,13 @@
 
 #include "Debounced.h"
 
+enum class eValveStates
+{
+	Fill,
+	Dump,
+	Hold
+};
+
 enum FillStates
 {
 	SolenoidFilling,
@@ -31,6 +38,9 @@ public:
 	void Run();
 	
 	void AllOff();
+	void Right(eValveStates s);
+	void Left(eValveStates s);
+	
 	void RightFillOn();
 	void RightFillOff();
 	void RightDumpOn();
