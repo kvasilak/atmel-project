@@ -1,9 +1,11 @@
 /* *****************************************************************************
-*  A templated circular buffer. 
+*  A templated circular buffer.
+*  Copyright 2015 Keith Vasilakes
 *  ***************************************************************************** */
 
-#pragma once
-#define __PROG_TYPES_COMPAT__
+#ifndef __CIRCULAR_BUFFER_H
+#define __CIRCULAR_BUFFER_H
+
 #include <stdint.h>
 #include <stddef.h>
 
@@ -29,50 +31,19 @@ public:
   {
   }
 
-  uint8_t ElementSize()
-  {
-    return sizeof(T);
-  }
-
-  bool IsEmpty()
-    /* Returns true if no data has been stored in the buffer, 
-    and false if at least one value has been stored. */
-  {
-    return Size == 0;
-  }
 
     /* Add a new value to the end of the buffer. If the
     buffer has exceed its intrinsic capacity, this will
     overwrite old entries. */
-  bool Put(const T c)
+  void Put(const T c)
   {
-	uint16_t in = In+1;
-	
-    if (in+1 >= MAX_ENTRIES -1)
-	{
-      in = 0;
-	}
-	
-	if(in != Out)
-	{
-		Buffer[In] = c;
-		
-		In = in;
-		return true;
-	}
-	
-	return false;
-  }
-  
-  //allows adding after buffer is full, 
-  //Will overwrite old data
-  void Add(T c)
-  {
-	  Buffer[In++] = c;
+    Buffer[In] = c;
 
-	  //handle wrap
-	  if( In >= MAX_ENTRIES-1)
-	  In = 0;
+    In++;
+
+    if (In >= MAX_ENTRIES) { In = 0; }
+
+    if(Size < MAX_ENTRIES ) { Size++; }
   }
 
 //Get a byte from the buffer
@@ -88,7 +59,7 @@ bool Get(T &c)
 		Out++;
 		
 		//handle wrap
-		if(Out > MAX_ENTRIES-1)
+		if(Out >= MAX_ENTRIES)
 		{
 			Out = 0;
 		}
@@ -97,6 +68,18 @@ bool Get(T &c)
 	}
 	
 	return false;
+}
+
+uint8_t ElementSize()
+{
+    return sizeof(T);
+}
+
+bool IsEmpty()
+/* Returns true if no data has been stored in the buffer, 
+and false if at least one value has been stored. */
+{
+    return Size == 0;
 }
 
 /* Empties the circular buffer. The old data is 
