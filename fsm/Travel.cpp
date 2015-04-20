@@ -26,8 +26,6 @@ void FsmTravel::OnEntry()
 	LeftSide.Init(LeftRear);
 	RightSide.Init(RightRear);
 
-	LeftSide.Limits(nvm::is().GetLeftMin(), nvm::is().GetLeftMax()); 
-	RightSide.Limits(nvm::is().GetRightMin(), nvm::is().GetRightMax());
 	
 	CSerial::is() << " FsmTravel::OnEntry()\r\n";
 	CSerial::is() << "Travel Cal vals; Left, " << nvm::is().GetLeftTravel() << ", Right, " << nvm::is().GetRightTravel() << "\n";

@@ -1,12 +1,12 @@
 /* 
-* FSMManualCal.cpp
+* FSMDance.cpp
 *
 * Created: 2/6/2015 9:34:03 PM
 * Author: keith
 */
 
 
-#include "ManualCal.h"
+#include "dance.h"
 #include "CController.h"
 #include "Cio.h"
 #include "CSerial.h"
@@ -16,15 +16,15 @@
 #include "nvm.h"
 
 
-FSMManualCal::FSMManualCal(CController& SMManager) :
+FSMDance::FSMDance(CController& SMManager) :
 CState(SMManager, eStates::STATE_MANUAL_CALIBRATE), 
 State(Idle)
 {
 }
 
-void FSMManualCal::OnEntry()
+void FSMDance::OnEntry()
 {
-	CSerial::is() << " FSMManualCal::OnEntry()\r\n";
+	CSerial::is() << " FSMDance::OnEntry()\r\n";
 	Blink = CTimer::GetTick();
 	
 	Cio::is().AllOff();
@@ -38,7 +38,7 @@ void FSMManualCal::OnEntry()
 //Manual calibration basically means finding the upper and lower 
 //suspension travel limits. These limits are used to determine if we 
 //should keep trying to adjust during travel or Camp mode
-void FSMManualCal::HandleEvent(eEvents evt)
+void FSMDance::HandleEvent(eEvents evt)
 {
 	static bool Active = false;
 	switch(evt)
@@ -72,13 +72,13 @@ void FSMManualCal::HandleEvent(eEvents evt)
 	}
 }
 
-void FSMManualCal::OnExit()
+void FSMDance::OnExit()
 {
 	CLeds::is().ActiveOn();
-	CSerial::is() << "FSMManualCal::OnExit()\r\n";
+	CSerial::is() << "FSMDance::OnExit()\r\n";
 }
 
-void FSMManualCal::CalcSpeed()
+void FSMDance::CalcSpeed()
 {
 static uint16_t oldleft= CADC::is().GetLeftHeight();
 static uint16_t oldright= CADC::is().GetRightHeight();
@@ -116,7 +116,7 @@ static uint16_t oldright= CADC::is().GetRightHeight();
 	}
 }
 
-bool FSMManualCal::IsMoving()
+bool FSMDance::IsMoving()
 {
 	bool moving = false;
 	
@@ -129,7 +129,7 @@ bool FSMManualCal::IsMoving()
 }
 
 //calibration state machine
-void FSMManualCal::Calibrate()
+void FSMDance::Calibrate()
 {
 	switch(State)
 	{
@@ -155,8 +155,6 @@ void FSMManualCal::Calibrate()
 			{
 				CSerial::is() << "Max Height\n";
 				
-				leftmax = CADC::is().GetLeftHeight();
-				rightmax = CADC::is().GetRightHeight();
 				State = Dump;
 			}
 		break;
@@ -183,9 +181,7 @@ void FSMManualCal::Calibrate()
 			if(false == IsMoving())
 			{
 				CSerial::is() << "Min height\n";
-				
-				leftmin = CADC::is().GetLeftHeight();
-				rightmin = CADC::is().GetRightHeight();
+
 				State = Done;
 			}
 		break;

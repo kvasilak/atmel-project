@@ -17,7 +17,7 @@
 #include "Manual.h"
 #include "Travel.h"
 #include "CampCal.h"
-#include "ManualCal.h"
+#include "dance.h"
 #include "TravelCal.h"
 
 #include "Cio.h"
@@ -40,7 +40,7 @@ public:
 	friend class FsmManual;
 	friend class FsmTravel;
 	friend class FsmCamp;
-	friend class FSMManualCal;
+	friend class FSMDance;
 	friend class FSMTravelCal;
 	friend class FSMCampCal;
 	
@@ -50,7 +50,7 @@ public:
 	FsmTravel		m_stateTravel;
 	FsmCamp			m_stateCamp;
 
-	FSMManualCal	m_stateManualCal;
+	FSMDance	m_stateManualCal;
 	FSMTravelCal	m_stateTravelCal;
 	FSMCampCal		m_stateCampCal;
 
