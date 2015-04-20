@@ -29,15 +29,9 @@ void FSMManualCal::OnEntry()
 	
 	Cio::is().AllOff();
 	
-	//Always start by filling the bags to find the upper limits
+	//Always start by filling the bags 
 	State = Fill;
-	
-	//setup t find min and maxs
-	leftmax = 0;
-	rightmax = 0;
-	leftmin = 1024;
-	rightmin = 1024;
-	
+
 	SpeedTime = CTimer::GetTick();
 }
 
@@ -69,17 +63,6 @@ void FSMManualCal::HandleEvent(eEvents evt)
 				}
 				
 				Blink = CTimer::GetTick();
-			}
-			
-			break;
-		case eEvents::CalibrateEvent:
-			//Pressing the calibrate button a second time, 
-			//at least 5 seconds after the first press will cancel the calibration
-			//otherwise it will run through raise and lower then calibrate will be complete
-			if(CTimer::IsTimedOut(5000, Blink))
-			{
-				CSerial::is() << "Manual cal, Cal event\n";
-				m_SMManager.ChangeState(eStates::STATE_MANUAL);
 			}
 			
 			break;
@@ -210,16 +193,6 @@ void FSMManualCal::Calibrate()
 			//Close Valves
 			Cio::is().AllOff();
 
-			//Save heights in EEPROM
-			nvm::is().SetLeftMax(leftmax);
-			nvm::is().SetRightMax(rightmax);
-			nvm::is().SetLeftMin(leftmin);
-			nvm::is().SetRightMin(rightmin);
-			
-			nvm::is().Save();
-			
-			CSerial::is() << "Saving; " << "LMax, " << leftmax << " RMax, " << rightmax << " LMin, " << leftmin << " RMin, " << rightmin << "\n";
-			
 			//back to manual mode
 			m_SMManager.ChangeState(eStates::STATE_MANUAL);
 			
