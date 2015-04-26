@@ -53,7 +53,7 @@ int main(void)
 	
 	CLeds::is().ActiveOn();
 	
-	Cio::is().CompressorOn();
+	//TODO fix FET !Cio::is().CompressorOn();
 	
 	nvm::is().init();
 

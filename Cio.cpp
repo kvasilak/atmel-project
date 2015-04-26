@@ -453,13 +453,15 @@ void Cio::LeftFillOff()
 
 void Cio::LeftDumpOn()
 {
-	PORTB |= _BV(7);
+	//TODO Bad port pin PORTB |= _BV(7);
+	PORTA |= _BV(PA3);
 	CLeds::is().LeftDumpOn();
 }
 
 void Cio::LeftDumpOff()
 {
-	PORTB &= ~_BV(7);
+	//TODO Bad port pin PORTB &= ~_BV(7);
+	PORTA &= ~_BV(3);
 	CLeds::is().LeftDumpOff();
 }
 
@@ -484,13 +486,13 @@ void Cio::PowerOn()
 
 void Cio::CompressorOn()
 {
-	//Turn on 5v, PA2
+	//Turn on 5v, PA3
 	PORTA |= _BV(PA3);
 }
 
 void Cio::CompressorOff()
 {
-	//Turn on 5v, PA2
+	//Turn on 5v, PA3
 	PORTA |= _BV(PA3);
 }
 
