@@ -164,7 +164,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case TiltLeft:
-			if(CTimer::IsTimedOut(1000, DanceTime))
+			if(CTimer::IsTimedOut(5000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -174,7 +174,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case TiltRight: //complete
-			if(CTimer::IsTimedOut(1000, DanceTime))
+			if(CTimer::IsTimedOut(5000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -184,7 +184,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case FillLeft:
-			if(CTimer::IsTimedOut(1000, DanceTime))
+			if(CTimer::IsTimedOut(5000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -194,7 +194,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case FillRight:
-			if(CTimer::IsTimedOut(1000, DanceTime))
+			if(CTimer::IsTimedOut(5000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -216,7 +216,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case Dump1:
-			if(CTimer::IsTimedOut(500, DanceTime))
+			if(CTimer::IsTimedOut(2000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -226,7 +226,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case Fill1:
-			if(CTimer::IsTimedOut(2000, DanceTime))
+			if(CTimer::IsTimedOut(4000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -236,7 +236,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case Dump2:
-			if(CTimer::IsTimedOut(750, DanceTime))
+			if(CTimer::IsTimedOut(3000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -246,7 +246,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case Fill2:
-			if(CTimer::IsTimedOut(1500, DanceTime))
+			if(CTimer::IsTimedOut(5000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -256,7 +256,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case Dump3:
-			if(CTimer::IsTimedOut(2000, DanceTime))
+			if(CTimer::IsTimedOut(7000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
