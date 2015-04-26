@@ -30,9 +30,12 @@ void FSMDance::OnEntry()
 	Cio::is().AllOff();
 	
 	//Always start by filling the bags 
-	State = Fill;
+	State = Filling;
 
 	SpeedTime = CTimer::GetTick();
+	
+	rolls = 0;
+	
 }
 
 //Manual calibration basically means finding the upper and lower 
@@ -110,7 +113,7 @@ static uint16_t oldright= CADC::is().GetRightHeight();
 		oldright = right;
 		oldleft = left;
 		
-		CSerial::is() << "speed,  " << RightSpeed << ", " << LeftSpeed << "\n";
+		//CSerial::is() << "speed,  " << RightSpeed << ", " << LeftSpeed << "\n";
 
 		SpeedTime = CTimer::GetTick();
 	}
@@ -153,55 +156,36 @@ void FSMDance::ShakeIt()
 		break;
 		case Filling:
 			//Wait for max height to be reached
-			if(false == IsMoving())
+			//if(false == IsMoving())
 			{
 				CSerial::is() << "Max Height\n";
 				
 				State = TiltLeft;
-				Cio::is().Right(eValveStates::Hold);
+				Cio::is().Right(eValveStates::Fill);
 				Cio::is().Left(eValveStates::Dump);
-				rolls = 0;
 			}
 		break;
 		case TiltLeft:
-			if(CTimer::IsTimedOut(5000, DanceTime))
+			if(CTimer::IsTimedOut(12000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
 				State = TiltRight;
 				Cio::is().Right(eValveStates::Dump);
-				Cio::is().Left(eValveStates::Hold);
-			}
-		break;
-		case TiltRight: //complete
-			if(CTimer::IsTimedOut(5000, DanceTime))
-			{
-				DanceTime = CTimer::GetTick();
-				
-				State = FillLeft;
-				Cio::is().Right(eValveStates::Hold);
 				Cio::is().Left(eValveStates::Fill);
 			}
 		break;
-		case FillLeft:
-			if(CTimer::IsTimedOut(5000, DanceTime))
-			{
-				DanceTime = CTimer::GetTick();
-				
-				State = FillRight;
-				Cio::is().Right(eValveStates::Fill);
-				Cio::is().Left(eValveStates::Hold);
-			}
-		break;
-		case FillRight:
-			if(CTimer::IsTimedOut(5000, DanceTime))
+		case TiltRight: //complete
+			if(CTimer::IsTimedOut(12000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
 				//Hip Roll 3 times
+				
+				CSerial::is() << "Roll #; " <<rolls << "\n";
 				if(rolls < 3)
 				{
-					State = TiltLeft;
+					State = Filling;
 					Cio::is().Right(eValveStates::Hold);
 					Cio::is().Left(eValveStates::Dump);
 				}
@@ -216,7 +200,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case Dump1:
-			if(CTimer::IsTimedOut(2000, DanceTime))
+			if(CTimer::IsTimedOut(1000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -226,7 +210,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case Fill1:
-			if(CTimer::IsTimedOut(4000, DanceTime))
+			if(CTimer::IsTimedOut(15000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -236,7 +220,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case Dump2:
-			if(CTimer::IsTimedOut(3000, DanceTime))
+			if(CTimer::IsTimedOut(5000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -246,7 +230,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case Fill2:
-			if(CTimer::IsTimedOut(5000, DanceTime))
+			if(CTimer::IsTimedOut(15000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -256,7 +240,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case Dump3:
-			if(CTimer::IsTimedOut(7000, DanceTime))
+			if(CTimer::IsTimedOut(15000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -266,6 +250,7 @@ void FSMDance::ShakeIt()
 		break;
 		case Done:
 			//back to manual mode
+			CLeds::is().ActiveOn();
 			m_SMManager.ChangeState(eStates::STATE_MANUAL);
 			
 			State = Idle;

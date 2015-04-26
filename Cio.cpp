@@ -454,7 +454,7 @@ void Cio::LeftFillOff()
 void Cio::LeftDumpOn()
 {
 	//TODO Bad port pin PORTB |= _BV(7);
-	PORTA |= _BV(PA3);
+	PORTA |= _BV(3);
 	CLeds::is().LeftDumpOn();
 }
 
