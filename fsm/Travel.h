@@ -23,6 +23,7 @@ class FsmTravel :public CState
 private:
 	CCorner LeftSide;
 	CCorner RightSide;
+	bool Starting;
 }; //Travel
 
 #endif //__TRAVEL_H__
