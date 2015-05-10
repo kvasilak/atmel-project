@@ -30,7 +30,7 @@ void FSMDance::OnEntry()
 	Cio::is().AllOff();
 	
 	//Always start by filling the bags 
-	State = Filling;
+	State = StartWaiting;
 
 	SpeedTime = CTimer::GetTick();
 	
@@ -138,45 +138,61 @@ void FSMDance::ShakeIt()
 	{
 		case Idle:
 		break;
-		case Fill:
-			//open both fill valves
-			Cio::is().Right(eValveStates::Fill);
-			Cio::is().Left(eValveStates::Fill);
-			
-			State = StartFilling;
-			
-			CSerial::is() << "start filling\n";
-		break;
-		case StartFilling:
-			if(true == IsMoving())
+		case StartWaiting:
 			{
-				CSerial::is() << "filling\n";
-				State = Filling;
+				CSerial::is() << "Waiting\n";
+				
+				Cio::is().Right(eValveStates::Hold);
+				Cio::is().Left(eValveStates::Hold);
+				
+				DanceTime = CTimer::GetTick();
+				State = Waiting;
 			}
 		break;
-		case Filling:
-			//Wait for max height to be reached
-			//if(false == IsMoving())
+		case Waiting:
+			if(CTimer::IsTimedOut(15000, DanceTime))
 			{
-				CSerial::is() << "Max Height\n";
+				CSerial::is() << "Done start delay\n";
 				
-				State = TiltLeft;
-				Cio::is().Right(eValveStates::Fill);
+				DanceTime = CTimer::GetTick();
+				
+				State = TiltLeft1;
+				Cio::is().Right(eValveStates::Hold);
 				Cio::is().Left(eValveStates::Dump);
 			}
 		break;
-		case TiltLeft:
-			if(CTimer::IsTimedOut(12000, DanceTime))
+		case TiltLeft1:
+			if(CTimer::IsTimedOut(5000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
-				State = TiltRight;
+				State = TiltLeft;
+				Cio::is().Right(eValveStates::Fill);
+				Cio::is().Left(eValveStates::Hold);
+			}
+		break;
+		case TiltLeft:
+			if(CTimer::IsTimedOut(5000, DanceTime))
+			{
+				DanceTime = CTimer::GetTick();
+				
+				State = TiltRight1;
 				Cio::is().Right(eValveStates::Dump);
 				Cio::is().Left(eValveStates::Fill);
 			}
 		break;
+		case TiltRight1:
+		if(CTimer::IsTimedOut(5000, DanceTime))
+			{
+				DanceTime = CTimer::GetTick();
+				
+				State = TiltRight;
+				Cio::is().Right(eValveStates::Hold);
+				Cio::is().Left(eValveStates::Fill);
+			} 
+		break;
 		case TiltRight: //complete
-			if(CTimer::IsTimedOut(12000, DanceTime))
+			if(CTimer::IsTimedOut(5000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -185,8 +201,8 @@ void FSMDance::ShakeIt()
 				CSerial::is() << "Roll #; " <<rolls << "\n";
 				if(rolls < 3)
 				{
-					State = Filling;
-					Cio::is().Right(eValveStates::Hold);
+					State = TiltLeft1;
+					Cio::is().Right(eValveStates::Fill);
 					Cio::is().Left(eValveStates::Dump);
 				}
 				else
@@ -200,7 +216,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case Dump1:
-			if(CTimer::IsTimedOut(1000, DanceTime))
+			if(CTimer::IsTimedOut(3000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -210,7 +226,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case Fill1:
-			if(CTimer::IsTimedOut(15000, DanceTime))
+			if(CTimer::IsTimedOut(6000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -220,7 +236,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case Dump2:
-			if(CTimer::IsTimedOut(5000, DanceTime))
+			if(CTimer::IsTimedOut(3000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -230,7 +246,7 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case Fill2:
-			if(CTimer::IsTimedOut(15000, DanceTime))
+			if(CTimer::IsTimedOut(6000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
@@ -240,20 +256,27 @@ void FSMDance::ShakeIt()
 			}
 		break;
 		case Dump3:
-			if(CTimer::IsTimedOut(15000, DanceTime))
+			if(CTimer::IsTimedOut(3000, DanceTime))
 			{
 				DanceTime = CTimer::GetTick();
 				
 				State = Done;
-				Cio::is().AllOff();
+				Cio::is().Right(eValveStates::Fill);
+				Cio::is().Left(eValveStates::Fill);
+				
 			}
 		break;
 		case Done:
 			//back to manual mode
-			CLeds::is().ActiveOn();
-			m_SMManager.ChangeState(eStates::STATE_MANUAL);
+			if(CTimer::IsTimedOut(5000, DanceTime))
+			{
+				CLeds::is().ActiveOn();
+				m_SMManager.ChangeState(eStates::STATE_MANUAL);
+				
+				Cio::is().AllOff();
 			
-			State = Idle;
+				State = Idle;
+			}
 		break;
 		default:
 			// close valves

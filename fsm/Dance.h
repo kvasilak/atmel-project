@@ -29,10 +29,11 @@ class FSMDance :public CState
 	enum CalStates
 	{
 		Idle,
-		Fill,
-		StartFilling,
-		Filling,
+		StartWaiting,
+		Waiting,
+		TiltLeft1,
 		TiltLeft,
+		TiltRight1,
 		TiltRight,
 		FillLeft,
 		FillRight,
