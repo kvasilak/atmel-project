@@ -349,9 +349,6 @@ void Cio::SteeringRemote()
 	bool RemoteUp = PINB & _BV(2);
 	bool RemoteDown = PINB & _BV(0);
 	
-	FillPressed = false;
-	DumpPressed = false;
-	
 	if(RemoteUp)
 	{
 		if(FillPressed)
@@ -364,6 +361,15 @@ void Cio::SteeringRemote()
 		}
 		else
 		{
+			//turn off and unlatch the dump button
+			if(DumpPressed)
+			{
+				LeftDumpOff();
+				RightDumpOff();
+				
+				DumpPressed = false;
+			}
+			
 			LeftFillOn();
 			RightFillOn();
 			
@@ -386,10 +392,18 @@ void Cio::SteeringRemote()
 		}
 		else
 		{
+			//turn off and unlatch the fill button
+			if(FillPressed)
+			{
+				LeftFillOff();
+				RightFillOff();
+				
+				FillPressed = false;
+			}
+			
 			LeftDumpOn();
 			RightDumpOn();
 			
-			FillPressed = false;
 			DumpPressed = true;
 		}
 	}

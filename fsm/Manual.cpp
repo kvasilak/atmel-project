@@ -22,6 +22,8 @@ void FsmManual::OnEntry()
 	CLeds::is().CampOff();
 	CLeds::is().TravelOKOff();
 	
+	Cio::is().AllOff();
+	
 	Cio::is().FillReset();
 	
 	CSerial::is() << " FsmManual::OnEntry()\r\n";
@@ -60,5 +62,7 @@ void FsmManual::HandleEvent(eEvents evt)
 void FsmManual::OnExit()
 {
 	CSerial::is() << " FsmManual::OnExit()\r\n";
+	
+	Cio::is().AllOff();
 }
 
