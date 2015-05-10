@@ -22,6 +22,8 @@ void FsmManual::OnEntry()
 	CLeds::is().CampOff();
 	CLeds::is().TravelOKOff();
 	
+	Cio::is().FillReset();
+	
 	CSerial::is() << " FsmManual::OnEntry()\r\n";
 }
 
@@ -30,18 +32,10 @@ void FsmManual::HandleEvent(eEvents evt)
 	switch(evt)
 	{
 		case eEvents::TravelEvent:
-			//change state if no manual buttons are active
-			if(Cio::is().IsHolding())
-			{
-				m_SMManager.ChangeState(eStates::STATE_TRAVEL, evt);
-			}
+			m_SMManager.ChangeState(eStates::STATE_TRAVEL, evt);
 		break;
 		case eEvents::CampEvent:
-			//change state if no manual buttons are active
-			if(Cio::is().IsHolding())
-			{
-				m_SMManager.ChangeState(eStates::STATE_CAMP, evt);
-			}
+			m_SMManager.ChangeState(eStates::STATE_CAMP, evt);
 		break;
 		case eEvents::RockerEvent:
 			Cio::is().RockerSwitch();

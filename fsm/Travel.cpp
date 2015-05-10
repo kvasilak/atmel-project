@@ -17,7 +17,8 @@
 FsmTravel::FsmTravel(CController& SMManager) :
 CState(SMManager, eStates::STATE_TRAVEL),
 LeftSide(LeftRear),
-RightSide(RightRear)
+RightSide(RightRear),
+Starting(true)
 {
 }
 
@@ -26,6 +27,10 @@ void FsmTravel::OnEntry()
 	LeftSide.Init(LeftRear);
 	RightSide.Init(RightRear);
 
+	LeftSide.SetLongFilter(false);
+	RightSide.SetLongFilter(false);
+	
+	Starting = true;
 	
 	CSerial::is() << " FsmTravel::OnEntry()\r\n";
 	CSerial::is() << "Travel Cal vals; Left, " << nvm::is().GetLeftTravel() << ", Right, " << nvm::is().GetRightTravel() << "\n";
@@ -39,6 +44,19 @@ void FsmTravel::HandleEvent(eEvents evt)
 			//run travel FSM
 			LeftSide.Run(nvm::is().GetLeftTravel());
 			RightSide.Run(nvm::is().GetRightTravel());
+			
+			if(Starting)
+			{
+				//switch to a slower filter as soon as we reach ride height
+				if(LeftSide.AtHeight() && RightSide.AtHeight() )
+				{
+					LeftSide.SetLongFilter(false);
+					RightSide.SetLongFilter(false);
+					
+					Starting = false;
+				}
+			}
+			
 			break;
 		case eEvents::RockerEvent:
 		case eEvents::OutSideEvent:

@@ -7,5 +7,8 @@ Micro level design issues
 * verify Cal LED current, Maybe too low
 * P1 has .5(?)mm pad spacing, while connector has 1mm, they seem to be different styles completely
 * atmega164 processoronly has 16k of memory, should be bigger, 1284 will be used
-* 
+* board too tall for the dash cutout
+* use 3d printed buttons
+* buttons and camp / travel LEDs should be all on the same PCB as the controller
+* solenoid board mounting should be compatible with controller mounting, I.e stackable...
 

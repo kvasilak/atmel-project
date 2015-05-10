@@ -76,6 +76,11 @@ public:
 
 	void PowerOn();
 	
+	void FillReset() 
+	{
+		FillPressed = false;
+		DumpPressed = false;
+	}
 
 private:
 	Cio();
@@ -90,6 +95,8 @@ private:
 	void Direction();
 	void Pullups();
 
+	bool FillPressed;
+	bool DumpPressed;
 
 }; //Cio
 

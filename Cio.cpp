@@ -141,6 +141,8 @@ void Cio::Init()
 	SteeringRemoteChanged();
 	OutSideRemoteChanged();
 	CalibrateChanged();
+	
+	FillReset();
 }
 
 //update switch states and debounce
@@ -252,31 +254,62 @@ void Cio::RockerSwitch()
 	if(RockerUp.Level())
 	{
 		CSerial::is() << "RockerUp.Level()\n";
-		LeftFillOn();
-		RightFillOn();
 		
-		LeftDumpOff();
-		RightDumpOff();
+		if(FillPressed)
+		{
+			LeftFillOff();
+			RightFillOff();
+			
+			FillPressed = false;
+		}
+		else
+		{
+			//turn off and unlatch the dump button
+			if(DumpPressed)
+			{
+				LeftDumpOff();
+				RightDumpOff();
+				
+				DumpPressed = false;
+			}
+			
+			LeftFillOn();
+			RightFillOn();
+			
+			FillPressed = true;
+		}
 	}
-	else if(RockerDown.Level())
+	
+	if(RockerDown.Level())
 	{
 		CSerial::is() <<  "RockerDown.Level()\n";
-		LeftDumpOn();
-		RightDumpOn();
 		
-		LeftFillOff();
-		RightFillOff();
+		//toggle on button press
+		if(DumpPressed)
+		{
+			LeftDumpOff();
+			RightDumpOff();
+			
+			DumpPressed = false;
+		}
+		else
+		{
+			//turn off and unlatch the fill button
+			if(FillPressed)
+			{
+				LeftFillOff();
+				RightFillOff();
+				
+				FillPressed = false;
+			}
+			
+			LeftDumpOn();
+			RightDumpOn();
+			
+			DumpPressed = true;
+		}
 	}
-	else
-	{
-		CSerial::is() << "all off\n";
-		
-		LeftDumpOff();
-		RightDumpOff();
-		
-		LeftFillOff();
-		RightFillOff();
-	}
+
 }
 
 void Cio::OutsideRemote()
@@ -285,6 +318,9 @@ void Cio::OutsideRemote()
 	bool RemoteLeftDown =PINA & _BV(6);		//right down
 	bool RemoteRightUp = PINA & _BV(5);		//left up
 	bool RemoteRightDown =PINA & _BV(7);	//right down
+	
+	FillPressed = false;
+	DumpPressed = false;
 	
 	if(RemoteLeftUp)
 		LeftFillOn();
@@ -313,27 +349,51 @@ void Cio::SteeringRemote()
 	bool RemoteUp = PINB & _BV(2);
 	bool RemoteDown = PINB & _BV(0);
 	
+	FillPressed = false;
+	DumpPressed = false;
+	
 	if(RemoteUp)
 	{
-		LeftFillOn();
-		RightFillOn();
+		if(FillPressed)
+		{
+			LeftFillOff();
+			RightFillOff();
+			
+			FillPressed = false;
+			
+		}
+		else
+		{
+			LeftFillOn();
+			RightFillOn();
+			
+			FillPressed = true;
+			DumpPressed = false;
+		}
+		
 	}
-	else
-	{
-		LeftFillOff();
-		RightFillOff();
-	}
+
 	
 	if(RemoteDown)
 	{
-		LeftDumpOn();
-		RightDumpOn();
+		if(DumpPressed)
+		{
+			LeftDumpOff();
+			RightDumpOff();
+			
+			DumpPressed = false;
+			
+		}
+		else
+		{
+			LeftDumpOn();
+			RightDumpOn();
+			
+			FillPressed = false;
+			DumpPressed = true;
+		}
 	}
-	else
-	{
-		LeftDumpOff();
-		RightDumpOff();
-	}
+
 }
 
 
