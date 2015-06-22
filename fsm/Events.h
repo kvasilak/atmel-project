@@ -10,7 +10,9 @@ enum class eEvents
 	SteeringEvent,
 	TravelEvent,
 	CampEvent,
-	CalibrateEvent
+	CalibrateEvent,
+	IgnitionOnEvent,
+	IgnitionOffEvent
 };
 
 

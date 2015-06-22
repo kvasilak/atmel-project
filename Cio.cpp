@@ -10,7 +10,6 @@
 #include "CLeds.h"
 #include "CSerial.h"
 
-
 // default constructor
 Cio::Cio()
 {

@@ -5,12 +5,13 @@
 * Author: keith
 */
 
-
+#include <avr/sleep.h>
 #include "Manual.h"
 #include "..\CController.h"
 #include "..\Cio.h"
 #include "..\CSerial.h"
 #include "..\CLeds.h"
+
 
 FsmManual::FsmManual(CController& SMManager) :
 CState(SMManager, eStates::STATE_MANUAL)
@@ -23,9 +24,7 @@ void FsmManual::OnEntry()
 	CLeds::is().TravelOKOff();
 	
 	Cio::is().AllOff();
-	
 	Cio::is().FillReset();
-	
 	CSerial::is() << " FsmManual::OnEntry()\r\n";
 }
 
@@ -35,25 +34,40 @@ void FsmManual::HandleEvent(eEvents evt)
 	{
 		case eEvents::TravelEvent:
 			m_SMManager.ChangeState(eStates::STATE_TRAVEL, evt);
-		break;
+			break;
 		case eEvents::CampEvent:
 			m_SMManager.ChangeState(eStates::STATE_CAMP, evt);
-		break;
+			break;
 		case eEvents::RockerEvent:
 			Cio::is().RockerSwitch();
-		break;
+			break;
 		case eEvents::OutSideEvent:
 			Cio::is().OutsideRemote();
-		break;
+			break;
 		case eEvents::SteeringEvent:
 			Cio::is().SteeringRemote();
-		break;
+			break;
 		case eEvents::CalibrateEvent:
 			m_SMManager.ChangeState(eStates::STATE_MANUAL_CALIBRATE);
-		break;
+			break;
 		case eEvents::TimerEvent:
 			//run travel FSM?
-		break;
+			break;
+		case IgnitionOnEvent:
+			Cio::is().AllOff();
+			Cio::is().FillReset();
+			CSerial::is() << " FsmManual::Ignition On\r\n";
+			break;
+		case IgnitionOffEvent:
+			Cio::is().AllOff();
+			Cio::is().FillReset();
+			CSerial::is() << " FsmManual::Ignition Off\r\n";
+			
+			//Cio::is().LowPower();
+			Cio::is().Sleep();
+			//set_sleep_mode(<mode>);
+			//sleep_mode();
+			break;
 		default:
 		break;
 	}

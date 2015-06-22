@@ -52,6 +52,11 @@ void FsmCamp::HandleEvent(eEvents evt)
 		break;
 		case eEvents::CalibrateEvent:
 			m_SMManager.ChangeState(eStates::STATE_CAMP_CALIBRATE);
+		break;
+		case IgnitionOnEvent:
+			break;
+		case IgnitionOffEvent:
+			break;
 		default:
 		break;
 	}

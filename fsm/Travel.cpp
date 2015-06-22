@@ -50,8 +50,9 @@ void FsmTravel::HandleEvent(eEvents evt)
 				//switch to a slower filter as soon as we reach ride height
 				if(LeftSide.AtHeight() && RightSide.AtHeight() )
 				{
-					LeftSide.SetLongFilter(false);
-					RightSide.SetLongFilter(false);
+					CSerial::is() << " *******Setting long travel Filter ******\r\n";
+					LeftSide.SetLongFilter(true);
+					RightSide.SetLongFilter(true);
 					
 					Starting = false;
 				}
@@ -71,6 +72,11 @@ void FsmTravel::HandleEvent(eEvents evt)
 		break;
 		case eEvents::CalibrateEvent:
 			m_SMManager.ChangeState(eStates::STATE_TRAVEL_CALIBRATE);
+			break;
+		case IgnitionOnEvent:
+			break;
+		case IgnitionOffEvent:
+			break;
 		default:
 		break;
 	}
