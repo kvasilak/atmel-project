@@ -62,7 +62,7 @@ public:
 	CController(const CController&);
 	CController& operator=(const CController&);
 
-	eStates m_CurrState;
+	
 
 	void ChangeState(eStates newState, eEvents evt = eEvents::NoEvent);
 
@@ -77,7 +77,11 @@ public:
 
 	bool IsTimedOut();
 	
+	eStates m_CurrState;
 	uint32_t Time;
+	uint32_t IgnitionChangeStart;
+	bool IgnitionEventPending;
+	bool LastIgnitionOn;
 	
 }; //CController
 

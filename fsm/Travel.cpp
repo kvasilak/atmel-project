@@ -73,9 +73,9 @@ void FsmTravel::HandleEvent(eEvents evt)
 		case eEvents::CalibrateEvent:
 			m_SMManager.ChangeState(eStates::STATE_TRAVEL_CALIBRATE);
 			break;
-		case IgnitionOnEvent:
+		case eEvents::IgnitionOnEvent:
 			break;
-		case IgnitionOffEvent:
+		case eEvents::IgnitionOffEvent:
 			break;
 		default:
 		break;

@@ -10,6 +10,16 @@
 #include "CLeds.h"
 #include "CSerial.h"
 
+//for ignition interrupt
+#include <avr/interrupt.h>
+
+//for sleep obviously
+#include <avr/sleep.h>
+
+volatile bool Cio::IgnitionOn =false; 
+volatile bool Cio::IgnitionChanged = false;
+
+
 // default constructor
 Cio::Cio()
 {
@@ -142,6 +152,9 @@ void Cio::Init()
 	CalibrateChanged();
 	
 	FillReset();
+	
+	IgnitionOn = false;
+	EnableIgnOnInterrupt();
 }
 
 //update switch states and debounce
@@ -153,6 +166,12 @@ void Cio::Run()
 	PushTravel.Update();
 	PushCamp.Update();
 	PushCalibrate.Update();
+}
+
+void Cio::EnableIgnOnInterrupt()
+{
+	EICRA |= /*(1<<ISC21) | */(1 << ISC20);    // set INT0 to trigger on rising edge
+	EIMSK |= (1 << INT2);     
 }
 
 bool Cio::RockerChanged()
@@ -569,3 +588,39 @@ void Cio::CompressorOff()
 	PORTA |= _BV(PA3);
 }
 
+//put the system into sleep to conserve power
+void Cio::Sleep()
+{
+	//Turn off all LEDS
+	CLeds::is().AllOff();
+	
+	//turn off all valves
+	AllOff();
+	
+	//turn off unnecessary peripherals
+	//ADC
+	//Comparator
+	//UARTs
+	
+	
+	//Set CPU to sleep, will wake up on an ignition IRQ
+	cli();
+	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+	
+	// sleep_mode() has a possible race condition
+	sleep_enable();
+	sei();
+	sleep_cpu();
+	sleep_disable();
+
+}
+
+// clock interrupt - clear flag immediately to resume count
+//PD2 (INT0/I26)
+ISR(PCINT2_vect)
+{
+	
+	Cio::IgnitionChanged = true;
+	
+	Cio::IgnitionOn  = (PIND & _BV(PORTD2)); //PD3 level
+}

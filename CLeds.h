@@ -27,6 +27,7 @@ public:
 
 	
 	void Init();
+	void AllOff();
 	
 	//LEDOUT0
 	//LED0

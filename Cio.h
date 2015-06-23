@@ -82,6 +82,10 @@ public:
 		DumpPressed = false;
 	}
 
+	void Sleep();
+	static volatile bool IgnitionOn;
+	static volatile bool IgnitionChanged;
+	
 private:
 	Cio();
 	Cio& operator=( const Cio &c );
@@ -94,6 +98,7 @@ private:
 	
 	void Direction();
 	void Pullups();
+	void EnableIgnOnInterrupt();
 
 	bool FillPressed;
 	bool DumpPressed;

@@ -33,6 +33,18 @@ void CLeds::Init()
 	CLedDriver::Init();
 }
 
+void CLeds::AllOff()
+{
+	RightFillOff();
+	RightDumpOff();
+	ActiveOff();
+	LeftFillOff();
+	LeftDumpOff();
+	CampOff();
+	TravelWarnOff();
+	TravelOKOff();
+}
+
 void CLeds::RightFillOn()
 {
 	LEDout0 |= Led0On;
