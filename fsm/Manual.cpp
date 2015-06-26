@@ -63,10 +63,7 @@ void FsmManual::HandleEvent(eEvents evt)
 			Cio::is().FillReset();
 			CSerial::is() << " FsmManual::Ignition Off\r\n";
 			
-			//Cio::is().LowPower();
-			Cio::is().Sleep();
-			//set_sleep_mode(<mode>);
-			//sleep_mode();
+			//Cio::is().Sleep();
 			break;
 		default:
 		break;

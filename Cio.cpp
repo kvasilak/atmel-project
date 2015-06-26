@@ -545,15 +545,15 @@ void Cio::LeftFillOff()
 
 void Cio::LeftDumpOn()
 {
-	//TODO Bad port pin PORTB |= _BV(7);
-	PORTA |= _BV(3);
+	PORTB |= _BV(7);
+	//PORTA |= _BV(3);
 	CLeds::is().LeftDumpOn();
 }
 
 void Cio::LeftDumpOff()
 {
-	//TODO Bad port pin PORTB &= ~_BV(7);
-	PORTA &= ~_BV(3);
+	PORTB &= ~_BV(7);
+	//PORTA &= ~_BV(3);
 	CLeds::is().LeftDumpOff();
 }
 
@@ -604,14 +604,14 @@ void Cio::Sleep()
 	
 	
 	//Set CPU to sleep, will wake up on an ignition IRQ
-	cli();
-	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-	
-	// sleep_mode() has a possible race condition
-	sleep_enable();
-	sei();
-	sleep_cpu();
-	sleep_disable();
+// 	cli();
+// 	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+// 	
+// 	// sleep_mode() has a possible race condition
+// 	sleep_enable();
+// 	sei();
+// 	sleep_cpu();
+// 	sleep_disable();
 
 }
 
