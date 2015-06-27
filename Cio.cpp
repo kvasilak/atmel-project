@@ -16,7 +16,6 @@
 //for sleep obviously
 #include <avr/sleep.h>
 
-volatile bool Cio::IgnitionOn =false; 
 volatile bool Cio::IgnitionChanged = false;
 
 
@@ -152,8 +151,7 @@ void Cio::Init()
 	CalibrateChanged();
 	
 	FillReset();
-	
-	IgnitionOn = false;
+
 	EnableIgnOnInterrupt();
 }
 
@@ -170,8 +168,8 @@ void Cio::Run()
 
 void Cio::EnableIgnOnInterrupt()
 {
-	EICRA |= /*(1<<ISC21) | */(1 << ISC20);    // set INT0 to trigger on rising edge
-	EIMSK |= (1 << INT2);     
+	EICRA = 10; //(1 << ISC00);    // set INT0 to trigger on rising edge
+	EIMSK  = 2;//|= (1 << INT2);     
 }
 
 bool Cio::RockerChanged()
@@ -615,12 +613,15 @@ void Cio::Sleep()
 
 }
 
+ bool Cio::IsIgnitionOn()
+ {
+ 	return (PIND & _BV(3)) & _BV(3);
+ }
+
 // clock interrupt - clear flag immediately to resume count
 //PD2 (INT0/I26)
-ISR(PCINT2_vect)
+ISR(INT1_vect)
 {
-	
 	Cio::IgnitionChanged = true;
-	
-	Cio::IgnitionOn  = (PIND & _BV(PORTD2)); //PD3 level
 }
+

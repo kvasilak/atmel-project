@@ -83,7 +83,7 @@ public:
 	}
 
 	void Sleep();
-	static volatile bool IgnitionOn;
+	bool IsIgnitionOn();
 	static volatile bool IgnitionChanged;
 	
 private:

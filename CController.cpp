@@ -111,57 +111,58 @@ void CController::CheckEvent()
 	
  	if(CTimer::IsTimedOut(500, istart))
  	{
- 		//uint8_t ign  = (PIND & _BV(PORTD2)); //PD3 level
- 		//uint8_t ign1  = (PIND & _BV(PORTD3));
- 		//uint8_t ign2  = (PIND & _BV(PORTD4));
+		
+ 		if(Cio::is().IsIgnitionOn())
+ 		{
+			 CSerial::is() << "Ignition is ON\n";
+		}
+		else
+		{
+			CSerial::is() << "Ignition is OFF\n";
+		}
  		
- 		uint8_t ign  = PIND & _BV(3);
- 		uint8_t ign1  = PIND & _BV(4);
- 		uint8_t ign2  = PIND & _BV(5);
- 		
- 		CSerial::is() << "Ignition is" << ign << ", " << ign1 << ", " << ign2 << "\n";
  		
  		istart = CTimer::GetTick();
  	}
 	
 	
-// 	if(Cio::IgnitionChanged)
-// 	{
-// 		CSerial::is() << "Ignition Changed\n";
-// 		
-// 		IgnitionChangeStart = CTimer::GetTick();
-// 		
-// 		Cio::IgnitionChanged = false;
-// 		
-// 		IgnitionEventPending = true;
-// 	}
-// 	
-// 	
-// 	if(IgnitionEventPending)
-// 	{
-// 		//Don't cycle power too fast
-// 		if(CTimer::IsTimedOut(500, IgnitionChangeStart))
-// 		{
-// 			//Was this a true event? Or just noise
-// 			if(LastIgnitionOn != Cio::IgnitionOn)
-// 			{
-// 				LastIgnitionOn = Cio::IgnitionOn;
-// 				
-// 				if(Cio::IgnitionOn)
-// 				{
-// 					CSerial::is() << "IgnitionOnEvent\n";
-// 					
-// 					ScheduleEvent(eEvents::IgnitionOnEvent);
-// 				}
-// 				else
-// 				{
-// 					CSerial::is() << "IgnitionOffEvent\n";
-// 					
-// 					ScheduleEvent(eEvents::IgnitionOffEvent);
-// 				}
-// 			}
-// 		}
-// 	}
+	if(Cio::IgnitionChanged)
+	{
+		CSerial::is() << "Ignition Changed\n";
+		
+		IgnitionChangeStart = CTimer::GetTick();
+		
+		Cio::IgnitionChanged = false;
+		
+		IgnitionEventPending = true;
+	}
+	
+	
+	if(IgnitionEventPending)
+	{
+		//Don't cycle power too fast
+		if(CTimer::IsTimedOut(500, IgnitionChangeStart))
+		{
+			//Was this a true event? Or just noise
+			if(LastIgnitionOn != Cio::is().IsIgnitionOn())
+			{
+				LastIgnitionOn = Cio::is().IsIgnitionOn();
+				
+				if(Cio::is().IsIgnitionOn())
+				{
+					CSerial::is() << "IgnitionOnEvent\n";
+					
+					ScheduleEvent(eEvents::IgnitionOnEvent);
+				}
+				else
+				{
+					CSerial::is() << "IgnitionOffEvent\n";
+					
+					ScheduleEvent(eEvents::IgnitionOffEvent);
+				}
+			}
+		}
+	}
 
 	
 	if(Cio::is().RockerChanged())
