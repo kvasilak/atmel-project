@@ -44,6 +44,20 @@ void CController::Init()
 	
 	//update the rocker switch state
 	ScheduleEvent(eEvents::RockerEvent);
+	
+// 	if(Cio::is().IsIgnitionOn())
+// 	{
+// 		//CLeds::is().ActiveOn();
+// 		//Cio::is().CompressorOn();
+//  		
+  		Cio::is().Wakeup();
+// 	}
+// 	else
+// 	{
+// 		//sleep
+// 		Cio::is().Sleep();
+// 	}
+	
 }
 
 void CController::ScheduleEvent(eEvents evt)
@@ -107,25 +121,12 @@ void CController::ChangeState(eStates newState, eEvents evt)
 //Camp event for any change of the camp button
 void CController::CheckEvent()
 {
-	static uint32_t istart = CTimer::GetTick();
-	
- 	if(CTimer::IsTimedOut(500, istart))
- 	{
-		
- 		if(Cio::is().IsIgnitionOn())
- 		{
-			 CSerial::is() << "Ignition is ON\n";
-		}
-		else
-		{
-			CSerial::is() << "Ignition is OFF\n";
-		}
- 		
- 		
- 		istart = CTimer::GetTick();
- 	}
-	
-	
+	if(LastIgnitionOn != Cio::is().IsIgnitionOn())
+	{
+		Cio::IgnitionChanged = true;
+		LastIgnitionOn = Cio::is().IsIgnitionOn();
+	}
+
 	if(Cio::IgnitionChanged)
 	{
 		CSerial::is() << "Ignition Changed\n";
@@ -144,23 +145,29 @@ void CController::CheckEvent()
 		if(CTimer::IsTimedOut(500, IgnitionChangeStart))
 		{
 			//Was this a true event? Or just noise
-			if(LastIgnitionOn != Cio::is().IsIgnitionOn())
-			{
+			//if(LastIgnitionOn != Cio::is().IsIgnitionOn())
+			//{
 				LastIgnitionOn = Cio::is().IsIgnitionOn();
 				
-				if(Cio::is().IsIgnitionOn())
+				IgnitionEventPending = false;
+				
+				if(LastIgnitionOn)
 				{
 					CSerial::is() << "IgnitionOnEvent\n";
+					
+					//Cio::is().Wakeup();
 					
 					ScheduleEvent(eEvents::IgnitionOnEvent);
 				}
 				else
 				{
-					CSerial::is() << "IgnitionOffEvent\n";
+					CSerial::is() << "IgnitionOffEvent\n";										
 					
 					ScheduleEvent(eEvents::IgnitionOffEvent);
+					
+					//Cio::is().Sleep();
 				}
-			}
+			//}
 		}
 	}
 

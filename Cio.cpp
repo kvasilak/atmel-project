@@ -6,6 +6,8 @@
 */
 
 #include <avr/io.h>
+#include <avr/power.h> //perihperal power control
+//#include <util/delay.h>
 #include "Cio.h"
 #include "CLeds.h"
 #include "CSerial.h"
@@ -168,7 +170,7 @@ void Cio::Run()
 
 void Cio::EnableIgnOnInterrupt()
 {
-	EICRA = 10; //(1 << ISC00);    // set INT0 to trigger on rising edge
+	EICRA = 4; //(1 << ISC00);    // set INT1 to trigger on both edges
 	EIMSK  = 2;//|= (1 << INT2);     
 }
 
@@ -551,7 +553,6 @@ void Cio::LeftDumpOn()
 void Cio::LeftDumpOff()
 {
 	PORTB &= ~_BV(7);
-	//PORTA &= ~_BV(3);
 	CLeds::is().LeftDumpOff();
 }
 
@@ -574,16 +575,21 @@ void Cio::PowerOn()
 	PORTA |= _BV(PA2);
 }
 
+void Cio::PowerOff()
+{
+	//Turn off 5v, PA2
+	PORTA &= ~_BV(PA2);
+}
+
 void Cio::CompressorOn()
 {
-	//Turn on 5v, PA3
+	//Turn on Air compressor enable, PA3
 	PORTA |= _BV(PA3);
 }
 
 void Cio::CompressorOff()
 {
-	//Turn on 5v, PA3
-	PORTA |= _BV(PA3);
+	PORTA &= ~_BV(PA3);
 }
 
 //put the system into sleep to conserve power
@@ -595,22 +601,45 @@ void Cio::Sleep()
 	//turn off all valves
 	AllOff();
 	
-	//turn off unnecessary peripherals
-	//ADC
-	//Comparator
-	//UARTs
+	CompressorOff();
 	
+	PowerOff();
+	
+	//turn off unnecessary peripherals
+    //power_all_disable();
+
 	
 	//Set CPU to sleep, will wake up on an ignition IRQ
-// 	cli();
-// 	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-// 	
-// 	// sleep_mode() has a possible race condition
-// 	sleep_enable();
-// 	sei();
-// 	sleep_cpu();
-// 	sleep_disable();
+ 	cli();
+ 	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+ 	
+ 	// sleep_mode() has a possible race condition
+ 	sleep_enable();
+ 	sei();
+ 	sleep_cpu();
+ 	sleep_disable();
+}
 
+void Cio::Wakeup()
+{
+	//int i=0;
+	PowerOn();
+	CompressorOn();
+	
+// 	for(i=0; i<2; i++)
+// 	{
+// 		CLeds::is().Init();
+// 	}
+// 	
+	CLeds::is().Init();
+	CLeds::is().Init();
+	CLeds::is().Init();
+	CLeds::is().Init();
+	CLeds::is().Dim(100);
+	
+	CLeds::is().ActiveOn();
+	
+	
 }
 
  bool Cio::IsIgnitionOn()
@@ -622,6 +651,6 @@ void Cio::Sleep()
 //PD2 (INT0/I26)
 ISR(INT1_vect)
 {
-	Cio::IgnitionChanged = true;
+	//Cio::IgnitionChanged = true;
 }
 

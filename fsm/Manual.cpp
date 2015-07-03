@@ -54,12 +54,12 @@ void FsmManual::HandleEvent(eEvents evt)
 			//run travel FSM?
 			break;
 		case eEvents::IgnitionOnEvent:
-			Cio::is().AllOff();
+			//Cio::is().AllOff();
 			Cio::is().FillReset();
 			CSerial::is() << " FsmManual::Ignition On\r\n";
 			break;
 		case eEvents::IgnitionOffEvent:
-			Cio::is().AllOff();
+			//Cio::is().AllOff();
 			Cio::is().FillReset();
 			CSerial::is() << " FsmManual::Ignition Off\r\n";
 			

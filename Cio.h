@@ -75,6 +75,7 @@ public:
 	FillStates RightState;
 
 	void PowerOn();
+	void PowerOff();
 	
 	void FillReset() 
 	{
@@ -83,6 +84,7 @@ public:
 	}
 
 	void Sleep();
+	void Wakeup();
 	bool IsIgnitionOn();
 	static volatile bool IgnitionChanged;
 	
