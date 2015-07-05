@@ -27,7 +27,9 @@ class FsmCamp :public virtual CState
 	void OnExit();
 	
 	private:
+	void LevelIt();
 	uint32_t start;
+	bool LevelComplete;
 
 }; //Camp
 

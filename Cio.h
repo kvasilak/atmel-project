@@ -77,7 +77,7 @@ public:
 	void PowerOn();
 	void PowerOff();
 	
-	void FillReset() 
+	void ResetButtons() 
 	{
 		FillPressed = false;
 		DumpPressed = false;

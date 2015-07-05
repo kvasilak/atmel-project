@@ -53,8 +53,21 @@ void FSMCampCal::HandleEvent(eEvents evt)
 			Cio::is().OutsideRemote();
 			break;
 		case eEvents::CalibrateEvent:
-			//user pressed the the cal button again, save settings
-			CSerial::is() << "Camp cal, Cal event\n";
+			//user pressed the the cal button again, save 
+			int16_t X;
+			int16_t Y;
+			int16_t Z;
+			
+			//Read Acccel
+			CMMA8451::is().ReadXYZ(int16_t &X, int16_t &Y, int16_t &Z);
+			
+			nvm::is().SetCampX(X);
+			nvm::is().SetCampY(Y);
+			nvm::is().SetCampZ(Z);
+			
+			nvm::is().Save();
+			
+			CSerial::is() << "Camp Cal Complete; X, " << X << ", Y, " << Y <<", Z, " << Z "\n";
 			
 			m_SMManager.ChangeState(eStates::STATE_CAMP);
 

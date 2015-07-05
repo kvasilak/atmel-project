@@ -74,8 +74,22 @@ void FsmTravel::HandleEvent(eEvents evt)
 			m_SMManager.ChangeState(eStates::STATE_TRAVEL_CALIBRATE);
 			break;
 		case eEvents::IgnitionOnEvent:
+			Cio::is().Wakeup();
+			
+			//reset so we get back to ride height quickly
+			LeftSide.AtHeight(false);
+			RightSide.AtHeight(false);
+		
+			LeftSide.SetLongFilter(false);
+			RightSide.SetLongFilter(false);
+			
+			Starting = true;
+			CSerial::is() << " FsmTravel::Ignition On\r\n";
 			break;
 		case eEvents::IgnitionOffEvent:
+			CSerial::is() << " FsmTravel::Ignition Off\r\n";
+		
+			Cio::is().Sleep();
 			break;
 		default:
 		break;

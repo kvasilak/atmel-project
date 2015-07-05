@@ -24,7 +24,7 @@ void FsmManual::OnEntry()
 	CLeds::is().TravelOKOff();
 	
 	Cio::is().AllOff();
-	Cio::is().FillReset();
+	Cio::is().ResetButtons();
 	CSerial::is() << " FsmManual::OnEntry()\r\n";
 }
 
@@ -51,19 +51,19 @@ void FsmManual::HandleEvent(eEvents evt)
 			m_SMManager.ChangeState(eStates::STATE_MANUAL_CALIBRATE);
 			break;
 		case eEvents::TimerEvent:
-			//run travel FSM?
+			//nothing to do here
 			break;
 		case eEvents::IgnitionOnEvent:
-			//Cio::is().AllOff();
-			Cio::is().FillReset();
+			Cio::is().Wakeup();
+			
+			Cio::is().ResetButtons();
 			CSerial::is() << " FsmManual::Ignition On\r\n";
 			break;
 		case eEvents::IgnitionOffEvent:
-			//Cio::is().AllOff();
-			Cio::is().FillReset();
+			Cio::is().ResetButtons();
 			CSerial::is() << " FsmManual::Ignition Off\r\n";
 			
-			//Cio::is().Sleep();
+			Cio::is().Sleep();
 			break;
 		default:
 		break;

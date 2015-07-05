@@ -152,7 +152,7 @@ void Cio::Init()
 	OutSideRemoteChanged();
 	CalibrateChanged();
 	
-	FillReset();
+	ResetButtons();
 
 	EnableIgnOnInterrupt();
 }
