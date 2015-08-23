@@ -22,7 +22,10 @@ volatile bool Cio::IgnitionChanged = false;
 
 
 // default constructor
-Cio::Cio()
+Cio::Cio() :
+Awake(false),
+FillPressed(false),
+DumpPressed(false)
 {
 } //Cio
 
@@ -598,6 +601,8 @@ void Cio::Sleep()
 	//Turn off all LEDS
 	CLeds::is().AllOff();
 	
+	Awake = false;
+	
 	//turn off all valves
 	AllOff();
 	
@@ -639,6 +644,7 @@ void Cio::Wakeup()
 	
 	CLeds::is().ActiveOn();
 	
+	Awake = true;
 	
 }
 

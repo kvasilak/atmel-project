@@ -123,6 +123,8 @@ void CController::CheckEvent()
 {
 	if(LastIgnitionOn != Cio::is().IsIgnitionOn())
 	{
+		CSerial::is() << "Ignition switch!\n";
+		
 		Cio::IgnitionChanged = true;
 		LastIgnitionOn = Cio::is().IsIgnitionOn();
 	}
@@ -141,22 +143,24 @@ void CController::CheckEvent()
 	
 	if(IgnitionEventPending)
 	{
+		//CSerial::is() << ".";
+		
 		//Don't cycle power too fast
-		if(CTimer::IsTimedOut(500, IgnitionChangeStart))
+		if(CTimer::IsTimedOut(1000, IgnitionChangeStart))
 		{
+			CSerial::is() << "Ignition pending timeout\n";
+			
 			//Was this a true event? Or just noise
-			//if(LastIgnitionOn != Cio::is().IsIgnitionOn())
-			//{
-				LastIgnitionOn = Cio::is().IsIgnitionOn();
+			if(LastIgnitionOn == Cio::is().IsIgnitionOn())
+			{
+				//LastIgnitionOn = Cio::is().IsIgnitionOn();
 				
 				IgnitionEventPending = false;
 				
 				if(LastIgnitionOn)
 				{
 					CSerial::is() << "IgnitionOnEvent\n";
-					
-					//Cio::is().Wakeup();
-					
+
 					ScheduleEvent(eEvents::IgnitionOnEvent);
 				}
 				else
@@ -164,10 +168,8 @@ void CController::CheckEvent()
 					CSerial::is() << "IgnitionOffEvent\n";										
 					
 					ScheduleEvent(eEvents::IgnitionOffEvent);
-					
-					//Cio::is().Sleep();
 				}
-			//}
+			}
 		}
 	}
 

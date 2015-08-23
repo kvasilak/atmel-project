@@ -12,6 +12,7 @@
 #include "..\CSerial.h"
 #include "..\CLeds.h"
 #include "..\CTimer.h"
+#include "nvm.h"
 
 FSMCampCal::FSMCampCal(CController& SMManager) :
 CState(SMManager, eStates::STATE_MANUAL)
@@ -59,7 +60,7 @@ void FSMCampCal::HandleEvent(eEvents evt)
 			int16_t Z;
 			
 			//Read Acccel
-			CMMA8451::is().ReadXYZ(int16_t &X, int16_t &Y, int16_t &Z);
+			CMMA8451::is().ReadXYZ(X, Y, Z);
 			
 			nvm::is().SetCampX(X);
 			nvm::is().SetCampY(Y);
@@ -67,7 +68,7 @@ void FSMCampCal::HandleEvent(eEvents evt)
 			
 			nvm::is().Save();
 			
-			CSerial::is() << "Camp Cal Complete; X, " << X << ", Y, " << Y <<", Z, " << Z "\n";
+			CSerial::is() << "Camp Cal Complete; X, " << X << ", Y, " << Y <<", Z, " << Z << "\n";
 			
 			m_SMManager.ChangeState(eStates::STATE_CAMP);
 

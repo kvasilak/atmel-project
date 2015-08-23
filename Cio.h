@@ -87,6 +87,7 @@ public:
 	void Wakeup();
 	bool IsIgnitionOn();
 	static volatile bool IgnitionChanged;
+	bool Awake;
 	
 private:
 	Cio();
