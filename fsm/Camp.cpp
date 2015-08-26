@@ -17,6 +17,8 @@ static const int16_t rolltol = 10;
 
 FsmCamp::FsmCamp(CController& SMManager) :
 CState(SMManager, eStates::STATE_CAMP),
+Start(0),
+MinTime(250),
 LevelComplete(false),
 ReadyToSleep(false)
 {
@@ -28,7 +30,7 @@ void FsmCamp::OnEntry()
  	int16_t pitch = nvm::is().GetCampZ();
 
 	CSerial::is() << " FsmCamp::OnEntry(), roll cal; " << roll << " pitch cal; " << pitch << "\r\n";
-	start = CTimer::GetTick();
+	Start = CTimer::GetTick();
 	
 	CMMA8451::is().writeRegister8(0x2A, 0x3d); //slow rate, low noise, Active
 	
@@ -79,6 +81,8 @@ void FsmCamp::HandleEvent(eEvents evt)
 			break;
 		case eEvents::IgnitionOffEvent:
 			
+			ReadyToSleep = true;
+			
 			if(LevelComplete)
 			{
 				Cio::is().Sleep();
@@ -93,6 +97,7 @@ void FsmCamp::OnExit()
 {
 	CSerial::is() << " FsmCamp::OnExit()\r\n";
 }
+
 
 //pitch + means nose high
 //pitch - means nose low
@@ -115,45 +120,136 @@ void FsmCamp::LevelIt()
  	int16_t pitchcal = nvm::is().GetCampZ();
 	 
 	 CSerial::is() << "pitch err; " << Z -pitchcal << " roll err; " << X - rollcal << "\n";
-  //pitch up if( Z > pitchcal + pitchtol )
+	 
+	 //check to see if we're at leveling limits
+	 
+	 
+ //pitch up ( rear too Damn low) if( Z	> pitchcal + pitchtol )
  {
-	 CSerial::is() << "pitch up\n";
-	 Cio::is().Left(eValveStates::Dump);
-	 Cio::is().Right(eValveStates::Dump);
- }
- //pitch down
- else if( Z < pitchcal - pitchtol )
- {
-	 CSerial::is() << "pitch down\n";
-	 Cio::is().Left(eValveStates::Fill);
-	 Cio::is().Right(eValveStates::Fill);
- }
- //pitch within tolerance
- else
- {
-	 //Roll up ( right up )
-	 if(X > rollcal + rolltol)
+	 //Raise the lower corner
+	 if(X > rollcal + rolltol)//Roll up ( Left down )
 	 {
-		 CSerial::is() << "roll up\n";
-		 Cio::is().Left(eValveStates::Fill);
-		 Cio::is().Right(eValveStates::Dump);
+		 //Raise Left
+		 if(CTimer::IsTimedOut(MinTime, Start))
+		 {
+			 CSerial::is() << "left up\n";
+			 Cio::is().Left(eValveStates::Fill);
+			 Cio::is().Right(eValveStates::Hold);
+			 
+			 Start = CTimer::GetTick();
+		 }
+		 
 	 }
-	 //Roll down (Right Down)
-	 else if(X < rollcal - rolltol)
+	 else if(X < rollcal - rolltol) //Roll down (Right Down)
 	 {
-		 CSerial::is() << "roll down\n";
-		 Cio::is().Left(eValveStates::Dump);
-		 Cio::is().Right(eValveStates::Fill);
+		 //Raise Right
+		if(CTimer::IsTimedOut(MinTime, Start))
+		{
+			CSerial::is() << "Right up\n";
+			Cio::is().Left(eValveStates::Hold);
+			Cio::is().Right(eValveStates::Fill);
+			 		 
+			Start = CTimer::GetTick();
+		}
 	 }
-	 //Roll within tolerance
 	 else
 	 {
-		 CSerial::is() << "pitch and roll within tolerance\n";
-		 Cio::is().Left(eValveStates::Hold);
-		 Cio::is().Right(eValveStates::Hold);
-		 
-		 LevelComplete = true;
+		//Raise left and right
+		if(CTimer::IsTimedOut(MinTime, Start))
+		{
+			CSerial::is() << "left up\n";
+			Cio::is().Left(eValveStates::Fill);
+			Cio::is().Right(eValveStates::Fill);
+			 		 
+			Start = CTimer::GetTick();
+		}
 	 }
-   }
+ }
+ //pitch down ( rear too Damn high )
+ else if( Z < pitchcal - pitchtol )
+ {
+	 //lower the higher corner
+	 if(X > rollcal + rolltol)//Roll up ( Left down )
+	 {
+		 //Lower Left
+		 if(CTimer::IsTimedOut(MinTime, Start))
+		 {
+			 CSerial::is() << "left Down\n";
+			 Cio::is().Left(eValveStates::Dump);
+			 Cio::is().Right(eValveStates::Hold);
+			 
+			 Start = CTimer::GetTick();
+		 }
+		 
+	 }
+	 else if(X < rollcal - rolltol) //Roll down (Right Down)
+	 {
+		 //Lower Right
+		 if(CTimer::IsTimedOut(MinTime, Start))
+		 {
+			 CSerial::is() << "Right down\n";
+			 Cio::is().Left(eValveStates::Hold);
+			 Cio::is().Right(eValveStates::Dump);
+			 
+			 Start = CTimer::GetTick();
+		 }
+	 }
+	 else
+	 {
+		 //Lower left and right
+		 if(CTimer::IsTimedOut(MinTime, Start))
+		 {
+			 CSerial::is() << "left right down\n";
+			 Cio::is().Left(eValveStates::Dump);
+			 Cio::is().Right(eValveStates::Dump);
+			 
+			 Start = CTimer::GetTick();
+		 }
+	 }
+ }
+ //Level pitch
+ else
+ {
+	//rotate
+	if(X > rollcal + rolltol)//Roll up ( Left down )
+	{
+		//Raise Left, lower right
+		 if(CTimer::IsTimedOut(MinTime, Start))
+		 {
+			 CSerial::is() << "left up right down\n";
+			 Cio::is().Left(eValveStates::Fill);
+			 Cio::is().Right(eValveStates::Dump);
+			 
+			 Start = CTimer::GetTick();
+		 }
+	
+	}
+	else if(X < rollcal - rolltol) //Roll down (Right Down)
+	{
+		//Raise Right, lower left
+		 if(CTimer::IsTimedOut(MinTime, Start))
+		 {
+			 CSerial::is() << "left down right up\n";
+			 Cio::is().Left(eValveStates::Dump);
+			 Cio::is().Right(eValveStates::Fill);
+			 
+			 Start = CTimer::GetTick();
+		 }
+	}
+	else
+	{
+		//perfect
+		 if(CTimer::IsTimedOut(MinTime, Start))
+		 {
+			 CSerial::is() << "left right Purrfect\n";
+			 Cio::is().Left(eValveStates::Hold);
+			 Cio::is().Right(eValveStates::Hold);
+			 
+			 Start = CTimer::GetTick();
+			 
+			 LevelComplete = true;
+		 }
+	}
+ }
 }
 
