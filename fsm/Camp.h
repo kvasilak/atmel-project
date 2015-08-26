@@ -30,8 +30,6 @@ class FsmCamp :public virtual CState
 	void LevelIt();
 	uint32_t Start;
 	uint32_t MinTime;
-	bool LevelComplete;
-	bool ReadyToSleep;
 
 }; //Camp
 

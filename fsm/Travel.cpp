@@ -81,6 +81,8 @@ void FsmTravel::HandleEvent(eEvents evt)
 			else
 			{
 				Cio::is().Wakeup();
+				
+				CLeds::is().TravelOKOn();
 			
 				//reset so we get back to ride height quickly
 				LeftSide.AtHeight(false);

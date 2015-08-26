@@ -18,9 +18,7 @@ static const int16_t rolltol = 10;
 FsmCamp::FsmCamp(CController& SMManager) :
 CState(SMManager, eStates::STATE_CAMP),
 Start(0),
-MinTime(250),
-LevelComplete(false),
-ReadyToSleep(false)
+MinTime(250)
 {
 }
 
@@ -36,8 +34,6 @@ void FsmCamp::OnEntry()
 	
 	CMMA8451::is().writeRegister8(0x2B, 2); //high res
 	
-	LevelComplete = false;
-	ReadyToSleep = false;
 }
 
 void FsmCamp::HandleEvent(eEvents evt)
@@ -46,16 +42,7 @@ void FsmCamp::HandleEvent(eEvents evt)
 	{
 		case eEvents::TimerEvent:
 			//run camp FSM 
-			//CMMA8451::is().ReadXYZ();
-				
-			if(!LevelComplete)
-			{
-				LevelIt();
-			}
-			else if(ReadyToSleep)
-			{
-				Cio::is().Sleep();
-			}
+			LevelIt();
 
 		break;
 		case eEvents::RockerEvent:
@@ -74,19 +61,14 @@ void FsmCamp::HandleEvent(eEvents evt)
 		break;
 		case eEvents::IgnitionOnEvent:
 			Cio::is().Wakeup();
-			
+			CLeds::is().CampOn();
 			//relevel on wakeup
-			LevelComplete = false;
-			ReadyToSleep = false;
+
 			break;
 		case eEvents::IgnitionOffEvent:
-			
-			ReadyToSleep = true;
-			
-			if(LevelComplete)
-			{
-				Cio::is().Sleep();
-			}
+
+			Cio::is().Sleep();
+
 			break;
 		default:
 		break;
@@ -120,8 +102,6 @@ void FsmCamp::LevelIt()
  	int16_t pitchcal = nvm::is().GetCampZ();
 	 
 	 CSerial::is() << "pitch err; " << Z -pitchcal << " roll err; " << X - rollcal << "\n";
-	 
-	 //check to see if we're at leveling limits
 	 
 	 
  //pitch up ( rear too Damn low) if( Z	> pitchcal + pitchtol )
@@ -246,8 +226,6 @@ void FsmCamp::LevelIt()
 			 Cio::is().Right(eValveStates::Hold);
 			 
 			 Start = CTimer::GetTick();
-			 
-			 LevelComplete = true;
 		 }
 	}
  }
