@@ -63,11 +63,15 @@ void FsmCamp::HandleEvent(eEvents evt)
 			Cio::is().Wakeup();
 			CLeds::is().CampOn();
 			//relevel on wakeup
+			
+			CSerial::is() << " FsmCamp::Ignition On\r\n";
 
 			break;
 		case eEvents::IgnitionOffEvent:
 
 			Cio::is().Sleep();
+			
+			CSerial::is() << " FsmCamp::Ignition Off\r\n";
 
 			break;
 		default:

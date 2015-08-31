@@ -214,7 +214,7 @@ void CController::Run()
 	
 	CheckEvent();
 	
-	if(CTimer::IsTimedOut(100, Time))
+	if(CTimer::IsTimedOut(100, Time) && Cio::is().Awake)
 	{
 		ScheduleEvent(eEvents::TimerEvent);
 		Time = CTimer::GetTick();
