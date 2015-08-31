@@ -45,18 +45,18 @@ void CController::Init()
 	//update the rocker switch state
 	ScheduleEvent(eEvents::RockerEvent);
 	
-// 	if(Cio::is().IsIgnitionOn())
-// 	{
-// 		//CLeds::is().ActiveOn();
-// 		//Cio::is().CompressorOn();
-//  		
+	if(Cio::is().IsIgnitionOn())
+	{
+		CLeds::is().ActiveOn();
+		Cio::is().CompressorOn();
+ 		
   		Cio::is().Wakeup();
-// 	}
-// 	else
-// 	{
-// 		//sleep
-// 		Cio::is().Sleep();
-// 	}
+	}
+	else
+	{
+		//sleep
+		Cio::is().Sleep();
+	}
 	
 }
 
@@ -214,9 +214,12 @@ void CController::Run()
 	
 	CheckEvent();
 	
-	if(CTimer::IsTimedOut(100, Time) && Cio::is().Awake)
+	if(CTimer::IsTimedOut(50, Time))
 	{
-		ScheduleEvent(eEvents::TimerEvent);
+		if( Cio::is().Awake)
+		{
+			ScheduleEvent(eEvents::TimerEvent);
+		}
 		Time = CTimer::GetTick();
 	}
 }
