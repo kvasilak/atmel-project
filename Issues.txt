@@ -1,14 +1,23 @@
 Micro level design issues
 
+Big things
 * rx/tx swapped to serial debug port
-* Resister values for I2C pullup? Dave spec 29.4k, atmel data shaat says 1533 ohms
 * CTS line on debug port needs to be Grounded
-* Verify UP / Down LED current, may be high
-* verify Cal LED current, Maybe too low
 * P1 has .5(?)mm pad spacing, while connector has 1mm, they seem to be different styles completely
-* atmega164 processoronly has 16k of memory, should be bigger, 1284 will be used
-* board too tall for the dash cutout
-* use 3d printed buttons
+* rj45 connector doesn't stay in very well, I think the lock tab is hitting the PCB and not locking.
+* atmega164 processor only has 16k of memory, should be bigger, 1284 will be used
+* board too tall for the dash cutout (I  will design board )
 * buttons and camp / travel LEDs should be all on the same PCB as the controller
-* solenoid board mounting should be compatible with controller mounting, I.e stackable...
+
+Minor things
+* Verify UP / Down LED current, may be high ( hasn't burnt out yet )
+* verify Cal LED current, Maybe too low ( seems bright enough )
+* Resister values for I2C pullup? Dave spec 29.4k, atmel data shaat says 1533 ohms
+* use 3d printed buttons with surface mount switches for up, down, camp and travel
+* solenoid board mounting should be compatible with controller, I.e
+* bezel to be laser cut lexan(?) with graphic overlay
+* change jtag connector to use smaller connector .050"(?) so I don't need to use the big ugly adapter
+* rotate Accel to be square to gravity for more resolution, instead of being at 45' I don't think we need to compensate for drift, I'm not doing it for the z axis
+* may need to low pass filter the accelerometer values  in camp mode, test first
+
 
