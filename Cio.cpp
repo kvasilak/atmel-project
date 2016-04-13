@@ -24,6 +24,7 @@ volatile uint8_t ispa;
 #define REV3_PCB
 
 
+
 // default constructor
 Cio::Cio() :
 Awake(false),
@@ -103,6 +104,20 @@ void Cio::Direction()
 		//6		out		1	LD
 		//7		out		1	LU
 		
+		#define IGNITION_ON_BIT				2
+		#define IGNITION_ON_PORT		PORTA
+		
+		#define SOLENOID_RD_BIT			4
+		#define SOLENOID_RD_PORT		PORTA
+		
+		#define SOLENOID_RU_BIT			5
+		#define SOLENOID_RU_PORT		PORTA
+		
+		#define SOLENOID_LD_BIT			6
+		#define SOLENOID_LD_PORT		PORTA
+		
+		#define SOLENOID_LU_BIT			7
+		#define SOLENOIF_LU_PORT		PORTA
 		
 		DDRB = 0x00;
 		
@@ -117,6 +132,30 @@ void Cio::Direction()
 		//6		in 		0	Remote down
 		//7		in		0	Remote up
 		
+		#define REMOTE_LD_BIT		0
+		#define REMOTE_LD_PORT		PORTB
+		
+		#define REMOTE_LU_BIT		1
+		#define REMOTE_PORT			PORTB
+		
+		#define REMOTE_RD_BIT		2
+		#define REMOTE_TD_PORT		PORTB
+		
+		#define REMOTE_CAMP_BIT		3
+		#define REMOTE_CAMP_PORT	PORTB
+		
+		#define REMOTE_RU_BIT		4
+		#define REMOTE_RU_PORT		PORTB
+		
+		#define REMOTE_TRAVEL_BIT	5
+		#define REMOTE_TRAVEL_PORT	PORTB
+		
+		#define REMOTE_DOWN_BIT		6
+		#define REMOTE_DOWN_PORT	PORTB
+		
+		#define REMOTE_UP_BIT		7
+		#define REMOTE_UP_PORT		PORTB
+		
 		DDRC = 0x80;
 		//Port C
 		//0		SCL
@@ -127,6 +166,9 @@ void Cio::Direction()
 		//5		JTAG
 		//6		in		0 spare
 		//7		out		1 Compressor on
+		
+		#define COMPRESSOR_ON_BIT	8
+		#define COMPRESSOR_ON_PORT	PORTC
 		
 		DDRD = 0x02;
 		//Port D
@@ -139,6 +181,26 @@ void Cio::Direction()
 		//5		in		0	Camp
 		//6		in		0	Down
 		//7		in		0	up
+		
+		#define POWER_ON_BIT			2
+		#define POWER_ON_PORT			PORTD
+		
+		#define TRAVEL_BUTTON_BIT		3
+		#define TRAVEL_BUTTON_PORT		PORTD
+		
+		#define CALIBRATE_BUTTON_BIT	4
+		#define CALIBRATE_BUTTON_PORT	PORTD
+		
+		#define CAMP_BUTTON_BIT			5
+		#define CAMP_BUTTON_PORT		PORTD
+		
+		#define DOWN_BUTTON_BIT			6
+		#define DOWN_BUTTON_PORT		PORTD
+		
+		#define UP_BUTTON_BIT			7
+		#define UP_BUTTON_PORT			PORTD
+		
+		
 		#endif
 }
 
@@ -643,51 +705,50 @@ void Cio::Left(eValveStates s)
 
 void Cio::RightFillOn()
 {
-	PORTA |= _BV(5);
+	SOLENOID_RU_PORT |= _BV(SOLENOID_RU_BIT);
 	CLeds::is().RightFillOn();
 }
 
 void Cio::RightFillOff()
 {
-	PORTA &= ~_BV(5);
+	SOLENOID_RU_PORT &= ~_BV(SOLENOID_RU_BIT);
 	CLeds::is().RightFillOff();
 }
 
 void Cio::RightDumpOn()
 {
-	PORTA |= _BV(4);
+	SOLENOID_RD_PORT |= _BV(SOLENOID_RD_BIT);
 	CLeds::is().RightDumpOn();
 }
 
 void Cio::RightDumpOff()
 {
-	PORTA &= ~_BV(4);
+	SOLENOID_RD_PORT &= ~_BV(SOLENOID_RD_BIT);
 	CLeds::is().RightDumpOff();
 }
 
 
 void Cio::LeftFillOn()
 {
-	PORTA |= _BV(7);
+	SOLENOIF_LU_PORT |= _BV(SOLENOID_LU_BIT);
 	CLeds::is().LeftFillOn();
 }
 
 void Cio::LeftFillOff()
 {
-	PORTA &= ~_BV(7);
+	SOLENOIF_LU_PORT &= ~_BV(SOLENOID_LU_BIT);
 	CLeds::is().LeftFillOff();
 }
 
 void Cio::LeftDumpOn()
 {
-	PORTA |= _BV(6);
-	//PORTA |= _BV(3);
+	SOLENOID_LD_PORT |= _BV(SOLENOID_LD_BIT);
 	CLeds::is().LeftDumpOn();
 }
 
 void Cio::LeftDumpOff()
 {
-	PORTA &= ~_BV(6);
+	SOLENOID_LD_PORT &= ~_BV(SOLENOID_LD_BIT);
 	CLeds::is().LeftDumpOff();
 }
 
@@ -707,24 +768,24 @@ bool Cio::IsHolding()
 void Cio::PowerOn()
 {
 	//Turn on 5v, PA2
-	PORTD |= _BV(PD2);
+	POWER_ON_PORT |= _BV(POWER_ON_BIT);
 }
 
 void Cio::PowerOff()
 {
 	//Turn off 5v, PA2
-	PORTD &= ~_BV(PD2);
+	POWER_ON_PORT &= ~_BV(POWER_ON_BIT);
 }
 
 void Cio::CompressorOn()
 {
 	//Turn on Air compressor enable, PA3
-	PORTC |= _BV(PC7);
+	COMPRESSOR_ON_PORT |= _BV(COMPRESSOR_ON_BIT);
 }
 
 void Cio::CompressorOff()
 {
-	PORTC &= ~_BV(PC7);
+	COMPRESSOR_ON_PORT &= ~_BV(COMPRESSOR_ON_BIT);
 }
 
 //put the system into sleep to conserve power
@@ -782,7 +843,7 @@ void Cio::Wakeup()
 
  bool Cio::IsIgnitionOn()
  {
- 	return (PINA & _BV(2)) & _BV(2);
+ 	return (IGNITION_ON_PORT & _BV(IGNITION_ON_BIT)) & _BV(IGNITION_ON_BIT);
  }
 
 // clock interrupt - clear flag immediately to resume count
