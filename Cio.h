@@ -93,8 +93,8 @@ private:
 	Cio();
 	Cio& operator=( const Cio &c );
 
-	Debounced RockerUp;
-	Debounced RockerDown;
+	Debounced ButtonUp;
+	Debounced ButtonDown;
 	Debounced PushCamp;
 	Debounced PushTravel;
 	Debounced PushCalibrate;
@@ -105,6 +105,8 @@ private:
 
 	bool FillPressed;
 	bool DumpPressed;
+	
+	uint32_t Time;
 
 }; //Cio
 

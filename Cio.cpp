@@ -11,6 +11,7 @@
 #include "Cio.h"
 #include "CLeds.h"
 #include "CSerial.h"
+#include "CTimer.h"
 
 //for ignition interrupt
 #include <avr/interrupt.h>
@@ -170,7 +171,7 @@ void Cio::Direction()
 		#define COMPRESSOR_ON_BIT	8
 		#define COMPRESSOR_ON_PORT	PORTC
 		
-		DDRD = 0x02;
+		DDRD = 0x06;
 		//Port D
 		//0		RX		0	Debug serial
 		//1		TX		1	Debug serial
@@ -194,10 +195,10 @@ void Cio::Direction()
 		#define CAMP_BUTTON_BIT			5
 		#define CAMP_BUTTON_PORT		PORTD
 		
-		#define DOWN_BUTTON_BIT			6
+		#define DOWN_BUTTON_BIT			7
 		#define DOWN_BUTTON_PORT		PORTD
 		
-		#define UP_BUTTON_BIT			7
+		#define UP_BUTTON_BIT			6
 		#define UP_BUTTON_PORT			PORTD
 		
 		
@@ -297,17 +298,17 @@ void Cio::Pullups()
 		//6		in		0 spare
 		//7		out		0 Compressor on
 		
-		PORTD = 0x00;
+		PORTD = 0xF8;
 		//Port D
 		//0		RX		0	Debug serial
 		//1		TX		0	Debug serial
 		//2		out		0	Power up
-		//3		in		0	Travel
+		//3		in		1	Travel
 		
-		//4		in		0	Calibrate
-		//5		in		0	Camp
-		//6		in		0	Down
-		//7		in		0	up
+		//4		in		1	Calibrate
+		//5		in		1	Camp
+		//6		in		1	Down
+		//7		in		1	up
 #endif
 }
 
@@ -322,7 +323,7 @@ void Cio::Init()
 //#ifdef REV2_PCB
 	//PushCalibrate.Attach(IO_PORTD, PORTD2);
 	//RockerDown.Attach(IO_PORTD, PORTD4);
-	//RockerUp.Attach(IO_PORTD, PORTD5);
+	//ButtonUp.Attach(IO_PORTD, PORTD5);
 	//PushTravel.Attach(IO_PORTD, PORTD6);
 	//PushCamp.Attach(IO_PORTD, PORTD7);
 //#endif
@@ -331,8 +332,8 @@ void Cio::Init()
 	PushTravel.Attach(IO_PORTD, PORTD3);
 	PushCalibrate.Attach(IO_PORTD, PORTD4);
 	PushCamp.Attach(IO_PORTD, PORTD5);
-	RockerDown.Attach(IO_PORTD, PORTD6);
-	RockerUp.Attach(IO_PORTD, PORTD7);
+	ButtonDown.Attach(IO_PORTD, PORTD6);
+	ButtonUp.Attach(IO_PORTD, PORTD7);
 #endif
 	
 
@@ -347,14 +348,16 @@ void Cio::Init()
 	ResetButtons();
 
 	EnableIgnOnInterrupt();
+	
+	Time = CTimer::GetTick();
 }
 
 //update switch states and debounce
 void Cio::Run()
 {
 	//debounce inputs
-	RockerDown.Update();
-	RockerUp.Update();
+	ButtonDown.Update();
+	ButtonUp.Update();
 	PushTravel.Update();
 	PushCamp.Update();
 	PushCalibrate.Update();
@@ -371,11 +374,17 @@ bool Cio::RockerChanged()
 	static bool OldRockerDown = false;
 	static bool OldRockerUp = false;
 
-	bool changed   = (OldRockerDown	!= (bool)RockerDown);
-		 changed  |= (OldRockerUp	!= (bool)RockerUp);
+	bool changed   = (OldRockerDown	!= ButtonDown.Level());
+		 changed  |= (OldRockerUp	!= ButtonUp.Level());
 	
-	OldRockerDown = (bool)RockerDown;
-	OldRockerUp = (bool)RockerUp;
+	OldRockerDown = ButtonDown.Level();
+	OldRockerUp = ButtonUp.Level();
+	
+	if(changed)
+	{
+
+		CSerial::is() << "PORTB; " << ButtonDown.Level() << ", " << ButtonUp.Level() <<"\n";
+	}
 	
 	return changed;
 }
@@ -466,9 +475,9 @@ bool Cio::CalibrateChanged()
 
 void Cio::RockerSwitch()
 {
-	if(RockerUp.Level())
+	if(!ButtonUp.Level())
 	{
-		CSerial::is() << "RockerUp.Level()\n";
+		CSerial::is() << "ButtonUp\n";
 		
 		if(FillPressed)
 		{
@@ -495,9 +504,10 @@ void Cio::RockerSwitch()
 		}
 	}
 	
-	if(RockerDown.Level())
+	if(!ButtonDown.Level())
 	{
-		CSerial::is() <<  "RockerDown.Level()\n";
+		CSerial::is() <<  "Button Down\n";
+
 		
 		//toggle on button press
 		if(DumpPressed)
@@ -529,124 +539,124 @@ void Cio::RockerSwitch()
 
 void Cio::OutsideRemote()
 {
-	//bool RemoteLeftDown  = PINB & _BV(0);
-	//bool RemoteLeftUp    = PINB & _BV(1);		
-    //bool RemoteRightDown = PINB & _BV(2);
-	//bool RemoteRightUp   = PINB & _BV(4);		
-	//
-	//FillPressed = false;
-	//DumpPressed = false;
-	//
-	//if(RemoteLeftUp)
-		//LeftFillOn();
-	//else
-		//LeftFillOff();
-		//
-	//if(RemoteRightUp)
-		//RightFillOn();
-	//else
-		//RightFillOff();
-		//
-	//if(RemoteLeftDown)
-		//LeftDumpOn();
-	//else
-		//LeftDumpOff();
-		//
-	//if(RemoteRightDown)
-		//RightDumpOn();
-	//else
-		//RightDumpOff();
+	bool RemoteLeftDown  = PINB & _BV(0);
+	bool RemoteLeftUp    = PINB & _BV(1);		
+    bool RemoteRightDown = PINB & _BV(2);
+	bool RemoteRightUp   = PINB & _BV(4);		
+	
+	FillPressed = false;
+	DumpPressed = false;
+	
+	if(RemoteLeftUp)
+		LeftFillOn();
+	else
+		LeftFillOff();
+		
+	if(RemoteRightUp)
+		RightFillOn();
+	else
+		RightFillOff();
+		
+	if(RemoteLeftDown)
+		LeftDumpOn();
+	else
+		LeftDumpOff();
+		
+	if(RemoteRightDown)
+		RightDumpOn();
+	else
+		RightDumpOff();
 	
 }
 
 void Cio::SteeringRemote()
 {
-	//bool RemoteUp = PINB & _BV(7);
-	//bool RemoteDown = PINB & _BV(6);
-	//
-	//if(RemoteUp)
-	//{
-		//if(FillPressed)
-		//{
-			//LeftFillOff();
-			//RightFillOff();
-			//
-			//FillPressed = false;
-			//
-		//}
-		//else
-		//{
-			////turn off and unlatch the dump button
-			//if(DumpPressed)
-			//{
-				//LeftDumpOff();
-				//RightDumpOff();
-				//
-				//DumpPressed = false;
-			//}
-			//
-			//LeftFillOn();
-			//RightFillOn();
-			//
-			//FillPressed = true;
-			//DumpPressed = false;
-		//}
-		//
-	//}
+	bool RemoteUp = PINB & _BV(7);
+	bool RemoteDown = PINB & _BV(6);
+	
+	if(RemoteUp)
+	{
+		if(FillPressed)
+		{
+			LeftFillOff();
+			RightFillOff();
+			
+			FillPressed = false;
+			
+		}
+		else
+		{
+			//turn off and unlatch the dump button
+			if(DumpPressed)
+			{
+				LeftDumpOff();
+				RightDumpOff();
+				
+				DumpPressed = false;
+			}
+			
+			LeftFillOn();
+			RightFillOn();
+			
+			FillPressed = true;
+			DumpPressed = false;
+		}
+		
+	}
 
 	
-	//if(RemoteDown)
-	//{
-		//if(DumpPressed)
-		//{
-			//LeftDumpOff();
-			//RightDumpOff();
-			//
-			//DumpPressed = false;
-			//
-		//}
-		//else
-		//{
-			////turn off and unlatch the fill button
-			//if(FillPressed)
-			//{
-				//LeftFillOff();
-				//RightFillOff();
-				//
-				//FillPressed = false;
-			//}
-			//
-			//LeftDumpOn();
-			//RightDumpOn();
-			//
-			//DumpPressed = true;
-		//}
-	//}
+	if(RemoteDown)
+	{
+		if(DumpPressed)
+		{
+			LeftDumpOff();
+			RightDumpOff();
+			
+			DumpPressed = false;
+			
+		}
+		else
+		{
+			//turn off and unlatch the fill button
+			if(FillPressed)
+			{
+				LeftFillOff();
+				RightFillOff();
+				
+				FillPressed = false;
+			}
+			
+			LeftDumpOn();
+			RightDumpOn();
+			
+			DumpPressed = true;
+		}
+	}
 
 }
 
 
 void Cio::CampSwitches()
 {
-	//bool SteeringCamp = PIND & _BV(5);
-	//
-	//if(!PushCamp.Level() || SteeringCamp)
-	//{
-		//CLeds::is().CampOn();
-		//CLeds::is().TravelOKOff();
-	//}
+	bool SteeringCamp = PINB & _BV(3);
+	
+	if(!PushCamp.Level() || SteeringCamp)
+	{
+		CLeds::is().CampOn();
+		CLeds::is().TravelOKOff();
+	}
 
 }
 
 void Cio::TravelSwitches()
 {
-	//bool SteeringTravel = PIND & _BV(3);
-	//
-	//if(!PushTravel.Level() || SteeringTravel)
-	//{
-		//CLeds::is().CampOff();
-		//CLeds::is().TravelOKOn();
-	//}
+	bool SteeringTravel = PINB & _BV(5);
+	
+	if(!PushTravel.Level() || SteeringTravel)
+	{
+		CLeds::is().CampOff();
+		CLeds::is().TravelOKOn();
+	}
 
 }
 
@@ -757,7 +767,7 @@ bool Cio::IsHolding()
 {
 	bool hold = true;
 	
-	if(RockerUp.Level() || RockerDown.Level())
+	if(ButtonUp.Level() || ButtonDown.Level())
 	{
 		hold = false;
 	}
@@ -833,7 +843,7 @@ void Cio::Wakeup()
 	CLeds::is().Init();
 	CLeds::is().Init();
 	CLeds::is().Init();
-	CLeds::is().Dim(100);
+	CLeds::is().Dim(2);
 	
 	CLeds::is().ActiveOn();
 	
@@ -843,7 +853,11 @@ void Cio::Wakeup()
 
  bool Cio::IsIgnitionOn()
  {
- 	return (IGNITION_ON_PORT & _BV(IGNITION_ON_BIT)) & _BV(IGNITION_ON_BIT);
+	 uint8_t port = IGNITION_ON_PORT;
+	 
+	// uint8_t bit = _BV(IGNITION_ON_BIT);
+	 
+ 	return (port & _BV(IGNITION_ON_BIT)) & _BV(IGNITION_ON_BIT);
  }
 
 // clock interrupt - clear flag immediately to resume count

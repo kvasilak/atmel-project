@@ -45,18 +45,22 @@ void CController::Init()
 	//update the rocker switch state
 	ScheduleEvent(eEvents::RockerEvent);
 	
-	if(Cio::is().IsIgnitionOn())
-	{
+	bool on = Cio::is().IsIgnitionOn();
+CSerial::is() <<"ignition " << on << "\n";
+	
+	
+	//if(on)
+	//{
 		CLeds::is().ActiveOn();
 		Cio::is().CompressorOn();
  		
   		Cio::is().Wakeup();
-	}
-	else
-	{
-		//sleep
-		Cio::is().Sleep();
-	}
+	//}
+	//else
+	//{
+		////sleep
+		//Cio::is().Sleep();
+	//}
 	
 }
 
