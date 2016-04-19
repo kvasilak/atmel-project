@@ -69,6 +69,10 @@ void FSMDance::HandleEvent(eEvents evt)
 			}
 			
 			break;
+		case eEvents::CalibrateEvent:
+			//return to normal if cal pressed again
+			m_SMManager.ChangeState(eStates::STATE_MANUAL);
+			break;
 		default:
 			CSerial::is() << "Manual cal, Default\n";
 			break;

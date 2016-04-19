@@ -391,26 +391,30 @@ bool Cio::RockerChanged()
 
 bool Cio::OutSideRemoteChanged()
 {
-	//static uint8_t OldPort = false;
-	//uint8_t port = PINB & 0x71;
+	static uint8_t OldPort = false;
 	
-	//bool changed = OldPort != port;
+	//pins 3,5,6,7
+	uint8_t port = PINB & 0x1D;
 	
-	//OldPort = port;
+	bool changed = OldPort != port;
 	
-	return false;//changed;
+	OldPort = port;
+	
+	return changed;
 }
 
 bool Cio::SteeringRemoteChanged()
 {
-	//static uint8_t OldPort = false;
-	//uint8_t port = PINB & 0xE8;
+	static uint8_t OldPort = false;
+	
+	//Pins 0,1,2,4
+	uint8_t port = PINB & 0x17;
 
-	//bool changed = OldPort != port;
+	bool changed = OldPort != port;
 
-	//OldPort = port;
+	OldPort = port;
 
-	return false; //changed;
+	return changed;
 }
 
 
@@ -420,19 +424,19 @@ bool Cio::SteeringRemoteChanged()
 //camp on steering remote
 bool Cio::CampChanged()
 {
-	//static bool OldCamp					= false;
-	//static bool OldInsideCamp			= false;
-	 //
-	//bool camp = (PINB & _BV(PORTB3));
- 	//
-	//bool Changed	= OldCamp			!= (bool)PushCamp;		//port D bit 7
-	//Changed			|= OldInsideCamp	!= camp;  //port B bit 3
-	 //
-	//OldCamp		= (bool)PushCamp;
-	//OldInsideCamp  = camp;
-//
-	//return Changed;
-	return false;
+	static bool OldCamp					= false;
+	static bool OldInsideCamp			= false;
+	 
+	bool camp = (REMOTE_CAMP_PORT & _BV(REMOTE_CAMP_BIT));
+ 	
+	bool Changed	= OldCamp			!= (bool)PushCamp;		//port D bit 7
+	Changed			|= OldInsideCamp	!= camp;  //port B bit 3
+	 
+	OldCamp		= (bool)PushCamp;
+	OldInsideCamp  = camp;
+
+	return Changed;
+
 }
 
 //returns true if the travel mode buttons have changed state
@@ -440,37 +444,34 @@ bool Cio::CampChanged()
 //camp on steering remote
 bool Cio::TravelChanged()
 {
-	//static bool OldTravel				= false;
-	//static bool OldInsideTravel			= false;	
-	//
-	//bool trav = (PINB & _BV(PORTB5));
-//
-	//bool Changed	= OldTravel				!= (bool)PushTravel;
-		 //Changed	|= OldInsideTravel		!= trav; 
-	//
-	//OldTravel		= (bool)PushTravel;
-	//OldInsideTravel = trav;
-	//
-	//return Changed;
+	static bool OldTravel				= false;
+	static bool OldInsideTravel			= false;	
 	
-	return false;
+	bool trav = (REMOTE_TRAVEL_PORT & _BV(REMOTE_TRAVEL_BIT));
+
+	bool Changed	= OldTravel				!= (bool)PushTravel;
+		 Changed	|= OldInsideTravel		!= trav; 
+	
+	OldTravel		= (bool)PushTravel;
+	OldInsideTravel = trav;
+	
+	return Changed;
 }
 
 bool Cio::CalibrateChanged()
 {
-	//static bool OldCal	= false;
-	//bool changed = false;
-	//
-	////only consider a press a change a release isn't a change
-	//if(PushCalibrate > 0)
-	//{
-		//changed = OldCal != (bool)PushCalibrate;
-	//}
-	//OldCal = (bool)PushCalibrate;
-	//
-	//return changed;
+	static bool OldCal	= false;
+	bool changed = false;
 	
-	return false;
+	//only consider a press a change a release isn't a change
+	if(PushCalibrate == 0)
+	{
+		changed = OldCal != (bool)PushCalibrate;
+	}
+	OldCal = (bool)PushCalibrate;
+	
+	return changed;
+
 }
 
 void Cio::RockerSwitch()
