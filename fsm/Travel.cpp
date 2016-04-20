@@ -24,6 +24,7 @@ Starting(true)
 
 void FsmTravel::OnEntry()
 {
+	CLeds::is().TravelOKOn();
 	LeftSide.Init(LeftRear);
 	RightSide.Init(RightRear);
 
@@ -65,7 +66,7 @@ void FsmTravel::HandleEvent(eEvents evt)
 			m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
 		break;
 		case eEvents::CampEvent:
-			m_SMManager.ChangeState(eStates::STATE_CAMP, evt);
+			m_SMManager.ChangeState(eStates::STATE_CAMP);
 		break;
 		case eEvents::TravelEvent:
 			if(Cio::is().TravelSwitches())
@@ -111,4 +112,5 @@ void FsmTravel::HandleEvent(eEvents evt)
 void FsmTravel::OnExit()
 {
 	CSerial::is() << " FsmTravel::OnExit()\r\n";
+	CLeds::is().TravelOKOff();
 }

@@ -24,6 +24,8 @@ MinTime(250)
 
 void FsmCamp::OnEntry()
 {
+	CLeds::is().CampOn();
+	
 	int16_t roll = nvm::is().GetCampX();
  	int16_t pitch = nvm::is().GetCampZ();
 
@@ -57,7 +59,7 @@ void FsmCamp::HandleEvent(eEvents evt)
 			}
 		break;
 		case eEvents::TravelEvent:
-			m_SMManager.ChangeState(eStates::STATE_TRAVEL, evt);
+			m_SMManager.ChangeState(eStates::STATE_TRAVEL);
 		break;
 		case eEvents::CalibrateEvent:
 			m_SMManager.ChangeState(eStates::STATE_CAMP_CALIBRATE);
@@ -85,6 +87,7 @@ void FsmCamp::HandleEvent(eEvents evt)
 void FsmCamp::OnExit()
 {
 	CSerial::is() << " FsmCamp::OnExit()\r\n";
+	CLeds::is().CampOff();
 }
 
 

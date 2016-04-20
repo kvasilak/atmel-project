@@ -644,9 +644,6 @@ bool Cio::CampSwitches()
 	
 	if(!PushCamp.Level() )//|| SteeringCamp)
 	{
-		CLeds::is().CampOn();
-		CLeds::is().TravelOKOff();
-		
 		pressed  = true;
 	}
 
@@ -660,9 +657,6 @@ bool Cio::TravelSwitches()
 	
 	if(!PushTravel.Level() )//|| SteeringTravel)
 	{
-		CLeds::is().CampOff();
-		CLeds::is().TravelOKOn();
-		
 		pressed = true;
 	}
 
