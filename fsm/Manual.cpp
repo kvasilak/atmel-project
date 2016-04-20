@@ -33,10 +33,17 @@ void FsmManual::HandleEvent(eEvents evt)
 	switch(evt)
 	{
 		case eEvents::TravelEvent:
-			m_SMManager.ChangeState(eStates::STATE_TRAVEL, evt);
+			if(Cio::is().TravelSwitches())
+			{
+				m_SMManager.ChangeState(eStates::STATE_TRAVEL);
+			}
 			break;
 		case eEvents::CampEvent:
-			m_SMManager.ChangeState(eStates::STATE_CAMP, evt);
+			if(Cio::is().CampSwitches())
+			{
+				m_SMManager.ChangeState(eStates::STATE_CAMP);
+			}
+			
 			break;
 		case eEvents::RockerEvent:
 			Cio::is().RockerSwitch();

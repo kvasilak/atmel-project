@@ -51,7 +51,10 @@ void FsmCamp::HandleEvent(eEvents evt)
 			m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
 		break;
 		case eEvents::CampEvent:
-			Cio::is().CampSwitches();
+			if(Cio::is().CampSwitches())
+			{
+				m_SMManager.ChangeState(eStates::STATE_MANUAL);
+			}
 		break;
 		case eEvents::TravelEvent:
 			m_SMManager.ChangeState(eStates::STATE_TRAVEL, evt);

@@ -33,7 +33,7 @@ void FsmTravel::OnEntry()
 	Starting = true;
 	
 	CSerial::is() << " FsmTravel::OnEntry()\r\n";
-	CSerial::is() << "Travel Cal vals; Left, " << nvm::is().GetLeftTravel() << ", Right, " << nvm::is().GetRightTravel() << "\n";
+	//CSerial::is() << "Travel Cal vals; Left, " << nvm::is().GetLeftTravel() << ", Right, " << nvm::is().GetRightTravel() << "\n";
 }
 
 void FsmTravel::HandleEvent(eEvents evt)
@@ -68,7 +68,10 @@ void FsmTravel::HandleEvent(eEvents evt)
 			m_SMManager.ChangeState(eStates::STATE_CAMP, evt);
 		break;
 		case eEvents::TravelEvent:
-			Cio::is().TravelSwitches();
+			if(Cio::is().TravelSwitches())
+			{
+				m_SMManager.ChangeState(eStates::STATE_MANUAL);
+			}
 		break;
 		case eEvents::CalibrateEvent:
 			m_SMManager.ChangeState(eStates::STATE_TRAVEL_CALIBRATE);

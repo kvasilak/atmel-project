@@ -49,18 +49,18 @@ void CController::Init()
 CSerial::is() <<"ignition " << on << "\n";
 	
 	
-	//if(on)
-	//{
+	if(on)
+	{
 		CLeds::is().ActiveOn();
 		Cio::is().CompressorOn();
  		
   		Cio::is().Wakeup();
-	//}
-	//else
-	//{
-		////sleep
-		//Cio::is().Sleep();
-	//}
+	}
+	else
+	{
+		//sleep
+		Cio::is().Sleep();
+	}
 	
 }
 

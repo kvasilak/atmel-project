@@ -66,8 +66,8 @@ public:
 	void OutsideRemote();
 	void SteeringRemote();
 
-	void CampSwitches();
-	void TravelSwitches();
+	bool CampSwitches();
+	bool TravelSwitches();
 	
 	bool IsHolding();
 	

@@ -106,19 +106,19 @@ void Cio::Direction()
 		//7		out		1	LU
 		
 		#define IGNITION_ON_BIT				2
-		#define IGNITION_ON_PORT		PORTA
+		#define IGNITION_ON_PORT		PINA
 		
 		#define SOLENOID_RD_BIT			4
-		#define SOLENOID_RD_PORT		PORTA
+		#define SOLENOID_RD_PORT		PINA
 		
 		#define SOLENOID_RU_BIT			5
-		#define SOLENOID_RU_PORT		PORTA
+		#define SOLENOID_RU_PORT		PINA
 		
 		#define SOLENOID_LD_BIT			6
-		#define SOLENOID_LD_PORT		PORTA
+		#define SOLENOID_LD_PORT		PINA
 		
 		#define SOLENOID_LU_BIT			7
-		#define SOLENOIF_LU_PORT		PORTA
+		#define SOLENOIF_LU_PORT		PINA
 		
 		DDRB = 0x00;
 		
@@ -134,28 +134,28 @@ void Cio::Direction()
 		//7		in		0	Remote up
 		
 		#define REMOTE_LD_BIT		0
-		#define REMOTE_LD_PORT		PORTB
+		#define REMOTE_LD_PORT		PINB
 		
 		#define REMOTE_LU_BIT		1
-		#define REMOTE_PORT			PORTB
+		#define REMOTE_PORT			PINB
 		
 		#define REMOTE_RD_BIT		2
-		#define REMOTE_TD_PORT		PORTB
+		#define REMOTE_TD_PORT		PINB
 		
 		#define REMOTE_CAMP_BIT		3
-		#define REMOTE_CAMP_PORT	PORTB
+		#define REMOTE_CAMP_PORT	PINB
 		
 		#define REMOTE_RU_BIT		4
-		#define REMOTE_RU_PORT		PORTB
+		#define REMOTE_RU_PORT		PINB
 		
 		#define REMOTE_TRAVEL_BIT	5
-		#define REMOTE_TRAVEL_PORT	PORTB
+		#define REMOTE_TRAVEL_PORT	PINB
 		
 		#define REMOTE_DOWN_BIT		6
-		#define REMOTE_DOWN_PORT	PORTB
+		#define REMOTE_DOWN_PORT	PINB
 		
 		#define REMOTE_UP_BIT		7
-		#define REMOTE_UP_PORT		PORTB
+		#define REMOTE_UP_PORT		PINB
 		
 		DDRC = 0x80;
 		//Port C
@@ -187,19 +187,19 @@ void Cio::Direction()
 		#define POWER_ON_PORT			PORTD
 		
 		#define TRAVEL_BUTTON_BIT		3
-		#define TRAVEL_BUTTON_PORT		PORTD
+		#define TRAVEL_BUTTON_PORT		PIND
 		
 		#define CALIBRATE_BUTTON_BIT	4
-		#define CALIBRATE_BUTTON_PORT	PORTD
+		#define CALIBRATE_BUTTON_PORT	PIND
 		
 		#define CAMP_BUTTON_BIT			5
-		#define CAMP_BUTTON_PORT		PORTD
+		#define CAMP_BUTTON_PORT		PIND
 		
 		#define DOWN_BUTTON_BIT			7
-		#define DOWN_BUTTON_PORT		PORTD
+		#define DOWN_BUTTON_PORT		PIND
 		
 		#define UP_BUTTON_BIT			6
-		#define UP_BUTTON_PORT			PORTD
+		#define UP_BUTTON_PORT			PIND
 		
 		
 		#endif
@@ -637,28 +637,36 @@ void Cio::SteeringRemote()
 }
 
 
-void Cio::CampSwitches()
+bool Cio::CampSwitches()
 {
-	bool SteeringCamp = PINB & _BV(3);
+	//bool SteeringCamp = PINB & _BV(3);
+	bool pressed =  false;
 	
-	if(!PushCamp.Level() || SteeringCamp)
+	if(!PushCamp.Level() )//|| SteeringCamp)
 	{
 		CLeds::is().CampOn();
 		CLeds::is().TravelOKOff();
+		
+		pressed  = true;
 	}
 
+	return pressed;
 }
 
-void Cio::TravelSwitches()
+bool Cio::TravelSwitches()
 {
-	bool SteeringTravel = PINB & _BV(5);
+	//bool SteeringTravel = REMOTE_TRAVEL_PORT & _BV(REMOTE_TRAVEL_BIT);
+	bool pressed = false;
 	
-	if(!PushTravel.Level() || SteeringTravel)
+	if(!PushTravel.Level() )//|| SteeringTravel)
 	{
 		CLeds::is().CampOff();
 		CLeds::is().TravelOKOn();
+		
+		pressed = true;
 	}
 
+	return pressed;
 }
 
 void Cio::AllOff()
@@ -856,9 +864,7 @@ void Cio::Wakeup()
  {
 	 uint8_t port = IGNITION_ON_PORT;
 	 
-	// uint8_t bit = _BV(IGNITION_ON_BIT);
-	 
- 	return (port & _BV(IGNITION_ON_BIT)) & _BV(IGNITION_ON_BIT);
+ 	return (port & _BV(IGNITION_ON_BIT)) == _BV(IGNITION_ON_BIT);
  }
 
 // clock interrupt - clear flag immediately to resume count
