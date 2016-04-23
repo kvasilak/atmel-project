@@ -105,20 +105,20 @@ void Cio::Direction()
 		//6		out		1	LD
 		//7		out		1	LU
 		
-		#define IGNITION_ON_BIT				2
+		#define IGNITION_ON_BIT			2
 		#define IGNITION_ON_PORT		PINA
 		
 		#define SOLENOID_RD_BIT			4
-		#define SOLENOID_RD_PORT		PINA
+		#define SOLENOID_RD_PORT		PORTA
 		
 		#define SOLENOID_RU_BIT			5
-		#define SOLENOID_RU_PORT		PINA
+		#define SOLENOID_RU_PORT		PORTA
 		
 		#define SOLENOID_LD_BIT			6
-		#define SOLENOID_LD_PORT		PINA
+		#define SOLENOID_LD_PORT		PORTA
 		
 		#define SOLENOID_LU_BIT			7
-		#define SOLENOIF_LU_PORT		PINA
+		#define SOLENOID_LU_PORT		PORTA
 		
 		DDRB = 0x00;
 		
@@ -482,6 +482,7 @@ void Cio::RockerSwitch()
 		
 		if(FillPressed)
 		{
+			CSerial::is() << "fill off\n";
 			LeftFillOff();
 			RightFillOff();
 			
@@ -492,11 +493,15 @@ void Cio::RockerSwitch()
 			//turn off and unlatch the dump button
 			if(DumpPressed)
 			{
+				CSerial::is() << "dump off\n";
+				
 				LeftDumpOff();
 				RightDumpOff();
 				
 				DumpPressed = false;
 			}
+			
+			CSerial::is() << "fill on\n";
 			
 			LeftFillOn();
 			RightFillOn();
@@ -513,6 +518,7 @@ void Cio::RockerSwitch()
 		//toggle on button press
 		if(DumpPressed)
 		{
+			CSerial::is() << "dump off\n";
 			LeftDumpOff();
 			RightDumpOff();
 			
@@ -523,11 +529,15 @@ void Cio::RockerSwitch()
 			//turn off and unlatch the fill button
 			if(FillPressed)
 			{
+				CSerial::is() << "fill off\n";
+				
 				LeftFillOff();
 				RightFillOff();
 				
 				FillPressed = false;
 			}
+			
+			CSerial::is() << "dump on\n";
 			
 			LeftDumpOn();
 			RightDumpOn();
@@ -743,13 +753,13 @@ void Cio::RightDumpOff()
 
 void Cio::LeftFillOn()
 {
-	SOLENOIF_LU_PORT |= _BV(SOLENOID_LU_BIT);
+	SOLENOID_LU_PORT |= _BV(SOLENOID_LU_BIT);
 	CLeds::is().LeftFillOn();
 }
 
 void Cio::LeftFillOff()
 {
-	SOLENOIF_LU_PORT &= ~_BV(SOLENOID_LU_BIT);
+	SOLENOID_LU_PORT &= ~_BV(SOLENOID_LU_BIT);
 	CLeds::is().LeftFillOff();
 }
 
@@ -846,7 +856,7 @@ void Cio::Wakeup()
 	CLeds::is().Init();
 	CLeds::is().Init();
 	CLeds::is().Init();
-	CLeds::is().Dim(2);
+	CLeds::is().Dim(10);
 	
 	CLeds::is().ActiveOn();
 	

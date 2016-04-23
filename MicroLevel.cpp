@@ -44,7 +44,7 @@ int main(void)
 	CTimer::Init();
 
 	CLeds::is().Init();
-	CLeds::is().Dim(5);
+	CLeds::is().Dim(0);
 	
 	Controller.Init();
 	
