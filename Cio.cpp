@@ -363,10 +363,11 @@ void Cio::Run()
 	PushCalibrate.Update();
 }
 
+//PCInt2 on pin 35
 void Cio::EnableIgnOnInterrupt()
 {
-	EICRA = 4; //(1 << ISC00);    // set INT1 to trigger on both edges
-	EIMSK  = 2;//|= (1 << INT2);     
+	PCMSK0 = 4;  //pcint2
+	PCICR = 1;  //pcie0
 }
 
 bool Cio::RockerChanged()
@@ -827,6 +828,7 @@ void Cio::Sleep()
 	PowerOff();
 	
 	//turn off unnecessary peripherals
+	//minimal power savings
     //power_all_disable();
 
 	
@@ -847,11 +849,6 @@ void Cio::Wakeup()
 	PowerOn();
 	CompressorOn();
 	
-// 	for(i=0; i<2; i++)
-// 	{
-// 		CLeds::is().Init();
-// 	}
-// 	
 	CLeds::is().Init();
 	CLeds::is().Init();
 	CLeds::is().Init();
@@ -872,9 +869,9 @@ void Cio::Wakeup()
  }
 
 // clock interrupt - clear flag immediately to resume count
-//PD2 (INT0/I26)
-ISR(INT1_vect)
+//PA2 pc int 2
+ISR(PCINT0_vect)
 {
-	//Cio::IgnitionChanged = true;
+	Cio::IgnitionChanged = true;
 }
 

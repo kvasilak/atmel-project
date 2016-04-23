@@ -261,6 +261,9 @@ void CCorner::SetLongFilter(bool slow)
 void CCorner::AtHeight(bool at)
 {
     IsAtHeight = at;
+	
+	//reset valve state machine
+	SetState(ValveIniting);
 }
 
 bool CCorner::AtHeight()
@@ -368,7 +371,7 @@ void CCorner::Run(int32_t setpoint)
 
     switch (State)
     {
-        case ValveIniting:
+        case ValveIniting: 
             FillOff();
             DumpOff();
             SetState(ValveHolding);
