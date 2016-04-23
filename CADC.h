@@ -26,6 +26,7 @@ public:
 	
 	uint16_t GetRightHeight();
 	uint16_t GetLeftHeight();
+	uint8_t GetDimmer();
 
 private:
 CADC();

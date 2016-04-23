@@ -12,7 +12,7 @@
 #include "common.h"
 #include "CTimer.h"
 #include "MMA8451.h"
-
+#include "CADC.h"
 
 // default constructor
 CController::CController() :
@@ -26,7 +26,6 @@ m_CurrState(eStates::STATE_MANUAL),
 IgnitionChangeStart(0),
 IgnitionEventPending(false),
 LastIgnitionOn(false)
-
 {
 	//this order determines the state machine order
 	m_StateList[0] = &m_stateManual;
@@ -213,7 +212,6 @@ void CController::CheckEvent()
 //called on a 100ms timer
 void CController::Run()
 {
-	//uint8_t me;
 	Cio::is().Run();
 	
 	CheckEvent();
@@ -223,6 +221,9 @@ void CController::Run()
 		if( Cio::is().Awake)
 		{
 			ScheduleEvent(eEvents::TimerEvent);
+
+			//LED brightness controlled by voltage on dimmer input
+			CLeds::is().Dim(CADC::is().GetDimmer());
 		}
 		Time = CTimer::GetTick();
 	}
