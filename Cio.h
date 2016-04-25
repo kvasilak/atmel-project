@@ -60,6 +60,7 @@ public:
 	bool CampChanged();
 	bool TravelChanged();
 	bool CalibrateChanged();
+	bool UpDownChanged();
 
 //What to do
 	void RockerSwitch();

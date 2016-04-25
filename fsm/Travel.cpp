@@ -62,7 +62,10 @@ void FsmTravel::HandleEvent(eEvents evt)
 			break;
 		case eEvents::RockerEvent:
 		case eEvents::OutSideEvent:
+			m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
+		break;
 		case eEvents::SteeringEvent:
+			Cio::is().SteeringRemote();
 			m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
 		break;
 		case eEvents::CampEvent:

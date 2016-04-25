@@ -91,7 +91,7 @@ void Cio::Direction()
 		//7		in		0	switch Camp
 		#endif
 		
-		#ifdef REV3_PCB
+	#ifdef REV3_PCB
 		//port A
 		DDRA = 0xF0;
 		
@@ -133,19 +133,19 @@ void Cio::Direction()
 		//6		in 		0	Remote down
 		//7		in		0	Remote up
 		
-		#define REMOTE_LD_BIT		0
+		#define REMOTE_LD_BIT		1/*0*/
 		#define REMOTE_LD_PORT		PINB
 		
-		#define REMOTE_LU_BIT		1
-		#define REMOTE_PORT			PINB
+		#define REMOTE_LU_BIT		4/*1*/
+		#define REMOTE_LU_PORT		PINB
 		
-		#define REMOTE_RD_BIT		2
-		#define REMOTE_TD_PORT		PINB
+		#define REMOTE_RD_BIT		0/*2*/
+		#define REMOTE_RD_PORT		PINB
 		
-		#define REMOTE_CAMP_BIT		3
+		#define REMOTE_CAMP_BIT		7/*3*/
 		#define REMOTE_CAMP_PORT	PINB
 		
-		#define REMOTE_RU_BIT		4
+		#define REMOTE_RU_BIT		2/*4*/
 		#define REMOTE_RU_PORT		PINB
 		
 		#define REMOTE_TRAVEL_BIT	5
@@ -154,7 +154,7 @@ void Cio::Direction()
 		#define REMOTE_DOWN_BIT		6
 		#define REMOTE_DOWN_PORT	PINB
 		
-		#define REMOTE_UP_BIT		7
+		#define REMOTE_UP_BIT		3/*7*/
 		#define REMOTE_UP_PORT		PINB
 		
 		DDRC = 0x80;
@@ -222,7 +222,7 @@ void Cio::Pullups()
 		//7		in		1	Remote LD
 		
 		
-		PORTB = 0x0F;
+		PORTB = 0x00;
 		
 		//port B
 		//0		in		1	Remote up
@@ -274,7 +274,7 @@ void Cio::Pullups()
 		//7		out		0	LU
 		
 		
-		PORTB = 0xFF;
+		PORTB = 0x00;
 		
 		//port B
 		//0		in		1	Remote LD
@@ -394,8 +394,8 @@ bool Cio::OutSideRemoteChanged()
 {
 	static uint8_t OldPort = false;
 	
-	//pins 3,5,6,7
-	uint8_t port = PINB & 0x1D;
+	//pins 0,1,2,4
+	uint8_t port = PINB & 0x17;
 	
 	bool changed = OldPort != port;
 	
@@ -408,13 +408,33 @@ bool Cio::SteeringRemoteChanged()
 {
 	static uint8_t OldPort = false;
 	
-	//Pins 0,1,2,4
-	uint8_t port = PINB & 0x17;
+	//pins 3, 6 //3,5,6,7
+	uint8_t port = PINB & 0x24;//E8;
 
 	bool changed = OldPort != port;
 
 	OldPort = port;
 
+	return changed;
+}
+
+//return true if the steering remote up or down button has changed
+bool Cio::UpDownChanged()
+{
+	static bool oldup = false;
+	static bool olddown = false;
+	
+	bool up = REMOTE_UP_PORT & _BV(REMOTE_UP_BIT);
+	bool down = REMOTE_DOWN_PORT & _BV(REMOTE_DOWN_BIT);
+	
+	bool changed = (oldup != up) || (olddown != down);
+	
+	if(changed)
+	{
+		oldup = up;
+		olddown = down;
+	}
+	
 	return changed;
 }
 
@@ -551,40 +571,56 @@ void Cio::RockerSwitch()
 
 void Cio::OutsideRemote()
 {
-	bool RemoteLeftDown  = PINB & _BV(0);
-	bool RemoteLeftUp    = PINB & _BV(1);		
-    bool RemoteRightDown = PINB & _BV(2);
-	bool RemoteRightUp   = PINB & _BV(4);		
+	bool RemoteLeftDown  = REMOTE_LD_PORT & _BV(REMOTE_LD_BIT);
+	bool RemoteLeftUp    = REMOTE_LU_PORT & _BV(REMOTE_LU_BIT);		
+    bool RemoteRightDown = REMOTE_RD_PORT & _BV(REMOTE_RD_BIT);
+	bool RemoteRightUp   = REMOTE_RU_PORT & _BV(REMOTE_RU_BIT);		
 	
 	FillPressed = false;
 	DumpPressed = false;
 	
 	if(RemoteLeftUp)
+	{
 		LeftFillOn();
+	}
 	else
+	{
 		LeftFillOff();
+	}
 		
 	if(RemoteRightUp)
+	{
 		RightFillOn();
+	}
 	else
+	{
 		RightFillOff();
+	}
 		
 	if(RemoteLeftDown)
+	{
 		LeftDumpOn();
+	}
 	else
+	{
 		LeftDumpOff();
+	}
 		
 	if(RemoteRightDown)
+	{
 		RightDumpOn();
+	}
 	else
+	{
 		RightDumpOff();
+	}
 	
 }
 
 void Cio::SteeringRemote()
 {
-	bool RemoteUp = PINB & _BV(7);
-	bool RemoteDown = PINB & _BV(6);
+	bool RemoteUp = REMOTE_UP_PORT & _BV(REMOTE_UP_BIT);
+	bool RemoteDown = REMOTE_DOWN_PORT & _BV(REMOTE_DOWN_BIT);
 	
 	if(RemoteUp)
 	{
@@ -650,10 +686,10 @@ void Cio::SteeringRemote()
 
 bool Cio::CampSwitches()
 {
-	//bool SteeringCamp = PINB & _BV(3);
+	bool SteeringCamp = REMOTE_CAMP_PORT & _BV(REMOTE_CAMP_BIT);
 	bool pressed =  false;
 	
-	if(!PushCamp.Level() )//|| SteeringCamp)
+	if(!PushCamp.Level() || SteeringCamp)
 	{
 		pressed  = true;
 	}
@@ -663,10 +699,10 @@ bool Cio::CampSwitches()
 
 bool Cio::TravelSwitches()
 {
-	//bool SteeringTravel = REMOTE_TRAVEL_PORT & _BV(REMOTE_TRAVEL_BIT);
+	bool SteeringTravel = REMOTE_TRAVEL_PORT & _BV(REMOTE_TRAVEL_BIT);
 	bool pressed = false;
 	
-	if(!PushTravel.Level() )//|| SteeringTravel)
+	if(!PushTravel.Level() || SteeringTravel)
 	{
 		pressed = true;
 	}
@@ -729,24 +765,32 @@ void Cio::Left(eValveStates s)
 
 void Cio::RightFillOn()
 {
+	CSerial::is() << "*RightFillOn\n";
+	
 	SOLENOID_RU_PORT |= _BV(SOLENOID_RU_BIT);
 	CLeds::is().RightFillOn();
 }
 
 void Cio::RightFillOff()
 {
+	CSerial::is() << "*RightFillOff\n";
+	
 	SOLENOID_RU_PORT &= ~_BV(SOLENOID_RU_BIT);
 	CLeds::is().RightFillOff();
 }
 
 void Cio::RightDumpOn()
 {
+	CSerial::is() << "*RightDumpOn\n";
+	
 	SOLENOID_RD_PORT |= _BV(SOLENOID_RD_BIT);
 	CLeds::is().RightDumpOn();
 }
 
 void Cio::RightDumpOff()
 {
+	CSerial::is() << "*RightDumpOff\n";
+	
 	SOLENOID_RD_PORT &= ~_BV(SOLENOID_RD_BIT);
 	CLeds::is().RightDumpOff();
 }
@@ -754,24 +798,32 @@ void Cio::RightDumpOff()
 
 void Cio::LeftFillOn()
 {
+	CSerial::is() << "*LeftFillOn\n";
+	
 	SOLENOID_LU_PORT |= _BV(SOLENOID_LU_BIT);
 	CLeds::is().LeftFillOn();
 }
 
 void Cio::LeftFillOff()
 {
+	CSerial::is() << "*LeftFillOff\n";
+	
 	SOLENOID_LU_PORT &= ~_BV(SOLENOID_LU_BIT);
 	CLeds::is().LeftFillOff();
 }
 
 void Cio::LeftDumpOn()
 {
+	CSerial::is() << "*LeftDumpOn\n";
+	
 	SOLENOID_LD_PORT |= _BV(SOLENOID_LD_BIT);
 	CLeds::is().LeftDumpOn();
 }
 
 void Cio::LeftDumpOff()
 {
+	CSerial::is() << "*LeftDumpOff\n";
+	
 	SOLENOID_LD_PORT &= ~_BV(SOLENOID_LD_BIT);
 	CLeds::is().LeftDumpOff();
 }

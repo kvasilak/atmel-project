@@ -187,7 +187,8 @@ void CController::CheckEvent()
 		ScheduleEvent(eEvents::OutSideEvent);
 	}
 	
-	if(Cio::is().SteeringRemoteChanged())
+	//if(Cio::is().SteeringRemoteChanged())
+	if(Cio::is().UpDownChanged())
 	{
 		ScheduleEvent(eEvents::SteeringEvent);
 	}
@@ -199,6 +200,8 @@ void CController::CheckEvent()
 
 	if(Cio::is().TravelChanged())
 	{
+		CSerial::is() << "***TravelChanged\n";	
+		
 		ScheduleEvent(eEvents::TravelEvent);
 	}
 	
