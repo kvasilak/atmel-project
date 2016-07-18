@@ -274,7 +274,7 @@ void Cio::Pullups()
 		//7		out		0	LU
 		
 		
-		PORTB = 0x00;
+		PORTB = 0xFF;
 		
 		//port B
 		//0		in		1	Remote LD
@@ -344,6 +344,7 @@ void Cio::Init()
 	SteeringRemoteChanged();
 	OutSideRemoteChanged();
 	CalibrateChanged();
+	UpDownChanged();
 	
 	ResetButtons();
 
@@ -905,7 +906,7 @@ void Cio::Wakeup()
 	CLeds::is().Init();
 	CLeds::is().Init();
 	CLeds::is().Init();
-	CLeds::is().Dim(10);
+	CLeds::is().Dim(100);
 	
 	CLeds::is().ActiveOn();
 	

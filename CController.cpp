@@ -226,7 +226,7 @@ void CController::Run()
 			ScheduleEvent(eEvents::TimerEvent);
 
 			//LED brightness controlled by voltage on dimmer input
-			CLeds::is().Dim(CADC::is().GetDimmer());
+//			CLeds::is().Dim(CADC::is().GetDimmer());
 		}
 		Time = CTimer::GetTick();
 	}

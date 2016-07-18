@@ -105,18 +105,20 @@ void FsmCamp::OnExit()
 
 void FsmCamp::LevelIt()
 {
- 	int16_t X;
- 	int16_t Y;
- 	int16_t Z;
+ 	int16_t X=0;
+ 	int16_t Y=0;
+ 	int16_t Z=0;
  	//Read Acccel
  	CMMA8451::is().ReadXYZ(X, Y, Z);
  	//determine x and z errors
  	int16_t rollcal = nvm::is().GetCampX();
  	int16_t pitchcal = nvm::is().GetCampZ();
 	 
+	 CSerial::is() << "x; " << X << ", Y; " << Y << ", Z; " << Z << "\n";
+	 
 	 CSerial::is() << "pitch err; " << Z -pitchcal << " roll err; " << X - rollcal << "\n";
 	 
-	 
+#ifdef nOpe	 
  //pitch up ( rear too Damn low) if( Z	> pitchcal + pitchtol )
  {
 	 //Raise the lower corner
@@ -242,5 +244,6 @@ void FsmCamp::LevelIt()
 		 }
 	}
  }
+ #endif
 }
 

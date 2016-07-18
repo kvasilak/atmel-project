@@ -95,7 +95,7 @@ bool CMMA8451::Init()
 		else		{			CSerial::is() << "unknown device; " << deviceid << "\n";		}	}
 	else
 	{
-		CSerial::is() << "read failed\n";
+		CSerial::is() << "MMA8451 read failed\n";
 	}
 
 	

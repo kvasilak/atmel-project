@@ -317,31 +317,31 @@ void CCorner::FilterHeight(int32_t height, int32_t setpoint)
            switch(corner)
            {
                 case LeftRear:
-                    CSerial::is() << ">Cnr, L_Err,";
-                    CSerial::is() << uint16_t(height - setpoint);
-                    CSerial::is() << "<";
+                   // CSerial::is() << ">Cnr, L_Err,";
+                    //CSerial::is() << uint16_t(height - setpoint);
+                    //CSerial::is() << "<";
 
-                    CSerial::is() << ">Cnr, L_Hght,";
+                    CSerial::is() << "L_Hght, ";
                     CSerial::is() << uint16_t(height);
-                    CSerial::is() << "<";
+                   // CSerial::is() << "<\r\n";
 
-                    CSerial::is() << ">Cnr, L_Slow,";
-                    CSerial::is() << uint16_t(slowheight - setpoint);
-                    CSerial::is() << "<\r\n";
+                   // CSerial::is() << ">Cnr, L_Slow,";
+                    //CSerial::is() << uint16_t(slowheight - setpoint);
+                    //CSerial::is() << "<\r\n";
 
                     break;
                 case RightRear:
-                    CSerial::is() << ">Cnr, R_Err,";
-                    CSerial::is() << uint16_t(height - setpoint);
-                    CSerial::is() << "<";
+                   // CSerial::is() << ">Cnr, R_Err,";
+                   // CSerial::is() << uint16_t(height - setpoint);
+                    //CSerial::is() << "<";
 
-                    CSerial::is() << ">Cnr, R_Hght,";
+                    CSerial::is() << ", R_Hght, ";
                     CSerial::is() << uint16_t(height);
-                    CSerial::is() << "<";
+                    CSerial::is() << "\r\n";
 
-                    CSerial::is() << ">Cnr, R_Slow,";
-                    CSerial::is() << uint16_t(slowheight - setpoint);
-                    CSerial::is() << "<\r\n";                
+                   // CSerial::is() << ">Cnr, R_Slow,";
+                   // CSerial::is() << uint16_t(slowheight - setpoint);
+                   // CSerial::is() << "<\r\n";                
 
                     break;
            } 
