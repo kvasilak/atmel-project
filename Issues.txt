@@ -1,18 +1,30 @@
 Micro level design issues
 
 Version 3
+Hardware
 * brightness control, need a way to easily control LED brightness. Dash brightness knob is terrible. Add a pot or button to adjust independently
 * mounting holes, inner bottom holes interfere with camp and travel buttons
 * Logo LEDs, can they be spread further apart?
-* Travel adjustment rate, need to slow down to almost never, mabe reduce sample rate to once a minute
-* Wake on button press, when sleeping any button press should wake the controller. The controller will then stay awake for a while then sleep
-    > Manual, stays awake for 5 minutes after last button press
-    > Travel, Stays awake untill level is achieved or 5 minutes
-    > Camp, stays awake until level is achieved or 5 minutes
-    
 * need a way to disable the steering remote
   > Pull down resistors
   > Special build
+
+Software
+* Travel adjustment rate, need to slow down to almost never, maybe reduce sample rate to once a minute
+* Wake on button press, when sleeping any button press should wake the controller. The controller will then stay awake for a while then sleep
+    > Manual, stays awake for 5 minutes after last button press
+    > Travel, Stays awake until level is achieved or 5 minutes
+    > Camp,   stays awake until level is achieved or 5 minutes
+    
+Mechanical
+* Design front panel
+* Design buttons
+* Design overlay
+* fix issue with sensor mount bracket
+    > Mounting hole spacing
+    > sensor mounting hole layout
+*Find 4 cond wire
+   > make custom harness with twisted wires?
   
 
 
