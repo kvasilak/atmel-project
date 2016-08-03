@@ -2,7 +2,7 @@ Micro level design issues
 
 Version 3
 Hardware
-* brightness control, need a way to easily control LED brightness. Dash brightness knob is terrible. Add a pot or button to adjust independently
+* brightness control, 0-12v input. Connect to 12v, dash lamps or seperate pot to control brightness
 * mounting holes, inner bottom holes interfere with camp and travel buttons
 * Logo LEDs, can they be spread further apart?
 * need a way to disable the steering remote
@@ -13,9 +13,11 @@ Software
 * Travel adjustment rate, need to slow down to almost never, maybe reduce sample rate to once a minute
 * Wake on button press, when sleeping any button press should wake the controller. The controller will then stay awake for a while then sleep
     > Manual, stays awake for 5 minutes after last button press
-    > Travel, Stays awake until level is achieved or 5 minutes
-    > Camp,   stays awake until level is achieved or 5 minutes
+      * any front panel button, any outside remote button, Inside remote does not wake
+    > Travel, Stays awake until level is achieved or 5 minutes (LEDs flash if level not achieved )
+    > Camp,   stays awake until level is achieved or 5 minutes ( LEDs flash if level not achieved )
 * remove dance 
+* Camp, flash LEDS if can't level, Timeout and / or no more motion
     
     
 Mechanical
