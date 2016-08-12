@@ -256,6 +256,16 @@ void CCorner::SetLongFilter(bool slow)
     filter_reg = (SmoothHeight << FILTER_SHIFT);
     
     LongFilter = slow;
+	
+	if(slow)
+	{
+		CycleTime = 5000; //5 seconds between readings
+	}
+	else
+	{
+		CycleTime = 100; //back to fast updates
+	}
+	
 }
 
 void CCorner::AtHeight(bool at)
@@ -392,7 +402,6 @@ void CCorner::Run(int32_t setpoint)
 
                 HoldOffTime = CTimer::GetTick();
                 DoPulse = false;
-                CycleTime = 100;
                 SetState(ValveHolding);
             }
             break;
@@ -408,7 +417,6 @@ void CCorner::Run(int32_t setpoint)
                 {
                     SetState(ValveFilling);
                     FillOn();
-                    CycleTime = 100;
                     
                     //if within 5x deadband, only pulse the valve
                     //so we don't over shoot the setpoint due to the long lag time
@@ -430,8 +438,6 @@ void CCorner::Run(int32_t setpoint)
                 {
                     SetState(ValveDumping);
                     DumpOn();
-                    
-                    CycleTime = 100;
                     
                     //if within 5x deadband, only pulse the valve
                     //so we don't over shoot the setpoint due to the long lag time
