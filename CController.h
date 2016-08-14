@@ -80,9 +80,13 @@ public:
 	eStates m_CurrState;
 	uint32_t Time;
 	uint32_t IgnitionChangeStart;
+	uint32_t ButtonWakeStart;
+	
+	uint8_t ButtonWakeSeconds;
+	
 	bool IgnitionEventPending;
 	bool LastIgnitionOn;
+	bool ButtonWakeup;
 }; //CController
-
 
 #endif //__CCONTROLLER_H__

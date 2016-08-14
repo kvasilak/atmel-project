@@ -69,6 +69,7 @@ void FSMTravelCal::HandleEvent(eEvents evt)
 			
 			m_SMManager.ChangeState(eStates::STATE_TRAVEL);
 			break;
+			//cancel calibration
 		case eEvents::TravelEvent:
 			m_SMManager.ChangeState(eStates::STATE_TRAVEL);
 			break;

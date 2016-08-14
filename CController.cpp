@@ -24,8 +24,11 @@ m_stateTravelCal(*this),
 m_stateCampCal(*this),
 m_CurrState(eStates::STATE_MANUAL),
 IgnitionChangeStart(0),
+ButtonWakeStart(0),
+ButtonWakeSeconds(0),
 IgnitionEventPending(false),
-LastIgnitionOn(false)
+LastIgnitionOn(false),
+ButtonWakeup(false)
 {
 	//this order determines the state machine order
 	m_StateList[0] = &m_stateManual;
@@ -73,7 +76,10 @@ void CController::ScheduleEvent(eEvents evt)
 		"Steering Event",
 		"Travel Event",
 		"Camp Event",
-		"Calibrate Event"
+		"Calibrate Event",
+		"Ignition On Event",
+		"Ignition Off Event",
+		"Button Wake Event"
 	};
 
 	//Don't show timer events, too much noise
@@ -124,19 +130,13 @@ void CController::ChangeState(eStates newState, eEvents evt)
 //Camp event for any change of the camp button
 void CController::CheckEvent()
 {
-	if(LastIgnitionOn != Cio::is().IsIgnitionOn())
-	{
-		CSerial::is() << "Ignition switch!\n";
-		
-		Cio::IgnitionChanged = true;
-		LastIgnitionOn = Cio::is().IsIgnitionOn();
-	}
-
 	if(Cio::IgnitionChanged)
 	{
 		CSerial::is() << "Ignition Changed\n";
 		
 		IgnitionChangeStart = CTimer::GetTick();
+		
+		LastIgnitionOn = Cio::is().IsIgnitionOn();
 		
 		Cio::IgnitionChanged = false;
 		
@@ -146,8 +146,6 @@ void CController::CheckEvent()
 	
 	if(IgnitionEventPending)
 	{
-		//CSerial::is() << ".";
-		
 		//Don't cycle power too fast
 		if(CTimer::IsTimedOut(1000, IgnitionChangeStart))
 		{
@@ -176,6 +174,34 @@ void CController::CheckEvent()
 		}
 	}
 
+	if( Cio::ButtonChanged)
+	{ 
+		Cio::ButtonChanged = false;
+		
+		ButtonWakeStart = CTimer::GetTick();
+		
+		ButtonWakeup = true;
+		ButtonWakeSeconds = 0;
+		
+		ScheduleEvent(eEvents::ButtonWakeEvent);
+		
+	}
+	
+	if(ButtonWakeup)
+	{
+		if(CTimer::IsTimedOut(1000, ButtonWakeStart))
+		{
+			ButtonWakeStart = CTimer::GetTick();		
+			
+			ButtonWakeSeconds++;
+			
+			//wait 5 seconds after last button press then resume sleep
+			if(ButtonWakeSeconds > 300)
+			{
+				ScheduleEvent(eEvents::IgnitionOffEvent);
+			}
+		}
+	}
 	
 	if(Cio::is().RockerChanged())
 	{
@@ -226,7 +252,9 @@ void CController::Run()
 			ScheduleEvent(eEvents::TimerEvent);
 
 			//LED brightness controlled by voltage on dimmer input
-//			CLeds::is().Dim(CADC::is().GetDimmer());
+			//Todo Scale to resistor divider
+			//Todo what to do about dash light dimmer
+			CLeds::is().Dim(CADC::is().GetDimmer());
 		}
 		Time = CTimer::GetTick();
 	}

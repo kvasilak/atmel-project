@@ -72,6 +72,7 @@ void FSMCampCal::HandleEvent(eEvents evt)
 			
 			m_SMManager.ChangeState(eStates::STATE_CAMP);
 			break;
+			//Cancel calibration
 		case eEvents::CampEvent:
 			m_SMManager.ChangeState(eStates::STATE_CAMP);
 		default:
