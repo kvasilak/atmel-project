@@ -88,6 +88,7 @@ public:
 	void Wakeup();
 	bool IsIgnitionOn();
 	static volatile bool IgnitionChanged;
+	static volatile bool ButtonChanged;
 	bool Awake;
 	
 private:
@@ -102,7 +103,7 @@ private:
 	
 	void Direction();
 	void Pullups();
-	void EnableIgnOnInterrupt();
+	void EnableIgnGPIOInterrupt();
 
 	bool FillPressed;
 	bool DumpPressed;

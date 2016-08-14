@@ -68,6 +68,10 @@ void FSMTravelCal::HandleEvent(eEvents evt)
 			CSerial::is() << "Travel Cal Complete; Left, " << nvm::is().GetLeftTravel() << ", Right, " << nvm::is().GetRightTravel() << "\n";
 			
 			m_SMManager.ChangeState(eStates::STATE_TRAVEL);
+			break;
+		case eEvents::TravelEvent:
+			m_SMManager.ChangeState(eStates::STATE_TRAVEL);
+			break;
 		default:
 		break;
 	}

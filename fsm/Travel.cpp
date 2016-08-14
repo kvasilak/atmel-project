@@ -81,31 +81,33 @@ void FsmTravel::HandleEvent(eEvents evt)
 			m_SMManager.ChangeState(eStates::STATE_TRAVEL_CALIBRATE);
 			break;
 		case eEvents::IgnitionOnEvent:
-			if(Cio::is().Awake)
-			{
-				CSerial::is() << " FsmTravel::Ignition On, Already awake!!!\r\n";
-			}
-			else
-			{
-				Cio::is().Wakeup();
+			Cio::is().Awake = true;
+			Cio::is().Wakeup();
 				
-				CLeds::is().TravelOKOn();
+			CLeds::is().TravelOKOn();
 			
-				//reset so we get back to ride height quickly
-				LeftSide.AtHeight(false);
-				RightSide.AtHeight(false);
+			//reset so we get back to ride height quickly
+			LeftSide.AtHeight(false);
+			RightSide.AtHeight(false);
 		
-				LeftSide.SetLongFilter(false);
-				RightSide.SetLongFilter(false);
+			LeftSide.SetLongFilter(false);
+			RightSide.SetLongFilter(false);
 			
-				Starting = true;
-				CSerial::is() << " FsmTravel::Ignition On\r\n";
-			}
+			Starting = true;
+			CSerial::is() << " FsmTravel::Ignition On\r\n";
+			
 			break;
 		case eEvents::IgnitionOffEvent:
+			Cio::is().Awake = false;
 			CSerial::is() << " FsmTravel::Ignition Off\r\n";
 		
 			Cio::is().Sleep();
+			break;
+		case eEvents::ButtonWakeEvent:
+			Cio::is().Wakeup();
+		
+			Cio::is().ResetButtons();
+			CSerial::is() << " FsmCamp::Button wake\r\n";
 			break;
 		default:
 		break;

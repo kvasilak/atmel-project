@@ -12,7 +12,8 @@ enum class eEvents
 	CampEvent,
 	CalibrateEvent,
 	IgnitionOnEvent,
-	IgnitionOffEvent
+	IgnitionOffEvent,
+	ButtonWakeEvent
 };
 
 

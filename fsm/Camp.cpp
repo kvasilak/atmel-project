@@ -68,6 +68,7 @@ void FsmCamp::HandleEvent(eEvents evt)
 			m_SMManager.ChangeState(eStates::STATE_CAMP_CALIBRATE);
 		break;
 		case eEvents::IgnitionOnEvent:
+		    Cio::is().Awake = true;
 			Cio::is().Wakeup();
 			CLeds::is().CampOn();
 			//relevel on wakeup
@@ -76,11 +77,17 @@ void FsmCamp::HandleEvent(eEvents evt)
 
 			break;
 		case eEvents::IgnitionOffEvent:
-
+			Cio::is().Awake = false;
 			Cio::is().Sleep();
 			
 			CSerial::is() << " FsmCamp::Ignition Off\r\n";
 
+			break;
+		case eEvents::ButtonWakeEvent:
+			Cio::is().Wakeup();
+			
+			Cio::is().ResetButtons();
+			CSerial::is() << " FsmCamp::Button wake\r\n";
 			break;
 		default:
 		break;

@@ -71,7 +71,9 @@ void FSMCampCal::HandleEvent(eEvents evt)
 			CSerial::is() << "Camp Cal Complete; X, " << X << ", Y, " << Y <<", Z, " << Z << "\n";
 			
 			m_SMManager.ChangeState(eStates::STATE_CAMP);
-
+			break;
+		case eEvents::CampEvent:
+			m_SMManager.ChangeState(eStates::STATE_CAMP);
 		default:
 		break;
 	}

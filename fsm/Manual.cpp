@@ -61,16 +61,24 @@ void FsmManual::HandleEvent(eEvents evt)
 			//nothing to do here
 			break;
 		case eEvents::IgnitionOnEvent:
+			Cio::is().Awake = true;
 			Cio::is().Wakeup();
 			
 			Cio::is().ResetButtons();
 			CSerial::is() << " FsmManual::Ignition On\r\n";
 			break;
 		case eEvents::IgnitionOffEvent:
+			Cio::is().Awake = false;
 			Cio::is().ResetButtons();
 			CSerial::is() << " FsmManual::Ignition Off\r\n";
 			
 			Cio::is().Sleep();
+			break;
+		case eEvents::ButtonWakeEvent:
+			Cio::is().Wakeup();
+		
+			Cio::is().ResetButtons();
+			CSerial::is() << " FsmManual::Ignition On\r\n";
 			break;
 		default:
 		break;

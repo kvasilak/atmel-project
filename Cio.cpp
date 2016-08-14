@@ -20,6 +20,7 @@
 #include <avr/sleep.h>
 
 volatile bool Cio::IgnitionChanged = false;
+volatile bool Cio::ButtonChanged = false;
 volatile uint8_t ispa;
 
 #define REV3_PCB
@@ -348,7 +349,7 @@ void Cio::Init()
 	
 	ResetButtons();
 
-	EnableIgnOnInterrupt();
+	EnableIgnGPIOInterrupt();
 	
 	Time = CTimer::GetTick();
 }
@@ -365,7 +366,7 @@ void Cio::Run()
 }
 
 //PCInt2 on pin 35
-void Cio::EnableIgnOnInterrupt()
+void Cio::EnableIgnGPIOInterrupt()
 {
 	//PCI0
 	PCMSK0 = _BV(PCINT2);  //pcint2
@@ -889,7 +890,7 @@ void Cio::Sleep()
 	//Turn off all LEDS
 	CLeds::is().AllOff();
 	
-	Awake = false;
+	//Awake = false;
 	
 	//turn off all valves
 	AllOff();
@@ -928,7 +929,7 @@ void Cio::Wakeup()
 	
 	CLeds::is().ActiveOn();
 	
-	Awake = true;
+	//Awake = true;
 	
 }
 
@@ -939,10 +940,27 @@ void Cio::Wakeup()
  	return (port & _BV(IGNITION_ON_BIT)) == _BV(IGNITION_ON_BIT);
  }
 
-// clock interrupt - clear flag immediately to resume count
+// ignition changed
 //PA2 pc int 2
 ISR(PCINT0_vect)
 {
 	Cio::IgnitionChanged = true;
 }
 
+//Outside remote changed
+ISR(PCINT1_vect)
+{
+	if(!Cio::is().Awake)
+	{
+		Cio::ButtonChanged = true;
+	}
+}
+
+//panel buttons changed
+ISR(PCINT3_vect)
+{
+	if(!Cio::is().Awake)
+	{
+		Cio::ButtonChanged = true;
+	}
+}
