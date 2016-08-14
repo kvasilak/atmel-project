@@ -47,39 +47,40 @@ void CLeds::AllOff()
 
 void CLeds::RightFillOn()
 {
-	LEDout0 |= Led0On;
+	LEDout0 |= Led2On;
 	
 	WriteReg(LEDReg0, LEDout0);
 }
 
 void CLeds::RightFillOff()
 {
-	LEDout0 &= Led0Off;
+	LEDout0 &= Led2Off;
 	WriteReg(LEDReg0, LEDout0);
 }
 
 void CLeds::RightDumpOn()
 {
-	LEDout0 |= Led1On;
-	WriteReg(LEDReg0, LEDout0);
+	LEDout1 |= Led1On;
+	WriteReg(LEDReg1, LEDout1);
 }
 
 void CLeds::RightDumpOff()
 {
-	LEDout0 &= Led1Off;
-	WriteReg(LEDReg0, LEDout0);
+	LEDout1 &= Led1Off;
+	WriteReg(LEDReg1, LEDout1);
 }
 
 void CLeds::ActiveOn()
 {
-	LEDout0 |= Led2On;
-	WriteReg(LEDReg0, LEDout0);
+	//LEDout0 |= Led2On;
+	LEDout1 |= Led3On;
+	WriteReg(LEDReg1, LEDout1);
 }
 
 void CLeds::ActiveOff()
 {
-	LEDout0 &= Led2Off;
-	WriteReg(LEDReg0, LEDout0);
+	LEDout1 &= Led3Off;
+	WriteReg(LEDReg1, LEDout1);
 }
 
 
@@ -97,25 +98,25 @@ void CLeds::LeftFillOff()
 
 void CLeds::LeftDumpOn()
 {
-	LEDout1 |= Led0On;
+	LEDout1 |= Led2On;
 	WriteReg(LEDReg1, LEDout1);
 }
 
 void CLeds::LeftDumpOff()
 {
-	LEDout1 &= Led0Off;
+	LEDout1 &= Led2Off;
 	WriteReg(LEDReg1, LEDout1);
 }
 
 void CLeds::CampOn()
 {
-	LEDout1 |= Led1On;
+	LEDout1 |= Led0On;
 	WriteReg(LEDReg1, LEDout1);
 }
 
 void CLeds::CampOff()
 {
-	LEDout1 &= Led1Off;
+	LEDout1 &= Led0Off;
 	WriteReg(LEDReg1, LEDout1);
 }
 
@@ -133,12 +134,12 @@ void CLeds::TravelWarnOff()
 
 void CLeds::TravelOKOn()
 {
-	LEDout1 |= Led3On;
-	WriteReg(LEDReg1, LEDout1);
+	LEDout0 |= Led1On;
+	WriteReg(LEDReg0, LEDout0);
 }
 
 void CLeds::TravelOKOff()
 {
-	LEDout1 &= Led3Off;
-	WriteReg(LEDReg1, LEDout1);
+	LEDout0 &= Led1Off;
+	WriteReg(LEDReg0, LEDout0);
 }

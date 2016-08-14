@@ -23,7 +23,7 @@ void CADC::Init()
 	// 16000000/128 = 125000
 	ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 	
-	DIDR0 = 0x03; //disable Digital on ADC 1 and 2
+	DIDR0 = 0x0B; //disable Digital on ADC 1 and 2 and 4
 }
 
 uint16_t CADC::Read(uint8_t ch)
@@ -54,4 +54,13 @@ uint16_t CADC::GetLeftHeight()
 uint16_t CADC::GetRightHeight()
 {
 	return Read(1);
+}
+
+uint8_t CADC::GetDimmer()
+{
+	uint16_t dim = Read(3);
+	
+	dim /= 4;
+	
+	return (uint8_t)dim;
 }

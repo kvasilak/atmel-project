@@ -256,11 +256,24 @@ void CCorner::SetLongFilter(bool slow)
     filter_reg = (SmoothHeight << FILTER_SHIFT);
     
     LongFilter = slow;
+	
+	if(slow)
+	{
+		CycleTime = 5000; //5 seconds between readings
+	}
+	else
+	{
+		CycleTime = 100; //back to fast updates
+	}
+	
 }
 
 void CCorner::AtHeight(bool at)
 {
     IsAtHeight = at;
+	
+	//reset valve state machine
+	SetState(ValveIniting);
 }
 
 bool CCorner::AtHeight()
@@ -314,31 +327,31 @@ void CCorner::FilterHeight(int32_t height, int32_t setpoint)
            switch(corner)
            {
                 case LeftRear:
-                    CSerial::is() << ">Cnr, L_Err,";
-                    CSerial::is() << uint16_t(height - setpoint);
-                    CSerial::is() << "<";
+                   // CSerial::is() << ">Cnr, L_Err,";
+                    //CSerial::is() << uint16_t(height - setpoint);
+                    //CSerial::is() << "<";
 
-                    CSerial::is() << ">Cnr, L_Hght,";
+                    CSerial::is() << "L_Hght, ";
                     CSerial::is() << uint16_t(height);
-                    CSerial::is() << "<";
+                   // CSerial::is() << "<\r\n";
 
-                    CSerial::is() << ">Cnr, L_Slow,";
-                    CSerial::is() << uint16_t(slowheight - setpoint);
-                    CSerial::is() << "<\r\n";
+                   // CSerial::is() << ">Cnr, L_Slow,";
+                    //CSerial::is() << uint16_t(slowheight - setpoint);
+                    //CSerial::is() << "<\r\n";
 
                     break;
                 case RightRear:
-                    CSerial::is() << ">Cnr, R_Err,";
-                    CSerial::is() << uint16_t(height - setpoint);
-                    CSerial::is() << "<";
+                   // CSerial::is() << ">Cnr, R_Err,";
+                   // CSerial::is() << uint16_t(height - setpoint);
+                    //CSerial::is() << "<";
 
-                    CSerial::is() << ">Cnr, R_Hght,";
+                    CSerial::is() << ", R_Hght, ";
                     CSerial::is() << uint16_t(height);
-                    CSerial::is() << "<";
+                    CSerial::is() << "\r\n";
 
-                    CSerial::is() << ">Cnr, R_Slow,";
-                    CSerial::is() << uint16_t(slowheight - setpoint);
-                    CSerial::is() << "<\r\n";                
+                   // CSerial::is() << ">Cnr, R_Slow,";
+                   // CSerial::is() << uint16_t(slowheight - setpoint);
+                   // CSerial::is() << "<\r\n";                
 
                     break;
            } 
@@ -368,7 +381,7 @@ void CCorner::Run(int32_t setpoint)
 
     switch (State)
     {
-        case ValveIniting:
+        case ValveIniting: 
             FillOff();
             DumpOff();
             SetState(ValveHolding);
@@ -389,7 +402,6 @@ void CCorner::Run(int32_t setpoint)
 
                 HoldOffTime = CTimer::GetTick();
                 DoPulse = false;
-                CycleTime = 100;
                 SetState(ValveHolding);
             }
             break;
@@ -405,7 +417,6 @@ void CCorner::Run(int32_t setpoint)
                 {
                     SetState(ValveFilling);
                     FillOn();
-                    CycleTime = 100;
                     
                     //if within 5x deadband, only pulse the valve
                     //so we don't over shoot the setpoint due to the long lag time
@@ -427,8 +438,6 @@ void CCorner::Run(int32_t setpoint)
                 {
                     SetState(ValveDumping);
                     DumpOn();
-                    
-                    CycleTime = 100;
                     
                     //if within 5x deadband, only pulse the valve
                     //so we don't over shoot the setpoint due to the long lag time

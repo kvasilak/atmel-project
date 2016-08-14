@@ -15,12 +15,12 @@ template <class T, uint16_t MAX_ENTRIES> class CircularBuffer
 
   // Head is the location of the last value added to the
   // circular buffer. 
-  int In;
-  int Out;
+  uint16_t In;
+  uint16_t Out;
 
   // Track the number of entries stored in the buffer. 
   // Never greater than MAX_ENTRIES;
-  int Size;
+  uint16_t Size;
 
 public:
   CircularBuffer():

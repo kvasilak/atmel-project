@@ -24,6 +24,7 @@ Starting(true)
 
 void FsmTravel::OnEntry()
 {
+	CLeds::is().TravelOKOn();
 	LeftSide.Init(LeftRear);
 	RightSide.Init(RightRear);
 
@@ -33,7 +34,7 @@ void FsmTravel::OnEntry()
 	Starting = true;
 	
 	CSerial::is() << " FsmTravel::OnEntry()\r\n";
-	CSerial::is() << "Travel Cal vals; Left, " << nvm::is().GetLeftTravel() << ", Right, " << nvm::is().GetRightTravel() << "\n";
+	//CSerial::is() << "Travel Cal vals; Left, " << nvm::is().GetLeftTravel() << ", Right, " << nvm::is().GetRightTravel() << "\n";
 }
 
 void FsmTravel::HandleEvent(eEvents evt)
@@ -61,14 +62,20 @@ void FsmTravel::HandleEvent(eEvents evt)
 			break;
 		case eEvents::RockerEvent:
 		case eEvents::OutSideEvent:
+			m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
+		break;
 		case eEvents::SteeringEvent:
+			Cio::is().SteeringRemote();
 			m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
 		break;
 		case eEvents::CampEvent:
-			m_SMManager.ChangeState(eStates::STATE_CAMP, evt);
+			m_SMManager.ChangeState(eStates::STATE_CAMP);
 		break;
 		case eEvents::TravelEvent:
-			Cio::is().TravelSwitches();
+			if(Cio::is().TravelSwitches())
+			{
+				m_SMManager.ChangeState(eStates::STATE_MANUAL);
+			}
 		break;
 		case eEvents::CalibrateEvent:
 			m_SMManager.ChangeState(eStates::STATE_TRAVEL_CALIBRATE);
@@ -108,4 +115,5 @@ void FsmTravel::HandleEvent(eEvents evt)
 void FsmTravel::OnExit()
 {
 	CSerial::is() << " FsmTravel::OnExit()\r\n";
+	CLeds::is().TravelOKOff();
 }

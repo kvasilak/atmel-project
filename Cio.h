@@ -60,14 +60,15 @@ public:
 	bool CampChanged();
 	bool TravelChanged();
 	bool CalibrateChanged();
+	bool UpDownChanged();
 
 //What to do
 	void RockerSwitch();
 	void OutsideRemote();
 	void SteeringRemote();
 
-	void CampSwitches();
-	void TravelSwitches();
+	bool CampSwitches();
+	bool TravelSwitches();
 	
 	bool IsHolding();
 	
@@ -93,8 +94,8 @@ private:
 	Cio();
 	Cio& operator=( const Cio &c );
 
-	Debounced RockerUp;
-	Debounced RockerDown;
+	Debounced ButtonUp;
+	Debounced ButtonDown;
 	Debounced PushCamp;
 	Debounced PushTravel;
 	Debounced PushCalibrate;
@@ -105,6 +106,8 @@ private:
 
 	bool FillPressed;
 	bool DumpPressed;
+	
+	uint32_t Time;
 
 }; //Cio
 

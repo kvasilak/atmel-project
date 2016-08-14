@@ -29,6 +29,7 @@ extern "C" void __cxa_pure_virtual()
 	//reset!
 	while (1);
 }
+// "optimization enabled, check i2c operation, I.E. LEDs and accel"
 
 int main(void)
 {

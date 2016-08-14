@@ -24,6 +24,8 @@ MinTime(250)
 
 void FsmCamp::OnEntry()
 {
+	CLeds::is().CampOn();
+	
 	int16_t roll = nvm::is().GetCampX();
  	int16_t pitch = nvm::is().GetCampZ();
 
@@ -47,14 +49,20 @@ void FsmCamp::HandleEvent(eEvents evt)
 		break;
 		case eEvents::RockerEvent:
 		case eEvents::OutSideEvent:
+			m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
+		break;
 		case eEvents::SteeringEvent:
+			Cio::is().SteeringRemote();
 			m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
 		break;
 		case eEvents::CampEvent:
-			Cio::is().CampSwitches();
+			if(Cio::is().CampSwitches())
+			{
+				m_SMManager.ChangeState(eStates::STATE_MANUAL);
+			}
 		break;
 		case eEvents::TravelEvent:
-			m_SMManager.ChangeState(eStates::STATE_TRAVEL, evt);
+			m_SMManager.ChangeState(eStates::STATE_TRAVEL);
 		break;
 		case eEvents::CalibrateEvent:
 			m_SMManager.ChangeState(eStates::STATE_CAMP_CALIBRATE);
@@ -82,6 +90,7 @@ void FsmCamp::HandleEvent(eEvents evt)
 void FsmCamp::OnExit()
 {
 	CSerial::is() << " FsmCamp::OnExit()\r\n";
+	CLeds::is().CampOff();
 }
 
 
@@ -96,18 +105,20 @@ void FsmCamp::OnExit()
 
 void FsmCamp::LevelIt()
 {
- 	int16_t X;
- 	int16_t Y;
- 	int16_t Z;
+ 	int16_t X=0;
+ 	int16_t Y=0;
+ 	int16_t Z=0;
  	//Read Acccel
  	CMMA8451::is().ReadXYZ(X, Y, Z);
  	//determine x and z errors
  	int16_t rollcal = nvm::is().GetCampX();
  	int16_t pitchcal = nvm::is().GetCampZ();
 	 
+	 CSerial::is() << "x; " << X << ", Y; " << Y << ", Z; " << Z << "\n";
+	 
 	 CSerial::is() << "pitch err; " << Z -pitchcal << " roll err; " << X - rollcal << "\n";
 	 
-	 
+#ifdef nOpe	 
  //pitch up ( rear too Damn low) if( Z	> pitchcal + pitchtol )
  {
 	 //Raise the lower corner
@@ -233,5 +244,6 @@ void FsmCamp::LevelIt()
 		 }
 	}
  }
+ #endif
 }
 

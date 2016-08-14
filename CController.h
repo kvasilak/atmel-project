@@ -82,7 +82,6 @@ public:
 	uint32_t IgnitionChangeStart;
 	bool IgnitionEventPending;
 	bool LastIgnitionOn;
-	
 }; //CController
 
 
