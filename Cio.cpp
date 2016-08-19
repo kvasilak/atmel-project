@@ -7,7 +7,6 @@
 
 #include <avr/io.h>
 #include <avr/power.h> //perihperal power control
-//#include <util/delay.h>
 #include "Cio.h"
 #include "CLeds.h"
 #include "CSerial.h"
@@ -376,17 +375,17 @@ void Cio::EnableIgnGPIOInterrupt()
 	//PB1 PCint 9, Remote LU
 	//PB2 PCint 10, Remote RD
 	//PB4 PCint 12, Remote RU
-	PCMSK1 = _BV(PCINT8) || _BV(PCINT9) || _BV(PCINT10) || _BV(PCINT12);
+	PCMSK1 = 0;//_BV(PCINT8) || _BV(PCINT9) || _BV(PCINT10) || _BV(PCINT12);
 	
 	//PCI3
 	//PD3 PCint 27, Travel
 	//PD5 PCint 29, Camp
 	//PD6 PCint 30, Down
 	//PD7 PCint 31, Up
-	PCMSK3 = _BV(PCINT27) || _BV(PCINT29) || _BV(PCINT30) || _BV(PCINT31);
+	PCMSK3 = 0x00; //(_BV(PCINT27) || _BV(PCINT29) || _BV(PCINT30) || _BV(PCINT31) );
 
 	//Enable interrupts
-	PCICR = _BV(PCIE0) || _BV(PCIE1) || _BV(PCIE3);
+	PCICR = (_BV(PCIE0));// || _BV(PCIE1) || _BV(PCIE3) );
 }
 
 //now a latching pushbutton not a rocker
@@ -907,6 +906,7 @@ void Cio::Sleep()
 	//Set CPU to sleep, will wake up on an ignition IRQ
  	cli();
  	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+	//set_sleep_mode(SLEEP_MODE_IDLE);
  	
  	// sleep_mode() has a possible race condition
  	sleep_enable();
@@ -950,17 +950,17 @@ ISR(PCINT0_vect)
 //Outside remote changed
 ISR(PCINT1_vect)
 {
-	if(!Cio::is().Awake)
-	{
+	//if(!Cio::is().Awake)
+	//{
 		Cio::ButtonChanged = true;
-	}
+	//}
 }
 
 //panel buttons changed
 ISR(PCINT3_vect)
 {
-	if(!Cio::is().Awake)
-	{
+	//if(!Cio::is().Awake)
+	//{
 		Cio::ButtonChanged = true;
-	}
+	//}
 }

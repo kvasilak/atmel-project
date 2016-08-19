@@ -57,6 +57,7 @@ CSerial::is() <<"ignition " << on << "\n";
 		Cio::is().CompressorOn();
  		
   		Cio::is().Wakeup();
+	    Cio::is().Awake = true;
 	}
 	else
 	{
@@ -85,7 +86,7 @@ void CController::ScheduleEvent(eEvents evt)
 	//Don't show timer events, too much noise
 	if(evt > eEvents::TimerEvent)
 	{
-		CSerial::is() << events[(int)evt] << "\n";
+		CSerial::is() << "***State Change: " << events[(int)evt] << "\n";
 	}
 	
 	m_StateList[(int)m_CurrState]->HandleEvent(evt);
