@@ -78,7 +78,7 @@ void FsmManual::HandleEvent(eEvents evt)
 			Cio::is().Wakeup();
 		
 			Cio::is().ResetButtons();
-			CSerial::is() << " FsmManual::Ignition On\r\n";
+			CSerial::is() << " FsmManual::BUtton Wake\r\n";
 			break;
 		default:
 		break;

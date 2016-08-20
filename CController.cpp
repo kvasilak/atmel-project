@@ -48,22 +48,17 @@ void CController::Init()
 	ScheduleEvent(eEvents::RockerEvent);
 	
 	bool on = Cio::is().IsIgnitionOn();
-CSerial::is() <<"ignition " << on << "\n";
+	CSerial::is() <<"ignition " << on << "\n";
 	
 	
-	if(on)
-	{
-		CLeds::is().ActiveOn();
-		Cio::is().CompressorOn();
+	//set the sleep flag so as will go to sleep after int 
+	IgnitionEventPending = true;
+
+	CLeds::is().ActiveOn();
+	Cio::is().CompressorOn();
  		
-  		Cio::is().Wakeup();
-	    Cio::is().Awake = true;
-	}
-	else
-	{
-		//sleep
-		Cio::is().Sleep();
-	}
+  	Cio::is().Wakeup();
+	Cio::is().Awake = true;
 	
 }
 
@@ -196,9 +191,11 @@ void CController::CheckEvent()
 			
 			ButtonWakeSeconds++;
 			
-			//wait 5 seconds after last button press then resume sleep
-			if(ButtonWakeSeconds > 300)
+			//wait 5 minutes after last button press then resume sleep
+			//if(ButtonWakeSeconds > 300)
+			if(ButtonWakeSeconds > 10)
 			{
+				CSerial::is() << "Button wake timeout\n";
 				ScheduleEvent(eEvents::IgnitionOffEvent);
 			}
 		}
