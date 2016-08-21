@@ -24,7 +24,7 @@ void FsmManual::OnEntry()
 	CLeds::is().TravelOKOff();
 	
 	Cio::is().AllOff();
-	Cio::is().ResetButtons();
+	//Cio::is().ResetButtons();
 	CSerial::is() << " FsmManual::OnEntry()\r\n";
 }
 
@@ -61,24 +61,34 @@ void FsmManual::HandleEvent(eEvents evt)
 			//nothing to do here
 			break;
 		case eEvents::IgnitionOnEvent:
-			Cio::is().Awake = true;
-			Cio::is().Wakeup();
-			
-			Cio::is().ResetButtons();
-			CSerial::is() << " FsmManual::Ignition On\r\n";
+			if(Cio::is().Awake == false)
+			{
+				Cio::is().Awake = true;
+				Cio::is().Wakeup();
+				
+				CSerial::is() << " FsmManual::Ignition On\r\n";
+			}
+			else
+			{
+				CSerial::is() << "Awake already\n";
+			}
 			break;
 		case eEvents::IgnitionOffEvent:
 			Cio::is().Awake = false;
-			Cio::is().ResetButtons();
+
 			CSerial::is() << " FsmManual::Ignition Off\r\n";
 			
 			Cio::is().Sleep();
 			break;
 		case eEvents::ButtonWakeEvent:
-			Cio::is().Wakeup();
+			if(Cio::is().Awake == false)
+			{
+				Cio::is().Awake = true;
+				Cio::is().Wakeup();
 		
-			Cio::is().ResetButtons();
-			CSerial::is() << " FsmManual::BUtton Wake\r\n";
+				//Cio::is().ResetButtons();
+				CSerial::is() << " FsmManual::BUtton Wake\r\n";
+			}
 			break;
 		default:
 		break;

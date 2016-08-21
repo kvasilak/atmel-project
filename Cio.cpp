@@ -346,7 +346,7 @@ void Cio::Init()
 	CalibrateChanged();
 	UpDownChanged();
 	
-	ResetButtons();
+	//ResetButtons();
 
 	EnableIgnGPIOInterrupt();
 	
@@ -375,19 +375,20 @@ void Cio::EnableIgnGPIOInterrupt()
 	//PB1 PCint 9, Remote LU
 	//PB2 PCint 10, Remote RD
 	//PB4 PCint 12, Remote RU
-	PCMSK1 = 0x17; //_BV(PCINT8) || _BV(PCINT9) || _BV(PCINT10) || _BV(PCINT12);
-	
-	//PCMSK2 = 0xff;
-	
+	//PCMSK1 = 0x17;
+	PCMSK1 = _BV(PCINT8) | _BV(PCINT9) | _BV(PCINT10) | _BV(PCINT12);
+
 	//PCI3
 	//PD3 PCint 27, Travel
 	//PD5 PCint 29, Camp
 	//PD6 PCint 30, Down
 	//PD7 PCint 31, Up
-	PCMSK3 = 0xE8;//(_BV(PCINT27) || _BV(PCINT29) || _BV(PCINT30) || _BV(PCINT31) );
+	//PCMSK3 = 0xE8;
+	PCMSK3 = _BV(PCINT27) | _BV(PCINT29) | _BV(PCINT30) | _BV(PCINT31) ;
 
 	//Enable interrupts
-	PCICR = 0x0B; //(_BV(PCIE0));// || _BV(PCIE1) || _BV(PCIE3) );
+	//PCICR = 0x0B;
+	PCICR = _BV(PCIE0) | _BV(PCIE1) | _BV(PCIE3) ;
 }
 
 //now a latching pushbutton not a rocker
@@ -952,25 +953,18 @@ ISR(PCINT0_vect)
 //Outside remote changed
 ISR(PCINT1_vect)
 {
-	if(!Cio::is().Awake)
-	{
+	//if(!Cio::is().Awake)
+	//{
 		Cio::ButtonChanged = true;
-	}
+	//}
 }
 
 //panel buttons changed
 ISR(PCINT3_vect)
 {
-	if(!Cio::is().Awake)
-	{
+	//if(!Cio::is().Awake)
+	//{
 		Cio::ButtonChanged = true;
-	}
+	//}
 }
 
-ISR(PCINT2_vect)
-{
-	if(!Cio::is().Awake)
-	{
-		Cio::ButtonChanged = true;
-	}
-}

@@ -159,6 +159,8 @@ void CController::CheckEvent()
 					CSerial::is() << "IgnitionOnEvent\n";
 
 					ScheduleEvent(eEvents::IgnitionOnEvent);
+					
+					ButtonWakeup = false;
 				}
 				else
 				{
@@ -173,14 +175,26 @@ void CController::CheckEvent()
 	if( Cio::ButtonChanged)
 	{ 
 		Cio::ButtonChanged = false;
+		CSerial::is() << "Button wake\n";		
 		
-		ButtonWakeStart = CTimer::GetTick();
+		if(Cio::is().Awake)
+		{
+			CSerial::is() << "Button restart\n";		
+			ButtonWakeStart = CTimer::GetTick();
+			ButtonWakeSeconds = 0;
+		}
+		else
+		{
+			CSerial::is() << "Button start\n";		
+			
 		
-		ButtonWakeup = true;
-		ButtonWakeSeconds = 0;
+			ButtonWakeStart = CTimer::GetTick();
 		
-		ScheduleEvent(eEvents::ButtonWakeEvent);
+			ButtonWakeup = true;
+			ButtonWakeSeconds = 0;
 		
+			ScheduleEvent(eEvents::ButtonWakeEvent);
+		}
 	}
 	
 	if(ButtonWakeup)
@@ -252,7 +266,7 @@ void CController::Run()
 			//LED brightness controlled by voltage on dimmer input
 			//Todo Scale to resistor divider
 			//Todo what to do about dash light dimmer
-			CLeds::is().Dim(CADC::is().GetDimmer());
+			//CLeds::is().Dim(CADC::is().GetDimmer());
 		}
 		Time = CTimer::GetTick();
 	}

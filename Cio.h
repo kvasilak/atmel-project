@@ -78,11 +78,11 @@ public:
 	void PowerOn();
 	void PowerOff();
 	
-	void ResetButtons() 
-	{
-		FillPressed = false;
-		DumpPressed = false;
-	}
+	//void ResetButtons() 
+	//{
+		//FillPressed = false;
+		//DumpPressed = false;
+	//}
 
 	void Sleep();
 	void Wakeup();

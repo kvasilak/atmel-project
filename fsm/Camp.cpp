@@ -84,9 +84,10 @@ void FsmCamp::HandleEvent(eEvents evt)
 
 			break;
 		case eEvents::ButtonWakeEvent:
+			Cio::is().Awake = true;
 			Cio::is().Wakeup();
 			
-			Cio::is().ResetButtons();
+			//Cio::is().ResetButtons();
 			CSerial::is() << " FsmCamp::Button wake\r\n";
 			break;
 		default:
