@@ -66,6 +66,8 @@ void FsmManual::HandleEvent(eEvents evt)
 				Cio::is().Awake = true;
 				Cio::is().Wakeup();
 				
+				Cio::is().UpdateButtons();
+				
 				CSerial::is() << " FsmManual::Ignition On\r\n";
 			}
 			else

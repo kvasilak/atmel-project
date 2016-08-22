@@ -346,7 +346,7 @@ void Cio::Init()
 	CalibrateChanged();
 	UpDownChanged();
 	
-	//ResetButtons();
+    ResetButtons();
 
 	EnableIgnGPIOInterrupt();
 	
@@ -943,6 +943,21 @@ void Cio::Wakeup()
  	return (port & _BV(IGNITION_ON_BIT)) == _BV(IGNITION_ON_BIT);
  }
 
+
+void Cio::UpdateButtons()
+{
+	if(FillPressed)
+	{
+		LeftFillOn();
+		RightFillOn();
+	}
+	else if(DumpPressed)
+	{
+		LeftDumpOff();
+		RightDumpOff();
+	}
+}
+
 // ignition changed
 //PA2 pc int 2
 ISR(PCINT0_vect)
@@ -953,18 +968,11 @@ ISR(PCINT0_vect)
 //Outside remote changed
 ISR(PCINT1_vect)
 {
-	//if(!Cio::is().Awake)
-	//{
-		Cio::ButtonChanged = true;
-	//}
+	Cio::ButtonChanged = true;
 }
 
 //panel buttons changed
 ISR(PCINT3_vect)
 {
-	//if(!Cio::is().Awake)
-	//{
-		Cio::ButtonChanged = true;
-	//}
+	Cio::ButtonChanged = true;
 }
-

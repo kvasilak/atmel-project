@@ -198,9 +198,6 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CADC.cpp">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="CADC.h">
       <SubType>compile</SubType>
     </Compile>
@@ -253,6 +250,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Debounced.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="fsm\CADC.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="fsm\Camp.cpp">
