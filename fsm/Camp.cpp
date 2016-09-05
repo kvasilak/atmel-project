@@ -18,7 +18,9 @@ static const int16_t rolltol = 10;
 FsmCamp::FsmCamp(CController& SMManager) :
 CState(SMManager, eStates::STATE_CAMP),
 Start(0),
-MinTime(250)
+MinTime(250),
+IsLevel(false),
+ReadyToSleep(false)
 {
 }
 
@@ -35,6 +37,9 @@ void FsmCamp::OnEntry()
 	CMMA8451::is().writeRegister8(0x2A, 0x3d); //slow rate, low noise, Active
 	
 	CMMA8451::is().writeRegister8(0x2B, 2); //high res
+	
+	IsLevel  = false;
+	ReadyToSleep = false;
 	
 }
 
@@ -68,17 +73,25 @@ void FsmCamp::HandleEvent(eEvents evt)
 			m_SMManager.ChangeState(eStates::STATE_CAMP_CALIBRATE);
 		break;
 		case eEvents::IgnitionOnEvent:
+			ReadyToSleep = false;
+			IsLevel = false;
+			
 			Cio::is().Wakeup();
 			CLeds::is().CampOn();
 			//relevel on wakeup
+			
+			Start = CTimer::GetTick();
 			
 			CSerial::is() << " FsmCamp::Ignition On\r\n";
 
 			break;
 		case eEvents::IgnitionOffEvent:
+			if(IsLevel)
+			{
+				Cio::is().Sleep();
+			}
 
-			Cio::is().Sleep();
-			
+			ReadyToSleep = true;
 			CSerial::is() << " FsmCamp::Ignition Off\r\n";
 
 			break;
@@ -111,18 +124,20 @@ void FsmCamp::LevelIt()
  	//Read Acccel
  	CMMA8451::is().ReadXYZ(X, Y, Z);
  	//determine x and z errors
- 	int16_t rollcal = nvm::is().GetCampX();
+ 	int16_t rollcal = nvm::is().GetCampY();
  	int16_t pitchcal = nvm::is().GetCampZ();
 	 
-	 CSerial::is() << "x; " << X << ", Y; " << Y << ", Z; " << Z << "\n";
+	//int16_t xcal = nvm::is().GetCampX();
 	 
-	 CSerial::is() << "pitch err; " << Z -pitchcal << " roll err; " << X - rollcal << "\n";
+	 CSerial::is() << ", Y; " << Y << ", Z; " << Z ;
 	 
-#ifdef nOpe	 
+	 CSerial::is()  << " Y err;" << Y - rollcal  << ";   Z err; " << Z -pitchcal << "\n";
+
+
  //pitch up ( rear too Damn low) if( Z	> pitchcal + pitchtol )
  {
 	 //Raise the lower corner
-	 if(X > rollcal + rolltol)//Roll up ( Left down )
+	 if(Y > rollcal + rolltol)//Roll up ( Left down )
 	 {
 		 //Raise Left
 		 if(CTimer::IsTimedOut(MinTime, Start))
@@ -135,7 +150,7 @@ void FsmCamp::LevelIt()
 		 }
 		 
 	 }
-	 else if(X < rollcal - rolltol) //Roll down (Right Down)
+	 else if(Y < rollcal - rolltol) //Roll down (Right Down)
 	 {
 		 //Raise Right
 		if(CTimer::IsTimedOut(MinTime, Start))
@@ -164,7 +179,7 @@ void FsmCamp::LevelIt()
  else if( Z < pitchcal - pitchtol )
  {
 	 //lower the higher corner
-	 if(X > rollcal + rolltol)//Roll up ( Left down )
+	 if(Y > rollcal + rolltol)//Roll up ( Left down )
 	 {
 		 //Lower Left
 		 if(CTimer::IsTimedOut(MinTime, Start))
@@ -177,7 +192,7 @@ void FsmCamp::LevelIt()
 		 }
 		 
 	 }
-	 else if(X < rollcal - rolltol) //Roll down (Right Down)
+	 else if(Y < rollcal - rolltol) //Roll down (Right Down)
 	 {
 		 //Lower Right
 		 if(CTimer::IsTimedOut(MinTime, Start))
@@ -206,7 +221,7 @@ void FsmCamp::LevelIt()
  else
  {
 	//rotate
-	if(X > rollcal + rolltol)//Roll up ( Left down )
+	if(Y > rollcal + rolltol)//Roll up ( Left down )
 	{
 		//Raise Left, lower right
 		 if(CTimer::IsTimedOut(MinTime, Start))
@@ -219,7 +234,7 @@ void FsmCamp::LevelIt()
 		 }
 	
 	}
-	else if(X < rollcal - rolltol) //Roll down (Right Down)
+	else if(Y < rollcal - rolltol) //Roll down (Right Down)
 	{
 		//Raise Right, lower left
 		 if(CTimer::IsTimedOut(MinTime, Start))
@@ -233,17 +248,28 @@ void FsmCamp::LevelIt()
 	}
 	else
 	{
-		//perfect
-		 if(CTimer::IsTimedOut(MinTime, Start))
-		 {
-			 CSerial::is() << "left right Purrfect\n";
-			 Cio::is().Left(eValveStates::Hold);
-			 Cio::is().Right(eValveStates::Hold);
+		Cio::is().Left(eValveStates::Hold);
+		Cio::is().Right(eValveStates::Hold);
 			 
-			 Start = CTimer::GetTick();
+		//perfect
+		 if(CTimer::IsTimedOut(5000, Start))
+		 {
+			 IsLevel = true;
+			 
+			 CSerial::is() << "left right Purrfect\n";
+			 
+			 //if level for 5 seconds and ignition is off, go to sleep
+			 if(ReadyToSleep)
+			 {
+				 Cio::is().Sleep();
+			 }
+			 else
+			 {
+				 CSerial::is() << "Not ready to sleep\n";
+			 }
 		 }
 	}
  }
- #endif
+
 }
 
