@@ -72,9 +72,17 @@ void FsmTravel::HandleEvent(eEvents evt)
 			m_SMManager.ChangeState(eStates::STATE_CAMP);
 		break;
 		case eEvents::TravelEvent:
-			if(Cio::is().TravelSwitches())
+			if(m_SMManager.ButtonWakeFirst)
 			{
-				m_SMManager.ChangeState(eStates::STATE_MANUAL);
+				CLeds::is().TravelOKOn();
+				m_SMManager.ButtonWakeFirst = false;
+			}
+			else
+			{
+				if(Cio::is().TravelSwitches())
+				{
+					m_SMManager.ChangeState(eStates::STATE_MANUAL);
+				}
 			}
 		break;
 		case eEvents::CalibrateEvent:

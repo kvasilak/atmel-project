@@ -16,6 +16,7 @@
 
 // default constructor
 CController::CController() :
+ButtonWakeFirst(false),
 m_stateManual(*this), //call the state constructor with a pointer to the manager class ( this )
 m_stateTravel(*this), 
 m_stateCamp(*this),
@@ -59,6 +60,7 @@ void CController::Init()
  		
   	Cio::is().Wakeup();
 	Cio::is().Awake = true;
+	ButtonWakeFirst = false;
 	
 }
 
@@ -167,6 +169,7 @@ void CController::CheckEvent()
 					CSerial::is() << "IgnitionOffEvent\n";										
 					
 					ScheduleEvent(eEvents::IgnitionOffEvent);
+					ButtonWakeup = false;
 				}
 			}
 		}
@@ -192,6 +195,7 @@ void CController::CheckEvent()
 		
 			ButtonWakeup = true;
 			ButtonWakeSeconds = 0;
+			ButtonWakeFirst = true;
 		
 			ScheduleEvent(eEvents::ButtonWakeEvent);
 		}
@@ -215,6 +219,8 @@ void CController::CheckEvent()
 		}
 	}
 	
+	//don't change if waking up from button press
+	
 	if(Cio::is().RockerChanged())
 	{
 		ScheduleEvent(eEvents::RockerEvent);
@@ -225,7 +231,6 @@ void CController::CheckEvent()
 		ScheduleEvent(eEvents::OutSideEvent);
 	}
 	
-	//if(Cio::is().SteeringRemoteChanged())
 	if(Cio::is().UpDownChanged())
 	{
 		ScheduleEvent(eEvents::SteeringEvent);
@@ -238,13 +243,12 @@ void CController::CheckEvent()
 
 	if(Cio::is().TravelChanged())
 	{
-		CSerial::is() << "***TravelChanged\n";	
-		
 		ScheduleEvent(eEvents::TravelEvent);
 	}
 	
 	if(Cio::is().CalibrateChanged())
 	{
+		ButtonWakeFirst = false;
 		ScheduleEvent(eEvents::CalibrateEvent);
 	}
 	

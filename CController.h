@@ -32,6 +32,7 @@ public:
 	
 	void Run();
 	void Init();
+	bool ButtonWakeFirst;
 	
 	private:
 	
@@ -87,6 +88,7 @@ public:
 	bool IgnitionEventPending;
 	bool LastIgnitionOn;
 	bool ButtonWakeup;
+	
 }; //CController
 
 #endif //__CCONTROLLER_H__

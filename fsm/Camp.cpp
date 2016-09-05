@@ -12,8 +12,8 @@
 #include "..\CSerial.h"
 #include "nvm.h"
 
-static const int16_t pitchtol = 10;
-static const int16_t rolltol = 10;
+static const int16_t pitchtol = 50;//10;
+static const int16_t rolltol = 50;//10;
 
 FsmCamp::FsmCamp(CController& SMManager) :
 CState(SMManager, eStates::STATE_CAMP),
@@ -61,9 +61,19 @@ void FsmCamp::HandleEvent(eEvents evt)
 			m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
 		break;
 		case eEvents::CampEvent:
-			if(Cio::is().CampSwitches())
+			CSerial::is() << " FsmCamp::Camp event\r\n";
+		
+			if(m_SMManager.ButtonWakeFirst)
 			{
-				m_SMManager.ChangeState(eStates::STATE_MANUAL);
+				CLeds::is().CampOn();
+				m_SMManager.ButtonWakeFirst = false;
+			}
+			else
+			{
+				if(Cio::is().CampSwitches())
+				{
+					m_SMManager.ChangeState(eStates::STATE_MANUAL);
+				}
 			}
 		break;
 		case eEvents::TravelEvent:
@@ -102,8 +112,7 @@ void FsmCamp::HandleEvent(eEvents evt)
 		case eEvents::ButtonWakeEvent:
 			Cio::is().Awake = true;
 			Cio::is().Wakeup();
-			
-			//Cio::is().ResetButtons();
+
 			CSerial::is() << " FsmCamp::Button wake\r\n";
 			break;
 		default:
