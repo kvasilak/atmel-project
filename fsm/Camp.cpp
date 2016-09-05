@@ -121,13 +121,10 @@ void FsmCamp::LevelIt()
  	int16_t X=0;
  	int16_t Y=0;
  	int16_t Z=0;
- 	//Read Acccel
+ 	//Read Acccel
  	CMMA8451::is().ReadXYZ(X, Y, Z);
- 	//determine x and z errors
- 	int16_t rollcal = nvm::is().GetCampY();
+ 	//determine Pitch and roll errors 	int16_t rollcal = nvm::is().GetCampY();
  	int16_t pitchcal = nvm::is().GetCampZ();
-	 
-	//int16_t xcal = nvm::is().GetCampX();
 	 
 	 CSerial::is() << ", Y; " << Y << ", Z; " << Z ;
 	 
