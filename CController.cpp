@@ -48,6 +48,7 @@ void CController::Init()
 	//update the rocker switch state
 	ScheduleEvent(eEvents::RockerEvent);
 	
+	//LastIgnitionOn = Cio::is().IsIgnitionOn();
 	bool on = Cio::is().IsIgnitionOn();
 	CSerial::is() <<"ignition " << on << "\n";
 	
@@ -149,13 +150,11 @@ void CController::CheckEvent()
 		{
 			CSerial::is() << "Ignition pending timeout\n";
 			
+			IgnitionEventPending = false;
+			
 			//Was this a true event? Or just noise
 			if(LastIgnitionOn == Cio::is().IsIgnitionOn())
 			{
-				//LastIgnitionOn = Cio::is().IsIgnitionOn();
-				
-				IgnitionEventPending = false;
-				
 				if(LastIgnitionOn)
 				{
 					CSerial::is() << "IgnitionOnEvent\n";

@@ -65,6 +65,8 @@ void FsmCamp::HandleEvent(eEvents evt)
 		
 			if(m_SMManager.ButtonWakeFirst)
 			{
+				CSerial::is() << " FsmCamp::button wake first\r\n";
+				
 				CLeds::is().CampOn();
 				m_SMManager.ButtonWakeFirst = false;
 			}
@@ -72,6 +74,8 @@ void FsmCamp::HandleEvent(eEvents evt)
 			{
 				if(Cio::is().CampSwitches())
 				{
+					CSerial::is() << " FsmCamp::camp switches\r\n";
+					
 					m_SMManager.ChangeState(eStates::STATE_MANUAL);
 				}
 			}
@@ -101,6 +105,7 @@ void FsmCamp::HandleEvent(eEvents evt)
 		case eEvents::IgnitionOffEvent:
 			if(IsLevel)
 			{
+				CSerial::is() << " FsmCamp::Sleep\r\n";
 				Cio::is().Awake = false;
 				Cio::is().Sleep();
 			}
@@ -114,6 +119,7 @@ void FsmCamp::HandleEvent(eEvents evt)
 			Cio::is().Wakeup();
 
 			CSerial::is() << " FsmCamp::Button wake\r\n";
+			Start = CTimer::GetTick();
 			break;
 		default:
 		break;
