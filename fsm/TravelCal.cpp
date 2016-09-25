@@ -41,11 +41,13 @@ void FSMTravelCal::HandleEvent(eEvents evt)
 				if(Active)
 				{
 					CLeds::is().ActiveOn();
+					CLeds::is().TravelOn();
 					Active = !Active;
 				}
 				else
 				{
 					CLeds::is().ActiveOff();
+					CLeds::is().TravelOff();
 					Active = !Active;
 				}
 				

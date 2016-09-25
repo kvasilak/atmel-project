@@ -56,14 +56,10 @@ public:
 	//LED1
 	void CampOn();
 	void CampOff();
-	
-	//LED2
-	void TravelWarnOn();
-	void TravelWarnOff();
-	
+		
 	//LED3
-	void TravelOKOn();
-	void TravelOKOff();
+	void TravelOn();
+	void TravelOff();
 	
 	CLeds& operator=( const CLeds &c );
 	

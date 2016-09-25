@@ -41,8 +41,7 @@ void CLeds::AllOff()
 	LeftFillOff();
 	LeftDumpOff();
 	CampOff();
-	TravelWarnOff();
-	TravelOKOff();
+	TravelOff();
 }
 
 void CLeds::RightFillOn()
@@ -72,7 +71,6 @@ void CLeds::RightDumpOff()
 
 void CLeds::ActiveOn()
 {
-	//LEDout0 |= Led2On;
 	LEDout1 |= Led3On;
 	WriteReg(LEDReg1, LEDout1);
 }
@@ -120,25 +118,13 @@ void CLeds::CampOff()
 	WriteReg(LEDReg1, LEDout1);
 }
 
-void CLeds::TravelWarnOn()
-{
-	LEDout1 |= Led2On;
-	WriteReg(LEDReg1, LEDout1);
-}
-
-void CLeds::TravelWarnOff()
-{
-	LEDout1 &= Led2Off;
-	WriteReg(LEDReg1, LEDout1);
-}
-
-void CLeds::TravelOKOn()
+void CLeds::TravelOn()
 {
 	LEDout0 |= Led1On;
 	WriteReg(LEDReg0, LEDout0);
 }
 
-void CLeds::TravelOKOff()
+void CLeds::TravelOff()
 {
 	LEDout0 &= Led1Off;
 	WriteReg(LEDReg0, LEDout0);

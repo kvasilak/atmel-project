@@ -69,6 +69,7 @@ public:
 
 	bool CampSwitches();
 	bool TravelSwitches();
+	bool CalibrateSwitch();
 	
 	bool IsHolding();
 	
@@ -91,6 +92,7 @@ public:
 	static volatile bool IgnitionChanged;
 	static volatile bool ButtonChanged;
 	bool Awake;
+	bool ButtonWake;
 	
 private:
 	Cio();

@@ -38,11 +38,13 @@ void FSMCampCal::HandleEvent(eEvents evt)
 				if(Active)
 				{
 					CLeds::is().ActiveOn();
+					CLeds::is().CampOn();
 					Active = !Active;
 				}
 				else
 				{
 					CLeds::is().ActiveOff();
+					CLeds::is().CampOff();
 					Active = !Active;
 				}
 				

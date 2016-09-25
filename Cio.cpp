@@ -29,6 +29,7 @@ volatile uint8_t ispa;
 // default constructor
 Cio::Cio() :
 Awake(false),
+ButtonWake(false),
 FillPressed(false),
 DumpPressed(false)
 {
@@ -517,6 +518,7 @@ bool Cio::CalibrateChanged()
 
 }
 
+
 void Cio::RockerSwitch()
 {
 	if(!ButtonUp.Level())
@@ -732,6 +734,19 @@ bool Cio::TravelSwitches()
 	return pressed;
 }
 
+bool Cio::CalibrateSwitch()
+{
+
+	bool pressed = false;
+	
+	if(!PushCalibrate.Level() )
+	{
+		pressed = true;
+	}
+
+	return pressed;
+}
+
 void Cio::AllOff()
 {
 	RightFillOff();
@@ -905,6 +920,8 @@ void Cio::Sleep()
 	//minimal power savings
     //power_all_disable();
 
+	FillPressed = false;
+	DumpPressed = false;
 	
 	//Set CPU to sleep, will wake up on an ignition IRQ
  	cli();

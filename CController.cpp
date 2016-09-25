@@ -48,7 +48,6 @@ void CController::Init()
 	//update the rocker switch state
 	ScheduleEvent(eEvents::RockerEvent);
 	
-	//LastIgnitionOn = Cio::is().IsIgnitionOn();
 	bool on = Cio::is().IsIgnitionOn();
 	CSerial::is() <<"ignition " << on << "\n";
 	
@@ -60,7 +59,7 @@ void CController::Init()
 	Cio::is().CompressorOn();
  		
   	Cio::is().Wakeup();
-	Cio::is().Awake = true;
+	if(on) {Cio::is().Awake = true;}
 	ButtonWakeFirst = false;
 	
 }
@@ -177,46 +176,10 @@ void CController::CheckEvent()
 	if( Cio::ButtonChanged)
 	{ 
 		Cio::ButtonChanged = false;
-		CSerial::is() << "Button wake\n";		
-		
-		if(Cio::is().Awake)
-		{
-			CSerial::is() << "Button restart\n";		
-			ButtonWakeStart = CTimer::GetTick();
-			ButtonWakeSeconds = 0;
-		}
-		else
-		{
-			CSerial::is() << "Button start\n";		
-			
-		
-			ButtonWakeStart = CTimer::GetTick();
-		
-			ButtonWakeup = true;
-			ButtonWakeSeconds = 0;
-			ButtonWakeFirst = true;
-		
-			ScheduleEvent(eEvents::ButtonWakeEvent);
-		}
+		CSerial::is() << "ButtonWakeEvent\n";
+		ScheduleEvent(eEvents::ButtonWakeEvent);
 	}
-	
-	if(ButtonWakeup)
-	{
-		if(CTimer::IsTimedOut(1000, ButtonWakeStart))
-		{
-			ButtonWakeStart = CTimer::GetTick();		
-			
-			ButtonWakeSeconds++;
-			
-			//wait 5 minutes after last button press then resume sleep
-			//if(ButtonWakeSeconds > 300)
-			if(ButtonWakeSeconds > 10)
-			{
-				CSerial::is() << "Button wake timeout\n";
-				ScheduleEvent(eEvents::IgnitionOffEvent);
-			}
-		}
-	}
+
 	
 	//don't change if waking up from button press
 	

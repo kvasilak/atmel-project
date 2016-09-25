@@ -21,6 +21,7 @@ class FsmManual :public CState
 	void OnExit();
 	
 	private:
+	uint32_t ButtonWakeStart;
 
 }; //Manual
 

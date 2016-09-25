@@ -24,7 +24,7 @@ Starting(true)
 
 void FsmTravel::OnEntry()
 {
-	CLeds::is().TravelOKOn();
+	CLeds::is().TravelOn();
 	LeftSide.Init(LeftRear);
 	RightSide.Init(RightRear);
 
@@ -74,7 +74,7 @@ void FsmTravel::HandleEvent(eEvents evt)
 		case eEvents::TravelEvent:
 			if(m_SMManager.ButtonWakeFirst)
 			{
-				CLeds::is().TravelOKOn();
+				CLeds::is().TravelOn();
 				m_SMManager.ButtonWakeFirst = false;
 			}
 			else
@@ -89,10 +89,10 @@ void FsmTravel::HandleEvent(eEvents evt)
 			m_SMManager.ChangeState(eStates::STATE_TRAVEL_CALIBRATE);
 			break;
 		case eEvents::IgnitionOnEvent:
-			Cio::is().Awake = true;
+			//Cio::is().Awake = true;
 			Cio::is().Wakeup();
 				
-			CLeds::is().TravelOKOn();
+			CLeds::is().TravelOn();
 			
 			//reset so we get back to ride height quickly
 			LeftSide.AtHeight(false);
@@ -112,8 +112,9 @@ void FsmTravel::HandleEvent(eEvents evt)
 			Cio::is().Sleep();
 			break;
 		case eEvents::ButtonWakeEvent:
-			Cio::is().Awake = true;
+			//Cio::is().Awake = true;
 			Cio::is().Wakeup();
+			CLeds::is().TravelOn();
 		
 			//7Cio::is().ResetButtons();
 			CSerial::is() << " FsmCamp::Button wake\r\n";
@@ -126,5 +127,5 @@ void FsmTravel::HandleEvent(eEvents evt)
 void FsmTravel::OnExit()
 {
 	CSerial::is() << " FsmTravel::OnExit()\r\n";
-	CLeds::is().TravelOKOff();
+	CLeds::is().TravelOff();
 }

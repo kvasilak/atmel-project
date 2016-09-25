@@ -28,7 +28,7 @@ void FsmCamp::OnEntry()
 {
 	CLeds::is().CampOn();
 	
-	int16_t roll = nvm::is().GetCampX();
+	int16_t roll = nvm::is().GetCampY();
  	int16_t pitch = nvm::is().GetCampZ();
 
 	CSerial::is() << " FsmCamp::OnEntry(), roll cal; " << roll << " pitch cal; " << pitch << "\r\n";
@@ -88,7 +88,7 @@ void FsmCamp::HandleEvent(eEvents evt)
 		break;
 		case eEvents::IgnitionOnEvent:
 
-		    Cio::is().Awake = true;
+		    //Cio::is().Awake = true;
 
 			ReadyToSleep = false;
 			IsLevel = false;
@@ -115,7 +115,7 @@ void FsmCamp::HandleEvent(eEvents evt)
 
 			break;
 		case eEvents::ButtonWakeEvent:
-			Cio::is().Awake = true;
+			//Cio::is().Awake = true;
 			Cio::is().Wakeup();
 
 			CSerial::is() << " FsmCamp::Button wake\r\n";
@@ -152,9 +152,9 @@ void FsmCamp::LevelIt()
  	//determine Pitch and roll errors 	int16_t rollcal = nvm::is().GetCampY();
  	int16_t pitchcal = nvm::is().GetCampZ();
 	 
-	 CSerial::is() << ", Y; " << Y << ", Z; " << Z ;
+	 CSerial::is() << "Y; " << Y << ", Z; " << Z ;
 	 
-	 CSerial::is()  << " Y err;" << Y - rollcal  << ";   Z err; " << Z -pitchcal << "\n";
+	 CSerial::is()  << " Y err; " << Y - rollcal  << ";   Z err; " << Z -pitchcal << "\n";
 
 
  //pitch up ( rear too Damn low) if( Z	> pitchcal + pitchtol )

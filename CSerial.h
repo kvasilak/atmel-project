@@ -54,6 +54,10 @@ class CSerial
 		
 		void Hex() {m_Base = 16; };		//show numbers in Base 16 ( hex )
 		void Dec() {m_Base = 10; };		//Show numbers in Base 10 ( decimal)
+
+		void PutBuf(uint8_t *data, uint16_t length);
+		
+		void DVSend(uint8_t stream_num, uint32_t timestamp, int32_t value);	
 			
 	private:
 		CSerial();

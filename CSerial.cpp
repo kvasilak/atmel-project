@@ -32,8 +32,9 @@
 
 #include "cserial.h"
 #include "circularbuffer.h"
+#include "DataVisualizer.h"
 
-static CircularBuffer <uint8_t, 300> TxBuf;
+static CircularBuffer <uint8_t, 2048> TxBuf;
 static CircularBuffer <uint8_t, 50> RxBuf;
 
 __extension__ typedef int __guard __attribute__((mode (__DI__)));
@@ -219,3 +220,48 @@ ISR(USART0_UDRE_vect)
 
 #endif
 
+/*! \brief  Send data visualizer data packet with 1 data field
+ *
+ * This routine constructs a data visualizer data packet with one data value
+ * field and then transmits it.  All multi-byte transmitted values
+ * use little endian byte order.
+ *
+ * \param   stream_num  The ID number of the visualizer data stream
+ * \param   timestamp   A 32-bit timestamp value, in microseconds
+ * \param   value       The data value to include in the transmitted packet
+ */
+void CSerial::DVSend(uint8_t stream_num, uint32_t timestamp, int32_t value)
+{
+	/* Define packet format with 1 data field */
+	struct {
+		adv_data_start_t start;       /* Starting fields of packet */
+		adv_data_field_t field;       /* 1 data field */
+		adv_data_end_t end;           /* Ending fields of packet */
+	} packet;
+
+	/* Construct packet */
+	packet.start.header1 = ADV_PKT_HEADER_1;
+	packet.start.header2 = ADV_PKT_HEADER_2;
+	packet.start.length  = sizeof(packet);
+	packet.start.type    = ADV_PKT_DATA;
+	packet.start.stream_num = stream_num;
+	packet.start.time_stamp = timestamp;
+
+	packet.field.value = value;
+
+	packet.end.crc = 0x00; /* Not used */
+	packet.end.mark = ADV_PKT_END;
+
+	/* Write packet */
+	PutBuf((uint8_t*)&packet, sizeof(packet));
+
+}
+
+void CSerial::PutBuf(uint8_t *data, uint16_t length)
+{
+	for( int i=0; i<(int)length;i++)
+	{
+		TxBuf.Put(data[i]);
+		//put16(data[i]);
+	}
+}

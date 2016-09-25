@@ -21,11 +21,13 @@ CState(SMManager, eStates::STATE_MANUAL)
 void FsmManual::OnEntry()
 {
 	CLeds::is().CampOff();
-	CLeds::is().TravelOKOff();
+	CLeds::is().TravelOff();
 	
 	Cio::is().AllOff();
 	//Cio::is().ResetButtons();
 	CSerial::is() << " FsmManual::OnEntry()\r\n";
+	
+	ButtonWakeStart = CTimer::GetTick();
 }
 
 void FsmManual::HandleEvent(eEvents evt)
@@ -47,6 +49,7 @@ void FsmManual::HandleEvent(eEvents evt)
 			break;
 		case eEvents::RockerEvent:
 			Cio::is().RockerSwitch();
+			ButtonWakeStart = CTimer::GetTick();
 			break;
 		case eEvents::OutSideEvent:
 			Cio::is().OutsideRemote();
@@ -58,7 +61,18 @@ void FsmManual::HandleEvent(eEvents evt)
 			//No dancing m_SMManager.ChangeState(eStates::STATE_MANUAL_CALIBRATE);
 			break;
 		case eEvents::TimerEvent:
-			//nothing to do here
+			//we are awake due to a button press
+			//timeout and sleep
+			if(Cio::is().ButtonWake)
+			{
+				if(CTimer::IsTimedOut(5000, ButtonWakeStart))
+				{
+					Cio::is().ButtonWake = false;
+					
+					m_SMManager.ScheduleEvent(eEvents::IgnitionOffEvent);
+				}
+			}
+			
 			break;
 		case eEvents::IgnitionOnEvent:
 			if(Cio::is().Awake == false)
@@ -83,14 +97,14 @@ void FsmManual::HandleEvent(eEvents evt)
 			Cio::is().Sleep();
 			break;
 		case eEvents::ButtonWakeEvent:
-			if(Cio::is().Awake == false)
-			{
-				Cio::is().Awake = true;
-				Cio::is().Wakeup();
 		
-				//Cio::is().ResetButtons();
+		if(!Cio::is().Awake)
+		{
+			Cio::is().ButtonWake = true;
+			m_SMManager.ScheduleEvent(eEvents::IgnitionOnEvent);
+
 				CSerial::is() << " FsmManual::BUtton Wake\r\n";
-			}
+		}
 			break;
 		default:
 		break;
