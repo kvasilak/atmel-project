@@ -24,6 +24,7 @@ private:
 	CCorner LeftSide;
 	CCorner RightSide;
 	bool Starting;
+	uint32_t Start;
 }; //Travel
 
 #endif //__TRAVEL_H__

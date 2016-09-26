@@ -18,7 +18,8 @@ FsmTravel::FsmTravel(CController& SMManager) :
 CState(SMManager, eStates::STATE_TRAVEL),
 LeftSide(LeftRear),
 RightSide(RightRear),
-Starting(true)
+Starting(true),
+Start(0)
 {
 }
 
@@ -32,6 +33,8 @@ void FsmTravel::OnEntry()
 	RightSide.SetLongFilter(false);
 	
 	Starting = true;
+
+	Start = CTimer::GetTick();
 	
 	CSerial::is() << " FsmTravel::OnEntry()\r\n";
 	//CSerial::is() << "Travel Cal vals; Left, " << nvm::is().GetLeftTravel() << ", Right, " << nvm::is().GetRightTravel() << "\n";
@@ -56,6 +59,17 @@ void FsmTravel::HandleEvent(eEvents evt)
 					RightSide.SetLongFilter(true);
 					
 					Starting = false;
+					
+					Start = CTimer::GetTick();
+				}
+			}
+			else if(Cio::is().ButtonWake)
+			{
+				//wait 5 seconds after getting to ride height then sleep
+				//only if the ign is off and we got a button wakeup
+				if(CTimer::IsTimedOut(5000, Start))
+				{
+					m_SMManager.ScheduleEvent(eEvents::IgnitionOffEvent);
 				}
 			}
 			
@@ -112,12 +126,16 @@ void FsmTravel::HandleEvent(eEvents evt)
 			Cio::is().Sleep();
 			break;
 		case eEvents::ButtonWakeEvent:
-			//Cio::is().Awake = true;
-			Cio::is().Wakeup();
-			CLeds::is().TravelOn();
+			if( !Cio::is().Awake)
+			{
+				Cio::is().Awake = true;
+				Cio::is().Wakeup();
+				CLeds::is().TravelOn();
 		
-			//7Cio::is().ResetButtons();
-			CSerial::is() << " FsmCamp::Button wake\r\n";
+				Cio::is().ButtonWake = true;
+
+				CSerial::is() << " FsmCamp::Button wake\r\n";
+			}
 			break;
 		default:
 		break;
