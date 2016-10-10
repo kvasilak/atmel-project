@@ -39,6 +39,7 @@ public:
 	//FSM specific //////////////////
 	
 	friend class FsmManual;
+	friend class ManualCal;
 	friend class FsmTravel;
 	friend class FsmCamp;
 	friend class FSMDance;

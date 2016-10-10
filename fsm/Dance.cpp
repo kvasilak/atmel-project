@@ -17,7 +17,7 @@
 
 
 FSMDance::FSMDance(CController& SMManager) :
-CState(SMManager, eStates::STATE_MANUAL_CALIBRATE), 
+CState(SMManager, eStates::STATE_DANCE), 
 State(Idle)
 {
 }
@@ -38,9 +38,7 @@ void FSMDance::OnEntry()
 	
 }
 
-//Manual calibration basically means finding the upper and lower 
-//suspension travel limits. These limits are used to determine if we 
-//should keep trying to adjust during travel or Camp mode
+//run the system through a 'dance routine' Just for show
 void FSMDance::HandleEvent(eEvents evt)
 {
 	static bool Active = false;

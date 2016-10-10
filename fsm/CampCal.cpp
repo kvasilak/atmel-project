@@ -74,7 +74,9 @@ void FSMCampCal::HandleEvent(eEvents evt)
 			
 			m_SMManager.ChangeState(eStates::STATE_CAMP);
 			break;
-			//Cancel calibration
+			//Cancel calibration on any button press except cal or outside remote
+		case eEvents::TravelEvent:
+		case eEvents::RockerEvent:
 		case eEvents::CampEvent:
 			m_SMManager.ChangeState(eStates::STATE_CAMP);
 		default:

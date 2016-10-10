@@ -8,6 +8,9 @@
 
 #include "CADC.h"
 #include <avr/io.h>
+#include <avr/eeprom.h>
+
+#include "nvm.h"
 
 // default constructor
 CADC::CADC()
@@ -63,4 +66,43 @@ uint8_t CADC::GetDimmer()
 	dim /= 4;
 	
 	return (uint8_t)dim;
+}
+
+//current height is greater than calibrated minimum height
+bool CADC::LeftHeightOK(void)
+{
+	bool isok = true;
+	uint16_t low = nvm::is().GetLeftLowest();
+	
+	// ignore check if not calibrated
+	if(low >0)
+	{
+		isok = false;
+		
+		if(GetLeftHeight() > low)
+		{
+			isok = true;
+		}
+	}
+	
+	return isok;
+}
+
+bool CADC::RightHeightOK(void)
+{
+	bool isok = true;
+	uint16_t low = nvm::is().GetRightLowest();
+	
+	// ignore check if not calibrated
+	if(low >0)
+	{
+		isok = false;
+		
+		if(GetRightHeight() > low)
+		{
+			isok = true;
+		}
+	}
+	
+	return isok;
 }

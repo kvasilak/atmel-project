@@ -23,6 +23,7 @@ class FSMTravelCal :public CState
 	void OnExit();
 	
 	private:
+	FSMTravelCal();
 	uint32_t Blink;
 
 }; //FSMTravelCal

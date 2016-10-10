@@ -24,9 +24,11 @@ public:
 	void Init();
 	uint16_t Read(uint8_t ch);
 	
-	uint16_t GetRightHeight();
-	uint16_t GetLeftHeight();
-	uint8_t GetDimmer();
+	uint16_t GetRightHeight(void);
+	uint16_t GetLeftHeight(void);
+	uint8_t GetDimmer(void);
+	bool LeftHeightOK(void);
+	bool RightHeightOK(void);
 
 private:
 CADC();

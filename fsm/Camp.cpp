@@ -287,7 +287,7 @@ void FsmCamp::LevelIt()
 		Cio::is().Right(eValveStates::Hold);
 			 
 		//perfect
-		 if(CTimer::IsTimedOut(5000, Start))
+		 if(CTimer::IsTimedOut(10000, Start))
 		 {
 			 IsLevel = true;
 			 

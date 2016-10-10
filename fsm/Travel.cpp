@@ -119,12 +119,15 @@ void FsmTravel::HandleEvent(eEvents evt)
 			CSerial::is() << " FsmTravel::Ignition On\r\n";
 			
 			break;
+			//Sleep as soon as the ign is off
 		case eEvents::IgnitionOffEvent:
 			Cio::is().Awake = false;
+			Cio::is().ButtonWake = false;
 			CSerial::is() << " FsmTravel::Ignition Off\r\n";
 		
 			Cio::is().Sleep();
 			break;
+			//wakeup and stay awake as long in travel
 		case eEvents::ButtonWakeEvent:
 			if( !Cio::is().Awake)
 			{

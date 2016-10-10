@@ -282,6 +282,12 @@
     <Compile Include="fsm\Dance.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="fsm\ManualCal.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="fsm\ManualCal.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="fsm\TravelCal.cpp">
       <SubType>compile</SubType>
     </Compile>

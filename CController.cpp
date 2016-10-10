@@ -223,6 +223,7 @@ void CController::Run()
 	
 	CheckEvent();
 	
+	
 	if(CTimer::IsTimedOut(50, Time))
 	{
 		if( Cio::is().Awake)

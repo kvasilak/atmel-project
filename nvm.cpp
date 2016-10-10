@@ -19,6 +19,9 @@ static uint16_t EEMEM eeCampX;
 static uint16_t EEMEM eeCampY;
 static uint16_t EEMEM eeCampZ;
 
+static uint16_t EEMEM eeLeftLowest;
+static uint16_t EEMEM eeRightLowest;
+
 static const uint8_t Majik = 0x42;
 
 // default constructor
@@ -37,6 +40,9 @@ void nvm::init()
 	CampY = eeprom_read_word( &eeCampY);
 	CampZ = eeprom_read_word( &eeCampZ);
 	
+	LeftLowest = eeprom_read_word( &eeLeftLowest);
+	RightLowest = eeprom_read_word( &eeRightLowest);
+	
 	if(MagicNumber != Majik)
 	{
 		MagicNumber		= Majik;
@@ -47,6 +53,9 @@ void nvm::init()
 		CampX			= 0xB50; //4096 * .707 ( SIN(45) )
 		CampY			= 0xb50;
 		CampZ			= 0x00;
+		
+		LeftLowest		= 0x00;
+		RightLowest		= 0x00;
 		
 		Save();
 	}
@@ -63,5 +72,8 @@ void nvm::Save()
 	eeprom_update_word( &eeCampX, CampX);
 	eeprom_update_word( &eeCampY, CampY);
 	eeprom_update_word( &eeCampZ, CampZ);
+	
+	eeprom_update_word( &eeLeftLowest, LeftLowest);
+	eeprom_update_word( &eeRightLowest, RightLowest);
 }
 

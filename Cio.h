@@ -34,53 +34,53 @@ public:
 		return a;
 	}
 
-	void Init();
-	void Run();
+	void Init(void);
+	void Run(void);
 	
 	void AllOff();
 	void Right(eValveStates s);
 	void Left(eValveStates s);
 	
-	void RightFillOn();
-	void RightFillOff();
-	void RightDumpOn();
-	void RightDumpOff();
-	void LeftFillOn();
-	void LeftFillOff();
-	void LeftDumpOn();
-	void LeftDumpOff();
+	void RightFillOn(void);
+	void RightFillOff(void);
+	void RightDumpOn(void);
+	void RightDumpOff(void);
+	void LeftFillOn(void);
+	void LeftFillOff(void);
+	void LeftDumpOn(void);
+	void LeftDumpOff(void);
 	
-	void CompressorOn();
-	void CompressorOff();
+	void CompressorOn(void);
+	void CompressorOff(void);
 
 	//whats changed
-	bool RockerChanged();
-	bool OutSideRemoteChanged();
-	bool SteeringRemoteChanged();
-	bool CampChanged();
-	bool TravelChanged();
-	bool CalibrateChanged();
-	bool UpDownChanged();
+	bool RockerChanged(void);
+	bool OutSideRemoteChanged(void);
+	bool SteeringRemoteChanged(void);
+	bool CampChanged(void);
+	bool TravelChanged(void);
+	bool CalibrateChanged(void);
+	bool UpDownChanged(void);
 
 //What to do
-	void RockerSwitch();
-	void OutsideRemote();
-	void SteeringRemote();
+	void RockerSwitch(void);
+	void OutsideRemote(void);
+	void SteeringRemote(void);
 
-	bool CampSwitches();
-	bool TravelSwitches();
-	bool CalibrateSwitch();
+	bool CampSwitches(void);
+	bool TravelSwitches(void);
+	bool CalibrateSwitch(void);
 	
-	bool IsHolding();
+	bool IsHolding(void);
 	
 	FillStates LeftState;
 	FillStates RightState;
 
-	void PowerOn();
-	void PowerOff();
-	void UpdateButtons();
+	void PowerOn(void);
+	void PowerOff(void);
+	void UpdateButtons(void);
 	
-	void ResetButtons() 
+	void ResetButtons(void) 
 	{
 		FillPressed = false;
 		DumpPressed = false;
@@ -88,7 +88,8 @@ public:
 
 	void Sleep();
 	void Wakeup();
-	bool IsIgnitionOn();
+	bool IsIgnitionOn(void);
+	
 	static volatile bool IgnitionChanged;
 	static volatile bool ButtonChanged;
 	bool Awake;
@@ -104,9 +105,9 @@ private:
 	Debounced PushTravel;
 	Debounced PushCalibrate;
 	
-	void Direction();
-	void Pullups();
-	void EnableIgnGPIOInterrupt();
+	void Direction(void);
+	void Pullups(void);
+	void EnableIgnGPIOInterrupt(void);
 
 	bool FillPressed;
 	bool DumpPressed;

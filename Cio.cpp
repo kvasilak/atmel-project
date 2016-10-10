@@ -11,6 +11,7 @@
 #include "CLeds.h"
 #include "CSerial.h"
 #include "CTimer.h"
+#include "CADC.h"
 
 //for ignition interrupt
 #include <avr/interrupt.h>
@@ -584,8 +585,15 @@ void Cio::RockerSwitch()
 			
 			CSerial::is() << "dump on\n";
 			
-			LeftDumpOn();
-			RightDumpOn();
+			if(CADC::is().LeftHeightOK())
+			{
+				LeftDumpOn();
+			}
+		
+			if(CADC::is().RightHeightOK())
+			{
+				RightDumpOn();
+			}
 			
 			DumpPressed = true;
 		}
@@ -623,16 +631,25 @@ void Cio::OutsideRemote()
 		
 	if(RemoteLeftDown)
 	{
-		LeftDumpOn();
+		if(CADC::is().LeftHeightOK())
+		{
+			LeftDumpOn();
+		}
 	}
 	else
 	{
-		LeftDumpOff();
+		if(CADC::is().RightHeightOK())
+		{
+			LeftDumpOff();
+		}
 	}
 		
 	if(RemoteRightDown)
 	{
-		RightDumpOn();
+		if(CADC::is().RightHeightOK())
+		{
+			RightDumpOn();
+		}
 	}
 	else
 	{
@@ -698,8 +715,15 @@ void Cio::SteeringRemote()
 				FillPressed = false;
 			}
 			
-			LeftDumpOn();
-			RightDumpOn();
+			if(CADC::is().LeftHeightOK())
+			{
+				LeftDumpOn();
+			}
+			
+			if(CADC::is().RightHeightOK())
+			{
+				RightDumpOn();
+			}
 			
 			DumpPressed = true;
 		}
@@ -974,6 +998,7 @@ void Cio::UpdateButtons()
 		RightDumpOff();
 	}
 }
+
 
 // ignition changed
 //PA2 pc int 2

@@ -53,19 +53,21 @@ void FsmManual::HandleEvent(eEvents evt)
 			break;
 		case eEvents::OutSideEvent:
 			Cio::is().OutsideRemote();
+			ButtonWakeStart = CTimer::GetTick();
 			break;
 		case eEvents::SteeringEvent:
 			Cio::is().SteeringRemote();
+			//Steering remote does not wake controller
 			break;
 		case eEvents::CalibrateEvent:
-			//No dancing m_SMManager.ChangeState(eStates::STATE_MANUAL_CALIBRATE);
+			m_SMManager.ChangeState(eStates::STATE_MANUAL_CALIBRATE);
 			break;
 		case eEvents::TimerEvent:
 			//we are awake due to a button press
 			//timeout and sleep
 			if(Cio::is().ButtonWake)
 			{
-				if(CTimer::IsTimedOut(5000, ButtonWakeStart))
+				if(CTimer::IsTimedOut(300000, ButtonWakeStart))
 				{
 					Cio::is().ButtonWake = false;
 					
@@ -87,6 +89,9 @@ void FsmManual::HandleEvent(eEvents evt)
 			else
 			{
 				CSerial::is() << "Awake already\n";
+
+				Cio::is().ButtonWake = false;
+				
 			}
 			break;
 		case eEvents::IgnitionOffEvent:
