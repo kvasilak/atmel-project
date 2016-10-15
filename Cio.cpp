@@ -170,7 +170,7 @@ void Cio::Direction()
 		//6		in		0 spare
 		//7		out		1 Compressor on
 		
-		#define COMPRESSOR_ON_BIT	8
+		#define COMPRESSOR_ON_BIT	7
 		#define COMPRESSOR_ON_PORT	PORTC
 		
 		DDRD = 0x06;
