@@ -12,9 +12,15 @@
 #include "..\CSerial.h"
 #include "..\CLeds.h"
 
+static const uint32_t ONESECOND = 1000;
+static const uint32_t ONEMINUTE = 60 * ONESECOND;
+
+static const uint32_t BUTTONHOLDTIME = 10 * ONESECOND;
+static const uint32_t BUTTONWAKETIME = 5 * ONEMINUTE; //how long to stay awake after a button wake event
 
 FsmManual::FsmManual(CController& SMManager) :
-CState(SMManager, eStates::STATE_MANUAL)
+CState(SMManager, eStates::STATE_MANUAL),
+WakeTime(BUTTONWAKETIME)
 {
 }
 
@@ -49,10 +55,25 @@ void FsmManual::HandleEvent(eEvents evt)
 			break;
 		case eEvents::RockerEvent:
 			Cio::is().RockerSwitch();
+			
+			if(Cio::is().IsHolding()) 
+			{
+				CSerial::is() << "Rock is holding\n";
+				WakeTime = BUTTONHOLDTIME;
+			}
+			
 			ButtonWakeStart = CTimer::GetTick();
+
 			break;
 		case eEvents::OutSideEvent:
 			Cio::is().OutsideRemote();
+			
+			if(Cio::is().IsHolding()) 
+			{
+				CSerial::is() << "OS is holding\n";
+				WakeTime = BUTTONHOLDTIME;
+			}
+			
 			ButtonWakeStart = CTimer::GetTick();
 			break;
 		case eEvents::SteeringEvent:
@@ -67,7 +88,7 @@ void FsmManual::HandleEvent(eEvents evt)
 			//timeout and sleep
 			if(Cio::is().ButtonWake)
 			{
-				if(CTimer::IsTimedOut(300000, ButtonWakeStart))
+				if(CTimer::IsTimedOut(WakeTime, ButtonWakeStart))
 				{
 					Cio::is().ButtonWake = false;
 					
@@ -79,11 +100,12 @@ void FsmManual::HandleEvent(eEvents evt)
 		case eEvents::IgnitionOnEvent:
 			if(Cio::is().Awake == false)
 			{
+				Cio::is().ButtonWake = false;
 				Cio::is().Awake = true;
 				Cio::is().Wakeup();
 				
 				Cio::is().UpdateButtons();
-				
+
 				CSerial::is() << " FsmManual::Ignition On\r\n";
 			}
 			else
@@ -103,12 +125,17 @@ void FsmManual::HandleEvent(eEvents evt)
 			break;
 		case eEvents::ButtonWakeEvent:
 		
+		Cio::is().ButtonWake = true;
+		
+		WakeTime = BUTTONWAKETIME;
+		
+		ButtonWakeStart = CTimer::GetTick();
+		
 		if(!Cio::is().Awake)
 		{
-			Cio::is().ButtonWake = true;
 			m_SMManager.ScheduleEvent(eEvents::IgnitionOnEvent);
 
-				CSerial::is() << " FsmManual::BUtton Wake\r\n";
+			CSerial::is() << " FsmManual::BUtton Wake\r\n";
 		}
 			break;
 		default:

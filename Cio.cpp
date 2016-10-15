@@ -608,25 +608,29 @@ void Cio::OutsideRemote()
     bool RemoteRightDown = REMOTE_RD_PORT & _BV(REMOTE_RD_BIT);
 	bool RemoteRightUp   = REMOTE_RU_PORT & _BV(REMOTE_RU_BIT);		
 	
-	FillPressed = false;
-	DumpPressed = false;
+	//FillPressed = false;
+	//DumpPressed = false;
 	
 	if(RemoteLeftUp)
 	{
 		LeftFillOn();
+		FillPressed = true;
 	}
 	else
 	{
 		LeftFillOff();
+		FillPressed = false;
 	}
 		
 	if(RemoteRightUp)
 	{
 		RightFillOn();
+		FillPressed = true;
 	}
 	else
 	{
 		RightFillOff();
+		FillPressed = false;
 	}
 		
 	if(RemoteLeftDown)
@@ -634,6 +638,7 @@ void Cio::OutsideRemote()
 		if(CADC::is().LeftHeightOK())
 		{
 			LeftDumpOn();
+			DumpPressed = true;
 		}
 	}
 	else
@@ -641,6 +646,7 @@ void Cio::OutsideRemote()
 		if(CADC::is().RightHeightOK())
 		{
 			LeftDumpOff();
+			DumpPressed = false;
 		}
 	}
 		
@@ -649,11 +655,13 @@ void Cio::OutsideRemote()
 		if(CADC::is().RightHeightOK())
 		{
 			RightDumpOn();
+			DumpPressed = true;
 		}
 	}
 	else
 	{
 		RightDumpOff();
+		DumpPressed = false;
 	}
 	
 }
@@ -892,11 +900,13 @@ void Cio::LeftDumpOff()
 
 bool Cio::IsHolding()
 {
-	bool hold = true;
+	bool hold = false;
 	
-	if(ButtonUp.Level() || ButtonDown.Level())
+	CSerial::is() << "holding? " << FillPressed << ", " << DumpPressed  << "\n";
+	
+	if(!FillPressed && !DumpPressed)
 	{
-		hold = false;
+		hold = true;
 	}
 	
 	return hold;

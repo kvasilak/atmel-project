@@ -178,34 +178,33 @@ void CController::CheckEvent()
 		Cio::ButtonChanged = false;
 		CSerial::is() << "ButtonWakeEvent\n";
 		ScheduleEvent(eEvents::ButtonWakeEvent);
-	}
 
+		//don't change if waking up from button press
 	
-	//don't change if waking up from button press
+		if(Cio::is().RockerChanged())
+		{
+			ScheduleEvent(eEvents::RockerEvent);
+		}
 	
-	if(Cio::is().RockerChanged())
-	{
-		ScheduleEvent(eEvents::RockerEvent);
-	}
+		if(Cio::is().OutSideRemoteChanged())
+		{
+			ScheduleEvent(eEvents::OutSideEvent);
+		}
 	
-	if(Cio::is().OutSideRemoteChanged())
-	{
-		ScheduleEvent(eEvents::OutSideEvent);
-	}
-	
-	if(Cio::is().UpDownChanged())
-	{
-		ScheduleEvent(eEvents::SteeringEvent);
-	}
+		if(Cio::is().UpDownChanged())
+		{
+			ScheduleEvent(eEvents::SteeringEvent);
+		}
 
- 	if(Cio::is().CampChanged())
- 	{
- 		ScheduleEvent(eEvents::CampEvent);
- 	}
+ 		if(Cio::is().CampChanged())
+ 		{
+ 			ScheduleEvent(eEvents::CampEvent);
+ 		}
 
-	if(Cio::is().TravelChanged())
-	{
-		ScheduleEvent(eEvents::TravelEvent);
+		if(Cio::is().TravelChanged())
+		{
+			ScheduleEvent(eEvents::TravelEvent);
+		}
 	}
 	
 	if(Cio::is().CalibrateChanged())
