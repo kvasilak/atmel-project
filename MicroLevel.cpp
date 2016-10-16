@@ -124,6 +124,8 @@ int main(void)
 	
 	CSerial::is().Init();
 	
+	CSerial::is() << "Microlevel V1.0\n" << "Copyright 2016 Keith Vasilakes\n\n";
+	
 	CTimer::Init();
 
 	CLeds::is().Init();
@@ -136,23 +138,6 @@ int main(void)
 	CMMA8451::is().Init();
 	
 	nvm::is().init();
-
-	////wait 3 seconds for rocker button press. If found send DV init
-	//uint32_t Time = CTimer::GetTick();
-	//
-	////CSerial::is() << "before stream\n";
-	//while(!CTimer::IsTimedOut(10000, Time))
-	//{
-		//Controller.Run();
-		//
-		//if(Cio::is().CalibrateSwitch())
-		//{
-			//visual_stream_init();
-			////CSerial::is() << "starting stream\n";
-			//break;
-		//}
-	//}
-
 
     while(1)
     {
