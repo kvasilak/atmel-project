@@ -57,7 +57,7 @@ public:
 	FSMCampCal		m_stateCampCal;
 
 	//The list of states in the same order as in states.h
-	CState *m_StateList[6];
+	CState *m_StateList[7];
 	
 	/////////////////////////////
 

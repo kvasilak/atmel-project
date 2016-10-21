@@ -15,7 +15,7 @@
 static const uint32_t ONESECOND = 1000;
 static const uint32_t ONEMINUTE = 60 * ONESECOND;
 
-static const uint32_t BUTTONHOLDTIME = 3 * ONESECOND;
+static const uint32_t BUTTONHOLDTIME = 300 * ONESECOND;
 static const uint32_t BUTTONWAKETIME = 5 * ONEMINUTE; //how long to stay awake after a button wake event
 
 FsmManual::FsmManual(CController& SMManager) :

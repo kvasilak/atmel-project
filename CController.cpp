@@ -105,15 +105,23 @@ void CController::ChangeState(eStates newState, eEvents evt)
 	
 	if(m_CurrState != newState)
 	{
-		m_StateList[(int)m_CurrState]->OnExit();
-		
-		m_CurrState = newState;
-		
-		m_StateList[(int)m_CurrState]->OnEntry();
-		
-		if(evt != eEvents::NoEvent)
+		if(newState < eStates::STATE_LAST_STATE)
 		{
-			m_StateList[(int)m_CurrState]->HandleEvent(evt);
+
+			m_StateList[(int)m_CurrState]->OnExit();
+		
+			m_CurrState = newState;
+		
+			m_StateList[(int)m_CurrState]->OnEntry();
+		
+			if(evt != eEvents::NoEvent)
+			{
+				m_StateList[(int)m_CurrState]->HandleEvent(evt);
+			}
+		}
+		else
+		{
+			CSerial::is() << "***illegal State! " << (int)newState << "\n";
 		}
 	}
 	
@@ -178,7 +186,9 @@ void CController::CheckEvent()
 		Cio::ButtonChanged = false;
 		CSerial::is() << "ButtonWakeEvent\n";
 		ScheduleEvent(eEvents::ButtonWakeEvent);
-
+	}
+	else
+	{
 		//don't change if waking up from button press
 	
 		if(Cio::is().RockerChanged())

@@ -90,6 +90,7 @@ bool CADC::LeftHeightOK(void)
 
 bool CADC::RightHeightOK(void)
 {
+	#ifdef LOW_LIMIT
 	bool isok = true;
 	uint16_t low = nvm::is().GetRightLowest();
 	
@@ -105,4 +106,7 @@ bool CADC::RightHeightOK(void)
 	}
 	
 	return isok;
+	#else
+	return true;// always OK for now...
+	#endif
 }
