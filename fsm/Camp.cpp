@@ -63,12 +63,12 @@ void FsmCamp::HandleEvent(eEvents evt)
 		case eEvents::CampEvent:
 			CSerial::is() << " FsmCamp::Camp event\r\n";
 		
-			if(!m_SMManager.ButtonWakeFirst)
+			if(m_SMManager.ButtonWakeFirst)
 			{
 				CSerial::is() << " FsmCamp::button wake first\r\n";
 				
 				CLeds::is().CampOn();
-				m_SMManager.ButtonWakeFirst = true;
+				m_SMManager.ButtonWakeFirst = false;
 			}
 			else
 			{
@@ -77,8 +77,6 @@ void FsmCamp::HandleEvent(eEvents evt)
 					CSerial::is() << " FsmCamp::camp switches\r\n";
 					
 					m_SMManager.ChangeState(eStates::STATE_MANUAL);
-					
-					m_SMManager.ButtonWakeFirst = false;
 				}
 			}
 		break;

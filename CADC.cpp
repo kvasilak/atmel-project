@@ -71,6 +71,7 @@ uint8_t CADC::GetDimmer()
 //current height is greater than calibrated minimum height
 bool CADC::LeftHeightOK(void)
 {
+	#ifdef LOW_LIMIT
 	bool isok = true;
 	uint16_t low = nvm::is().GetLeftLowest();
 	
@@ -86,6 +87,9 @@ bool CADC::LeftHeightOK(void)
 	}
 	
 	return isok;
+	#else
+	return true;// always OK for now...
+	#endif
 }
 
 bool CADC::RightHeightOK(void)

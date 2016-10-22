@@ -16,6 +16,7 @@
 #include "Camp.h"
 #include "Manual.h"
 #include "Travel.h"
+#include "ManualCal.h"
 #include "CampCal.h"
 #include "dance.h"
 #include "TravelCal.h"
@@ -39,10 +40,11 @@ public:
 	//FSM specific //////////////////
 	
 	friend class FsmManual;
-	friend class ManualCal;
 	friend class FsmTravel;
 	friend class FsmCamp;
+	
 	friend class FSMDance;
+	friend class ManualCal;
 	friend class FSMTravelCal;
 	friend class FSMCampCal;
 	
@@ -52,9 +54,10 @@ public:
 	FsmTravel		m_stateTravel;
 	FsmCamp			m_stateCamp;
 
-	FSMDance	m_stateManualCal;
+	ManualCal		m_stateManualCal;
 	FSMTravelCal	m_stateTravelCal;
 	FSMCampCal		m_stateCampCal;
+//	FSMDance		m_stateDance;
 
 	//The list of states in the same order as in states.h
 	CState *m_StateList[7];

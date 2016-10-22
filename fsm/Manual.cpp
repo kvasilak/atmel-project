@@ -15,8 +15,9 @@
 static const uint32_t ONESECOND = 1000;
 static const uint32_t ONEMINUTE = 60 * ONESECOND;
 
-static const uint32_t BUTTONHOLDTIME = 300 * ONESECOND;
-static const uint32_t BUTTONWAKETIME = 5 * ONEMINUTE; //how long to stay awake after a button wake event
+static const uint32_t BUTTONHOLDTIME = 30 * ONESECOND; //how long to stay awake in HOLD
+static const uint32_t REMOTEWAKETIME = 1 * ONEMINUTE; //how long to stay awake if outside remote pressed
+static const uint32_t BUTTONWAKETIME = 5 * ONEMINUTE; //how long to stay awake in RAISE or LOWER
 
 FsmManual::FsmManual(CController& SMManager) :
 CState(SMManager, eStates::STATE_MANUAL),
@@ -62,6 +63,10 @@ void FsmManual::HandleEvent(eEvents evt)
 				CSerial::is() << "Rock is holding\n";
 				WakeTime = BUTTONHOLDTIME;
 			}
+			else
+			{
+				WakeTime = BUTTONWAKETIME;
+			}
 			
 			ButtonWakeStart = CTimer::GetTick();
 
@@ -69,17 +74,16 @@ void FsmManual::HandleEvent(eEvents evt)
 		case eEvents::OutSideEvent:
 			Cio::is().OutsideRemote();
 			
-			if(Cio::is().IsHolding()) 
-			{
-				CSerial::is() << "OS is holding\n";
-				WakeTime = BUTTONHOLDTIME;
-			}
+			WakeTime = REMOTEWAKETIME;
+			
+			CSerial::is() << "OS is holding\n";
 			
 			ButtonWakeStart = CTimer::GetTick();
 			break;
 		case eEvents::SteeringEvent:
 			Cio::is().SteeringRemote();
 			//Steering remote does not wake controller
+			WakeTime = REMOTEWAKETIME;
 			break;
 		case eEvents::CalibrateEvent:
 			m_SMManager.ChangeState(eStates::STATE_MANUAL_CALIBRATE);
@@ -127,8 +131,6 @@ void FsmManual::HandleEvent(eEvents evt)
 		case eEvents::ButtonWakeEvent:
 		
 		Cio::is().ButtonWake = true;
-		
-		WakeTime = BUTTONWAKETIME;
 		
 		ButtonWakeStart = CTimer::GetTick();
 		
