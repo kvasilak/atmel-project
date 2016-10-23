@@ -23,6 +23,7 @@ class FsmManual :public CState
 	private:
 	uint32_t ButtonWakeStart;
 	uint32_t WakeTime;
+	uint32_t Blink;
 
 }; //Manual
 

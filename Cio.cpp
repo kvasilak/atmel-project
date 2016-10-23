@@ -941,7 +941,7 @@ void Cio::Sleep()
 	//Turn off all LEDS
 	CLeds::is().AllOff();
 	
-	//Awake = false;
+	Awake = false;
 	
 	//turn off all valves
 	AllOff();
@@ -983,7 +983,7 @@ void Cio::Wakeup()
 	
 	CLeds::is().ActiveOn();
 	
-	//Awake = true;
+	Awake = true;
 	
 }
 

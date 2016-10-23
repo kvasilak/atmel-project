@@ -333,11 +333,10 @@ void CCorner::FilterHeight(int32_t height, int32_t setpoint)
 
                     CSerial::is() << "L_Hght, ";
                     CSerial::is() << uint16_t(height);
-                   // CSerial::is() << "<\r\n";
 
-                   // CSerial::is() << ">Cnr, L_Slow,";
-                    //CSerial::is() << uint16_t(slowheight - setpoint);
-                    //CSerial::is() << "<\r\n";
+                    CSerial::is() << " err, ";
+                    CSerial::is() << uint16_t(height - setpoint);
+                    CSerial::is() << "\n";
 
                     break;
                 case RightRear:
@@ -347,11 +346,10 @@ void CCorner::FilterHeight(int32_t height, int32_t setpoint)
 
                     CSerial::is() << ", R_Hght, ";
                     CSerial::is() << uint16_t(height);
-                    CSerial::is() << "\r\n";
 
-                   // CSerial::is() << ">Cnr, R_Slow,";
-                   // CSerial::is() << uint16_t(slowheight - setpoint);
-                   // CSerial::is() << "<\r\n";                
+                    CSerial::is() << " err, ";
+                    CSerial::is() << uint16_t(height - setpoint);
+                    CSerial::is() << "\n";                
 
                     break;
            } 
@@ -368,14 +366,14 @@ void CCorner::Run(int32_t setpoint)
     int32_t height 			= GetHeight();
     
     //prevent setpoint from exceeding cal limits
-    if(setpoint > LimitHigh)
-    {
-        setpoint = LimitHigh;
-    }
-    else if(setpoint < LimitLow) 
-    {
-        setpoint = LimitLow;
-    } 
+    //if(setpoint > LimitHigh)
+    //{
+        //setpoint = LimitHigh;
+    //}
+    //else if(setpoint < LimitLow) 
+    //{
+        //setpoint = LimitLow;
+    //} 
     
     FilterHeight(height, setpoint);
 

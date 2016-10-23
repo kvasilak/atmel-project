@@ -32,6 +32,7 @@ void FSMTravelCal::OnEntry()
 void FSMTravelCal::HandleEvent(eEvents evt)
 {
 	static bool Active = false;
+	uint16_t Lheight, Rheight;
 	
 	switch(evt)
 	{
@@ -52,6 +53,12 @@ void FSMTravelCal::HandleEvent(eEvents evt)
 				}
 				
 				Blink = CTimer::GetTick();
+				
+			Lheight = CADC::is().GetLeftHeight();
+			Rheight = CADC::is().GetRightHeight();
+			
+			CSerial::is() << "L, " << Lheight << " R, " << Rheight << "\n";
+
 			}
 			break;
 		case eEvents::OutSideEvent:

@@ -63,15 +63,15 @@ void FsmTravel::HandleEvent(eEvents evt)
 					Start = CTimer::GetTick();
 				}
 			}
-			else if(Cio::is().ButtonWake)
-			{
-				//wait 5 seconds after getting to ride height then sleep
-				//only if the ign is off and we got a button wakeup
-				if(CTimer::IsTimedOut(5000, Start))
-				{
-					m_SMManager.ScheduleEvent(eEvents::IgnitionOffEvent);
-				}
-			}
+			//else if(Cio::is().ButtonWake)
+			//{
+				////wait 5 seconds after getting to ride height then sleep
+				////only if the ign is off and we got a button wakeup
+				//if(CTimer::IsTimedOut(5000, Start))
+				//{
+					//m_SMManager.ScheduleEvent(eEvents::IgnitionOffEvent);
+				//}
+			//}
 			
 			break;
 		case eEvents::RockerEvent:

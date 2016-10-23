@@ -11,6 +11,7 @@
 #include "..\Cio.h"
 #include "..\CSerial.h"
 #include "..\CLeds.h"
+#include "CADC.h"
 
 static const uint32_t ONESECOND = 1000;
 static const uint32_t ONEMINUTE = 60 * ONESECOND;
@@ -32,7 +33,9 @@ void FsmManual::OnEntry()
 	
 	Cio::is().AllOff();
 	//Cio::is().ResetButtons();
-	CSerial::is() << " FsmManual::OnEntry()\r\n";
+	CSerial::is() << " FsmManual::OnEntry()\n";
+	
+	Blink = CTimer::GetTick();
 	
 	ButtonWakeStart = CTimer::GetTick();
 	WakeTime = BUTTONHOLDTIME;
@@ -40,6 +43,8 @@ void FsmManual::OnEntry()
 
 void FsmManual::HandleEvent(eEvents evt)
 {
+	uint16_t Lheight, Rheight;
+	
 	switch(evt)
 	{
 		case eEvents::TravelEvent:
@@ -101,12 +106,23 @@ void FsmManual::HandleEvent(eEvents evt)
 				}
 			}
 			
+			if(CTimer::IsTimedOut(250, Blink))
+			{
+				Lheight = CADC::is().GetLeftHeight();
+				Rheight = CADC::is().GetRightHeight();
+				
+				CSerial::is() << "L, " << Lheight << " R, " << Rheight << "\n";
+				
+				Blink = CTimer::GetTick();
+			}
+			
+			
 			break;
 		case eEvents::IgnitionOnEvent:
 			if(Cio::is().Awake == false)
 			{
 				Cio::is().ButtonWake = false;
-				Cio::is().Awake = true;
+				//Cio::is().Awake = true;
 				Cio::is().Wakeup();
 				
 				Cio::is().UpdateButtons();
@@ -115,28 +131,28 @@ void FsmManual::HandleEvent(eEvents evt)
 			}
 			else
 			{
-				CSerial::is() << "Awake already\n";
-
 				Cio::is().ButtonWake = false;
-				
+				CSerial::is() << "Awake already\n";			
 			}
 			break;
 		case eEvents::IgnitionOffEvent:
-			Cio::is().Awake = false;
+			//Cio::is().Awake = false;
 
 			CSerial::is() << " FsmManual::Ignition Off\r\n";
 			
 			Cio::is().Sleep();
 			break;
 		case eEvents::ButtonWakeEvent:
-		
-		Cio::is().ButtonWake = true;
-		
-		ButtonWakeStart = CTimer::GetTick();
-		
+
 		if(!Cio::is().Awake)
 		{
-			m_SMManager.ScheduleEvent(eEvents::IgnitionOnEvent);
+			Cio::is().ButtonWake = true;
+			
+			ButtonWakeStart = CTimer::GetTick();
+			
+			Cio::is().Wakeup();
+				
+			Cio::is().UpdateButtons();
 
 			CSerial::is() << " FsmManual::BUtton Wake\r\n";
 		}

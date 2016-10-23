@@ -53,21 +53,10 @@ typedef enum
   VALVE_STATES_LIST(ENUMIFY)
 }ValveOp;
 
-// typedef enum 
-// {
-//   ValveIniting,     
-//     ValveFilling,      
-//     ValveFillPulse,    
-//     ValveDumping,      
-//     ValveDumpPulse,    
-//     ValveHoldEntry,    
-//     ValveHolding,      
-//     ValveLastState
-// }ValveOp;
 
 // Parameter K for the filter
 #define FILTER_SHIFT    8//8
-#define DEAD_BAND       10 //5
+#define DEAD_BAND       7//10
 
 class CCorner 
 {
