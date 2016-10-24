@@ -119,8 +119,8 @@ void FsmManual::HandleEvent(eEvents evt)
 			
 			break;
 		case eEvents::IgnitionOnEvent:
-			if(Cio::is().Awake == false)
-			{
+			//if(Cio::is().Awake == false)
+			//{
 				Cio::is().ButtonWake = false;
 				//Cio::is().Awake = true;
 				Cio::is().Wakeup();
@@ -128,12 +128,12 @@ void FsmManual::HandleEvent(eEvents evt)
 				Cio::is().UpdateButtons();
 
 				CSerial::is() << " FsmManual::Ignition On\r\n";
-			}
-			else
-			{
-				Cio::is().ButtonWake = false;
-				CSerial::is() << "Awake already\n";			
-			}
+			//}
+			//else
+			//{
+			//	Cio::is().ButtonWake = false;
+			//	CSerial::is() << "Awake already\n";			
+			//}
 			break;
 		case eEvents::IgnitionOffEvent:
 			//Cio::is().Awake = false;

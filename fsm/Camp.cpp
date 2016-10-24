@@ -12,8 +12,8 @@
 #include "..\CSerial.h"
 #include "nvm.h"
 
-static const int16_t pitchtol = 50;//10;
-static const int16_t rolltol = 50;//10;
+static const int16_t pitchtol = 10;//10;
+static const int16_t rolltol = 10;//10;
 
 FsmCamp::FsmCamp(CController& SMManager) :
 CState(SMManager, eStates::STATE_CAMP),
@@ -41,6 +41,7 @@ void FsmCamp::OnEntry()
 	IsLevel  = false;
 	ReadyToSleep = false;
 	
+	Wait = CTimer::GetTick();
 }
 
 void FsmCamp::HandleEvent(eEvents evt)
@@ -89,6 +90,8 @@ void FsmCamp::HandleEvent(eEvents evt)
 		case eEvents::IgnitionOnEvent:
 
 		    Cio::is().Awake = true;
+			
+			Cio::is().ButtonWake = false;
 
 			ReadyToSleep = false;
 			IsLevel = false;
@@ -162,10 +165,12 @@ void FsmCamp::LevelIt()
  	//determine Pitch and roll errors 	int16_t rollcal = nvm::is().GetCampY();
  	int16_t pitchcal = nvm::is().GetCampZ();
 	 
-	 CSerial::is() << "Y; " << Y << ", Z; " << Z ;
+	 if(CTimer::IsTimedOut(500, Wait))
+	 {
+		 CSerial::is() << "Y; " << Y << ", Z; " << Z ;
 	 
-	 CSerial::is()  << " Y err; " << Y - rollcal  << ";   Z err; " << Z -pitchcal << "\n";
-
+		 CSerial::is()  << " Y err; " << Y - rollcal  << ";   Z err; " << Z -pitchcal << "\n";
+	 }
 
  //pitch up ( rear too Damn low) if( Z	> pitchcal + pitchtol )
  {
@@ -281,15 +286,17 @@ void FsmCamp::LevelIt()
 	}
 	else
 	{
+		CSerial::is() << "left right Purrfect\n";
+		 
 		Cio::is().Left(eValveStates::Hold);
 		Cio::is().Right(eValveStates::Hold);
 			 
 		//perfect
-		 if(CTimer::IsTimedOut(10000, Start))
+		 if(CTimer::IsTimedOut(1000, Start))
 		 {
 			 IsLevel = true;
 			 
-			 CSerial::is() << "left right Purrfect\n";
+			 //Start = CTimer::GetTick();
 			 
 			 //if level for 5 seconds and ignition is off, go to sleep
 			 if(ReadyToSleep)
