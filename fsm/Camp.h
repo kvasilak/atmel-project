@@ -17,21 +17,19 @@
 #include "..\CLeds.h"
 #include "..\CTimer.h"
 #include "..\MMA8451.h"
+#include "common.h"
 
-    #define CAMP_STATES_LIST(macro)\
+    #define PITCH_STATES_LIST(macro) \
     macro(CampIniting),     \
-    macro(CampHold),		\
     macro(CampRearLow),     \
     macro(CampRearHigh),    \
-    macro(CampRollLeft),    \
-    macro(CampRollRight),   \
-    macro(CampLastState),	\
-	macro(CampLevel)
+	macro(CampLevel),       \
+    macro(CampComplete)
     
     typedef enum
     {
-	    CAMP_STATES_LIST(ENUMIFY)
-    }CampStates_e;
+	    PITCH_STATES_LIST(ENUMIFY)
+    }PitchStates_e;
 	
 	#define ROLL_STATES_LIST(macro)\
 	macro(RollHold),				\
@@ -55,18 +53,20 @@ class FsmCamp :public virtual CState
 	
 	private:
 	void LevelIt();
-	void SetState(CampStates_e s);
+    void LevelMachine();
+	void SetPitchState(PitchStates_e s);
 	void SetRollState(RollStates_e s);
+    void LevelRoll(int16_t Y);
 	
 	uint32_t Start;
 	uint32_t DebugDelay;
 	uint32_t MinTime;
 	bool IsLevel;
 	bool ReadyToSleep;
-	CampStates_e State;
+	PitchStates_e PitchState;
 	uint32_t DebugTime;
 	RollStates_e RollState;
-	bool Entered;
+	bool PitchEntered;
 	bool RollEntered;
 
 }; //Camp
