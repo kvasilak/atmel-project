@@ -56,7 +56,7 @@ class FsmCamp :public virtual CState
     void LevelMachine();
 	void SetPitchState(PitchStates_e s);
 	void SetRollState(RollStates_e s);
-    void LevelRoll(int16_t Y);
+    bool LevelRoll(int16_t Y);
 	
 	uint32_t Start;
 	uint32_t DebugDelay;

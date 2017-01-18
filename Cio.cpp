@@ -959,8 +959,8 @@ void Cio::Sleep()
 	
 	//Set CPU to sleep, will wake up on an ignition IRQ
  	cli();
- 	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-	//set_sleep_mode(SLEEP_MODE_IDLE);
+ 	//set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+	set_sleep_mode(SLEEP_MODE_IDLE);
  	
  	// sleep_mode() has a possible race condition
  	sleep_enable();

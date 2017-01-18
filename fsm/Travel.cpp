@@ -139,7 +139,7 @@ void FsmTravel::HandleEvent(eEvents evt)
 		
 				Cio::is().ButtonWake = true;
 
-				CSerial::is() << " FsmCamp::Button wake\r\n";
+				CSerial::is() << " FsmCTravel::Button wake\r\n";
 			}
 			break;
 		default:

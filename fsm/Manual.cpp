@@ -18,7 +18,7 @@ static const uint32_t ONEMINUTE = 60 * ONESECOND;
 
 static const uint32_t BUTTONHOLDTIME = 30 * ONESECOND; //how long to stay awake in HOLD
 static const uint32_t REMOTEWAKETIME = 1 * ONEMINUTE; //how long to stay awake if outside remote pressed
-static const uint32_t BUTTONWAKETIME = 5 * ONEMINUTE; //how long to stay awake in RAISE or LOWER
+static const uint32_t BUTTONWAKETIME = 1/*5*/ * ONEMINUTE; //how long to stay awake in RAISE or LOWER
 
 FsmManual::FsmManual(CController& SMManager) :
 CState(SMManager, eStates::STATE_MANUAL),
@@ -43,7 +43,7 @@ void FsmManual::OnEntry()
 
 void FsmManual::HandleEvent(eEvents evt)
 {
-	uint16_t Lheight, Rheight;
+	//uint16_t Lheight, Rheight;
 	
 	switch(evt)
 	{
@@ -106,15 +106,15 @@ void FsmManual::HandleEvent(eEvents evt)
 				}
 			}
 			
-			if(CTimer::IsTimedOut(250, Blink))
-			{
-				Lheight = CADC::is().GetLeftHeight();
-				Rheight = CADC::is().GetRightHeight();
-				
-				CSerial::is() << "L, " << Lheight << " R, " << Rheight << "\n";
-				
-				Blink = CTimer::GetTick();
-			}
+			//if(CTimer::IsTimedOut(250, Blink))
+			//{
+				//Lheight = CADC::is().GetLeftHeight();
+				//Rheight = CADC::is().GetRightHeight();
+				//
+				//CSerial::is() << "L, " << Lheight << " R, " << Rheight << "\n";
+				//
+				//Blink = CTimer::GetTick();
+			//}
 			
 			
 			break;

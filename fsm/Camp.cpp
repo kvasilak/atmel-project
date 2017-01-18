@@ -12,8 +12,8 @@
 #include "..\CSerial.h"
 #include "nvm.h"
 
-static const int16_t pitchtol = 10;//10;
-static const int16_t rolltol = 10;//10;
+static const int16_t pitchtol = 50;//10;
+static const int16_t rolltol = 50;//10;
 
 FsmCamp::FsmCamp(CController& SMManager) :
 CState(SMManager, eStates::STATE_CAMP),
@@ -53,7 +53,8 @@ void FsmCamp::HandleEvent(eEvents evt)
 	{
 		case eEvents::TimerEvent:
 			//run camp FSM 
-			LevelIt();
+			//LevelIt();
+            LevelMachine();
 
 		break;
 		case eEvents::RockerEvent:
@@ -293,14 +294,14 @@ void FsmCamp::LevelIt()
 	    else
 	    {	 
 		    //perfect
+            CSerial::is() << "left right Purrfect\n";
+            
 		     if(CTimer::IsTimedOut(1000, Start))
 		     {
 			 
 			     Cio::is().Left(eValveStates::Hold);
 			     Cio::is().Right(eValveStates::Hold);
-		
-			     CSerial::is() << "left right Purrfect\n";
-			 
+
 			     IsLevel = true;
 			 
 			     Start = CTimer::GetTick();
@@ -308,8 +309,9 @@ void FsmCamp::LevelIt()
 			     //if level for 5 seconds and ignition is off, go to sleep
 			     if(ReadyToSleep)
 			     {
-				    //Cio::is().Awake = false;
-				    //Cio::is().Sleep();
+                     CSerial::is() << "leveled, Sleeping\n";
+				    Cio::is().Awake = false;
+				    Cio::is().Sleep();
 			     }
 			     else
 			     {
@@ -326,7 +328,7 @@ void FsmCamp::SetPitchState(PitchStates_e s)
 {
 	static const char *StateStrs[] = {PITCH_STATES_LIST(STRINGIFY)};
 
-	CSerial::is() << "Pitch, ";
+	CSerial::is() << ">>>>Pitch, ";
 	CSerial::is() << StateStrs[s] ;
 	CSerial::is() << "<\r\n";
 
@@ -338,7 +340,7 @@ void FsmCamp::SetRollState(RollStates_e s)
 {
 	static const char *StateStrs[] = {ROLL_STATES_LIST(STRINGIFY)};
 
-	CSerial::is() << "Roll, ";
+	CSerial::is() << ">>>>Roll, ";
 	CSerial::is() << StateStrs[s] ;
 	CSerial::is() << "<\r\n";
 
@@ -346,9 +348,10 @@ void FsmCamp::SetRollState(RollStates_e s)
 	RollEntered = false;
 }
 
-void FsmCamp::LevelRoll(int16_t Y)
+bool FsmCamp::LevelRoll(int16_t Y)
 {
     int16_t rollcal = nvm::is().GetCampY();
+    bool level = false;
     
     if(Y > rollcal + rolltol)//Roll up ( Left down )
     {
@@ -364,7 +367,10 @@ void FsmCamp::LevelRoll(int16_t Y)
     {
         Cio::is().Left(eValveStates::Hold);
         Cio::is().Right(eValveStates::Hold);
-    }
+        
+        level = true;
+    }   
+    return level;
 }
 
 void FsmCamp::LevelMachine()
@@ -383,7 +389,7 @@ void FsmCamp::LevelMachine()
 	{
 		CSerial::is() << "X; " << X << ", Y; " << Y << ", Z; " << Z ;
 		 	
-		CSerial::is()  << "** roll err; " << Y - rollcal  << ";   height err; " << Z -pitchcal << "\n";
+		CSerial::is()  << "** roll err; " << Y - rollcal  << ";   pitch err; " << Z -pitchcal << "\n";
 		 	
 		DebugDelay = CTimer::GetTick();
 	}
@@ -404,7 +410,7 @@ void FsmCamp::LevelMachine()
             {
                 SetPitchState(CampRearHigh);
             }
-            else //we're level
+            else //we're levelpitnhwise
             {
                 SetPitchState(CampLevel);
             }
@@ -495,7 +501,10 @@ void FsmCamp::LevelMachine()
                  }
                  else //pitch and roll level
                  {
-                      LevelRoll(Y);
+                      if(LevelRoll(Y))
+                      {
+                          SetPitchState(CampComplete);
+                      }
                      
                  }                     
 			}
@@ -507,37 +516,47 @@ void FsmCamp::LevelMachine()
 			}               
 		    break;
         case CampComplete:
-        if(PitchEntered)
-        {
-            //rear low
-            if( Z	> pitchcal + pitchtol )
+            if(PitchEntered)
             {
-                SetPitchState(CampRearLow);
-            }
-            //rear high
-            else  if( Z < pitchcal - pitchtol )
-            {
-                SetPitchState(CampRearHigh);
-            }
-            else //roll level
-            {
-                LevelRoll(Y);
-                
-                // make sure we stay level for a bit before sleeping
-                if(CTimer::IsTimedOut(3000, Start))
+                //rear low
+                if( Z	> pitchcal + pitchtol )
                 {
-                    //sleep
-                    
-                    SetPitchState(CampIniting);
+                    SetPitchState(CampRearLow);
                 }
-            }            
-        }
-        else
-        {
-   
-            Start = CTimer::GetTick();
-            PitchEntered = true;
-        }
-        break;
+                //rear high
+                else  if( Z < pitchcal - pitchtol )
+                {
+                    SetPitchState(CampRearHigh);
+                }
+                else //pitch is level
+                {
+                    if( (Z > pitchcal - pitchtol) && (Z < pitchcal + pitchtol))
+                    {
+                        // make sure we stay level for a bit before sleeping
+                        if(CTimer::IsTimedOut(3000, Start))
+                        {
+                            //sleep
+                            CSerial::is() << "leveled, Sleeping\n";
+				            Cio::is().Awake = false;
+				            Cio::is().Sleep();
+                            
+                            //Wakes up here
+                            SetPitchState(CampIniting);
+                        }
+                    }  
+                    else
+                    {
+                        //Level not stable
+                        SetPitchState(CampIniting);
+                        Start = CTimer::GetTick();
+                    }              
+                }            
+            }
+            else
+            {
+                 Start = CTimer::GetTick();
+                PitchEntered = true;
+            }
+            break;
 	}
 }
