@@ -485,8 +485,7 @@ bool Cio::CampChanged()
 }
 
 //returns true if the travel mode buttons have changed state
-//camp switch
-//camp on steering remote
+//from not pressed to pressed
 bool Cio::TravelChanged()
 {
 	static bool OldTravel				= false;
@@ -742,10 +741,10 @@ void Cio::SteeringRemote()
 
 bool Cio::CampSwitches()
 {
-	//bool SteeringCamp = REMOTE_CAMP_PORT & _BV(REMOTE_CAMP_BIT);
+	bool SteeringCamp = REMOTE_CAMP_PORT & _BV(REMOTE_CAMP_BIT);
 	bool pressed =  false;
 	
-	if(!PushCamp.Level())// || SteeringCamp)
+	if(!PushCamp.Level() || SteeringCamp)
 	{
 		pressed  = true;
 	}
@@ -755,10 +754,10 @@ bool Cio::CampSwitches()
 
 bool Cio::TravelSwitches()
 {
-	//bool SteeringTravel = REMOTE_TRAVEL_PORT & _BV(REMOTE_TRAVEL_BIT);
+	bool SteeringTravel = REMOTE_TRAVEL_PORT & _BV(REMOTE_TRAVEL_BIT);
 	bool pressed = false;
 	
-	if(!PushTravel.Level() )//|| SteeringTravel)
+	if(!PushTravel.Level() || SteeringTravel)
 	{
 		pressed = true;
 	}
@@ -789,52 +788,74 @@ void Cio::AllOff()
 
 void Cio::Right(eValveStates s)
 {
-	switch(s)
-	{
-		case eValveStates::Dump:
-			RightFillOff();
-			RightDumpOn();
-		break;
-		case eValveStates::Fill:
-			RightDumpOff();
-			RightFillOn();
-		break;
-		case eValveStates::Hold:
-			RightFillOff();
-			RightDumpOff();
-		break;
-		default:
-			RightFillOff();
-			RightDumpOff();
-	}
+    static eValveStates last = eValveStates::None;
+
+    if(s != last)
+    {
+        last = s;
+        
+        CSerial::is() << "*Right ";
+        
+	    switch(s)
+	    {
+		    case eValveStates::Dump:
+            CSerial::is() << " Dump\n";
+			    RightFillOff();
+			    RightDumpOn();
+		    break;
+		    case eValveStates::Fill:
+            CSerial::is() << " Fill\n";
+			    RightDumpOff();
+			    RightFillOn();
+		    break;
+		    case eValveStates::Hold:
+            CSerial::is() << " Hold\n";
+			    RightFillOff();
+			    RightDumpOff();
+		    break;
+		    default:
+			    RightFillOff();
+			    RightDumpOff();
+	    }
+    }    
 }
 
 void Cio::Left(eValveStates s)
 {
-	switch(s)
-	{
-		case eValveStates::Dump:
-			LeftFillOff();
-			LeftDumpOn();
-		break;
-		case eValveStates::Fill:
-			LeftFillOn();
-			LeftDumpOff();
-		break;
+    static eValveStates last = eValveStates::None;
+   
+    
+    if(s != last)
+    {
+        last = s;
+        
+        CSerial::is() << "*Left ";
+         
+	    switch(s)
+	    {
+		    case eValveStates::Dump:
+			    LeftFillOff();
+			    LeftDumpOn();
+		    break;
+		    case eValveStates::Fill:
+			    LeftFillOn();
+			    LeftDumpOff();
+		    break;
 
-		case eValveStates::Hold:
-			LeftFillOff();
-			LeftDumpOff();
-		break;
-		default:
-			LeftFillOff();
-			LeftDumpOff();
-	}
+		    case eValveStates::Hold:
+			    LeftFillOff();
+			    LeftDumpOff();
+		    break;
+		    default:
+			    LeftFillOff();
+			    LeftDumpOff();
+	    }
+    }        
 }
 
 void Cio::RightFillOn()
 {
-	CSerial::is() << "*RightFillOn\n";
+	//CSerial::is() << "*RightFillOn\n";
 	
 	SOLENOID_RU_PORT |= _BV(SOLENOID_RU_BIT);
 	CLeds::is().RightFillOn();
@@ -842,7 +863,7 @@ void Cio::RightFillOn()
 
 void Cio::RightFillOff()
 {
-	CSerial::is() << "*RightFillOff\n";
+	//CSerial::is() << "*RightFillOff\n";
 	
 	SOLENOID_RU_PORT &= ~_BV(SOLENOID_RU_BIT);
 	CLeds::is().RightFillOff();
@@ -850,7 +871,7 @@ void Cio::RightFillOff()
 
 void Cio::RightDumpOn()
 {
-	CSerial::is() << "*RightDumpOn\n";
+	//CSerial::is() << "*RightDumpOn\n";
 	
 	SOLENOID_RD_PORT |= _BV(SOLENOID_RD_BIT);
 	CLeds::is().RightDumpOn();
@@ -858,7 +879,7 @@ void Cio::RightDumpOn()
 
 void Cio::RightDumpOff()
 {
-	CSerial::is() << "*RightDumpOff\n";
+	//CSerial::is() << "*RightDumpOff\n";
 	
 	SOLENOID_RD_PORT &= ~_BV(SOLENOID_RD_BIT);
 	CLeds::is().RightDumpOff();
@@ -867,7 +888,7 @@ void Cio::RightDumpOff()
 
 void Cio::LeftFillOn()
 {
-	CSerial::is() << "*LeftFillOn\n";
+	//CSerial::is() << "*LeftFillOn\n";
 	
 	SOLENOID_LU_PORT |= _BV(SOLENOID_LU_BIT);
 	CLeds::is().LeftFillOn();
@@ -875,7 +896,7 @@ void Cio::LeftFillOn()
 
 void Cio::LeftFillOff()
 {
-	CSerial::is() << "*LeftFillOff\n";
+	//CSerial::is() << "*LeftFillOff\n";
 	
 	SOLENOID_LU_PORT &= ~_BV(SOLENOID_LU_BIT);
 	CLeds::is().LeftFillOff();
@@ -883,7 +904,7 @@ void Cio::LeftFillOff()
 
 void Cio::LeftDumpOn()
 {
-	CSerial::is() << "*LeftDumpOn\n";
+	//CSerial::is() << "*LeftDumpOn\n";
 	
 	SOLENOID_LD_PORT |= _BV(SOLENOID_LD_BIT);
 	CLeds::is().LeftDumpOn();
@@ -891,7 +912,7 @@ void Cio::LeftDumpOn()
 
 void Cio::LeftDumpOff()
 {
-	CSerial::is() << "*LeftDumpOff\n";
+	//CSerial::is() << "*LeftDumpOff\n";
 	
 	SOLENOID_LD_PORT &= ~_BV(SOLENOID_LD_BIT);
 	CLeds::is().LeftDumpOff();

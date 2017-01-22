@@ -12,8 +12,8 @@
 #include "..\CSerial.h"
 #include "nvm.h"
 
-static const int16_t pitchtol = 50;//10;
-static const int16_t rolltol = 50;//10;
+static const int16_t pitchtol = 20;//10;
+static const int16_t rolltol = 5;//10;
 
 FsmCamp::FsmCamp(CController& SMManager) :
 CState(SMManager, eStates::STATE_CAMP),
@@ -43,6 +43,8 @@ void FsmCamp::OnEntry()
 	
 	IsLevel  = false;
 	ReadyToSleep = false;
+    
+    SetPitchState(CampIniting);
 	
 	DebugDelay = CTimer::GetTick();
 }
@@ -67,22 +69,12 @@ void FsmCamp::HandleEvent(eEvents evt)
 		break;
 		case eEvents::CampEvent:
 			CSerial::is() << " FsmCamp::Camp event\r\n";
-		
-			if(m_SMManager.ButtonWakeFirst)
+            
+			if(Cio::is().CampSwitches())
 			{
-				CSerial::is() << " FsmCamp::button wake first\r\n";
-				
-				CLeds::is().CampOn();
-				m_SMManager.ButtonWakeFirst = false;
-			}
-			else
-			{
-				if(Cio::is().CampSwitches())
-				{
-					CSerial::is() << " FsmCamp::camp switches\r\n";
+				CSerial::is() << " FsmCamp::camp switches\r\n";
 					
-					m_SMManager.ChangeState(eStates::STATE_MANUAL);
-				}
+				m_SMManager.ChangeState(eStates::STATE_MANUAL);
 			}
 		break;
 		case eEvents::TravelEvent:
@@ -91,54 +83,31 @@ void FsmCamp::HandleEvent(eEvents evt)
 		case eEvents::CalibrateEvent:
 			m_SMManager.ChangeState(eStates::STATE_CAMP_CALIBRATE);
 		break;
-		case eEvents::IgnitionOnEvent:
+        case eEvents::ButtonWakeEvent:
+        case eEvents::IgnitionOnEvent:
 
-		    Cio::is().Awake = true;
-			
-			Cio::is().ButtonWake = false;
+            Cio::is().Awake = true;
+            
+            //Cio::is().ButtonWake = false;
 
-			ReadyToSleep = false;
-			IsLevel = false;
+           // ReadyToSleep = false;
+            IsLevel = false;
 
-			Cio::is().Wakeup();
-			CLeds::is().CampOn();
-			//relevel on wakeup
-			
-			Start = CTimer::GetTick();
-			
-			CSerial::is() << " FsmCamp::Ignition On\r\n";
+            Cio::is().Wakeup();
+            CLeds::is().CampOn();
+            //relevel on wakeup
+            SetPitchState(CampIniting);
+            
+            Start = CTimer::GetTick();
+            
+            CSerial::is() << " FsmCamp::Ignition On\r\n";
 
-			break;
+            break;
+
+        //let the manual state handle it
 		case eEvents::IgnitionOffEvent:
-			if(IsLevel)
-			{
-				CSerial::is() << " FsmCamp::Sleep\r\n";
-				Cio::is().Awake = false;
-				Cio::is().Sleep();
-			}
-
-			ReadyToSleep = true;
 			CSerial::is() << " FsmCamp::Ignition Off\r\n";
-
-			break;
-		case eEvents::ButtonWakeEvent:
-			if(!Cio::is().Awake)
-			{
-				Cio::is().Wakeup();
-			
-				Cio::is().ButtonWake = true;
-
-				CSerial::is() << " FsmCamp::Button wake\r\n";
-				Start = CTimer::GetTick();
-				
-				m_SMManager.ButtonWakeFirst = false;
-				Cio::is().Awake = true;
-				
-			}
-
-            //sleep after we achieve level
-			ReadyToSleep = true; 
-			
+            m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
 			break;
 		default:
 		break;
@@ -149,179 +118,6 @@ void FsmCamp::OnExit()
 {
 	CSerial::is() << " FsmCamp::OnExit()\r\n";
 	CLeds::is().CampOff();
-}
-
-
-//pitch + means nose high
-//pitch - means nose low
-//
-//roll + means left down, right up
-//roll - means left up, right down 
-//
-//Accel should be orientated such that X is at 0 G and Z is at zero G
-//This would be with the corner dot in the upper left
-void FsmCamp::LevelIt()
-{
- 	int16_t X=0;
- 	int16_t Y=0;
- 	int16_t Z=0;
- 	//Read Acccel
- 	CMMA8451::is().ReadXYZ(X, Y, Z);
- 	//determine Pitch and roll errors 	int16_t rollcal = nvm::is().GetCampY();
- 	int16_t pitchcal = nvm::is().GetCampZ();
-	 
-	 if(CTimer::IsTimedOut(1000, DebugDelay))
-	 {
-		 CSerial::is() << "X; " << X << ", Y; " << Y << ", Z; " << Z ;
-	 
-		 CSerial::is()  << "** roll err; " << Y - rollcal  << ";   height err; " << Z -pitchcal << "\n";
-		 
-		 DebugDelay = CTimer::GetTick();
-	 }
-
-     //pitch up ( rear too Damn low)     if( Z	> pitchcal + pitchtol )
-     {
-	     //Raise the lower corner
-	     if(Y < rollcal - rolltol)//Roll up ( Left down )
-	     {
-		     //Raise Left
-		     if(CTimer::IsTimedOut(MinTime, Start))
-		     {
-			     CSerial::is() << "left up: " << rollcal - rolltol << "\n";
-			     Cio::is().Left(eValveStates::Fill);
-			     Cio::is().Right(eValveStates::Hold);
-			 
-			     Start = CTimer::GetTick();
-		     }
-		 
-	     }
-	     else if(Y > rollcal + rolltol) //Roll down (Right Down)
-	     {
-		     //Raise Right
-		    if(CTimer::IsTimedOut(MinTime, Start))
-		    {
-			    CSerial::is() << "Right up\n";
-			    Cio::is().Left(eValveStates::Hold);
-			    Cio::is().Right(eValveStates::Fill);
-			 		 
-			    Start = CTimer::GetTick();
-		    }
-	     }
-	     else
-	     {
-		    //Raise left and right
-		    if(CTimer::IsTimedOut(MinTime, Start))
-		    {
-			    CSerial::is() << "both up\n";
-			    Cio::is().Left(eValveStates::Fill);
-			    Cio::is().Right(eValveStates::Fill);
-			 		 
-			    Start = CTimer::GetTick();
-		    }
-	     }
-     }
-     //pitch down ( rear too Damn high )
-     else if( Z < pitchcal - pitchtol )
-     {
-	     //lower the higher corner
-	     if(Y > rollcal + rolltol)//Roll up ( Left down )
-	     {
-		     //Lower Left
-		     if(CTimer::IsTimedOut(MinTime, Start))
-		     {
-			     CSerial::is() << "left Down\n";
-			     Cio::is().Left(eValveStates::Dump);
-			     Cio::is().Right(eValveStates::Hold);
-			 
-			     Start = CTimer::GetTick();
-		     }
-		 
-	     }
-	     else if(Y < rollcal - rolltol) //Roll down (Right Down)
-	     {
-		     //Lower Right
-		     if(CTimer::IsTimedOut(MinTime, Start))
-		     {
-			     CSerial::is() << "Right down\n";
-			     Cio::is().Left(eValveStates::Hold);
-			     Cio::is().Right(eValveStates::Dump);
-			 
-			     Start = CTimer::GetTick();
-		     }
-	     }
-	     else
-	     {
-		     //Lower left and right
-		     if(CTimer::IsTimedOut(MinTime, Start))
-		     {
-			     CSerial::is() << "left right down\n";
-			     Cio::is().Left(eValveStates::Dump);
-			     Cio::is().Right(eValveStates::Dump);
-			 
-			     Start = CTimer::GetTick();
-		     }
-	     }
-     }
-     //Level pitch
-     else
-     {
-	    //rotate
-	    if(Y < rollcal - rolltol)//Roll up ( Left down )
-	    {
-		    //Raise Left, lower right
-		     if(CTimer::IsTimedOut(MinTime, Start))
-		     {
-			     CSerial::is() << "left up right down\n";
-			     Cio::is().Left(eValveStates::Fill);
-			     Cio::is().Right(eValveStates::Dump);
-			 
-			     Start = CTimer::GetTick();
-		     }
-	
-	    }
-	    else if(Y > rollcal + rolltol) //Roll down (Right Down)
-	    {
-		    //Raise Right, lower left
-		     if(CTimer::IsTimedOut(MinTime, Start))
-		     {
-			     CSerial::is() << "left down right up\n";
-			     Cio::is().Left(eValveStates::Dump);
-			     Cio::is().Right(eValveStates::Fill);
-			 
-			     Start = CTimer::GetTick();
-		     }
-	    }
-	    else
-	    {	 
-		    //perfect
-            CSerial::is() << "left right Purrfect\n";
-            
-		     if(CTimer::IsTimedOut(1000, Start))
-		     {
-			 
-			     Cio::is().Left(eValveStates::Hold);
-			     Cio::is().Right(eValveStates::Hold);
-
-			     IsLevel = true;
-			 
-			     Start = CTimer::GetTick();
-			 
-			     //if level for 5 seconds and ignition is off, go to sleep
-			     if(ReadyToSleep)
-			     {
-                     CSerial::is() << "leveled, Sleeping\n";
-				    Cio::is().Awake = false;
-				    Cio::is().Sleep();
-			     }
-			     else
-			     {
-				     CSerial::is() << "Not ready to sleep\n";
-			     }
-		     }
-	    }
-     }
-         
-
 }
 
 void FsmCamp::SetPitchState(PitchStates_e s)
@@ -418,27 +214,24 @@ void FsmCamp::LevelMachine()
 		break;
 		case CampRearLow:
 			//pitch up ( rear too Damn low)
-			if(PitchEntered)
+            //rear high
+            if( Z < pitchcal - pitchtol )
             {
-                //rear high
-                if( Z < pitchcal - pitchtol )
-                {
-                    SetPitchState(CampRearHigh);
-                }
-                //we're level
-                else if( (Z > pitchcal - pitchtol) && (Z < pitchcal + pitchtol))
-                {
-                    SetPitchState(CampLevel);
-                }
+                SetPitchState(CampRearHigh);
+            }
+            //we're level
+            else if( (Z > pitchcal - pitchtol) && (Z < pitchcal + pitchtol))
+            {
+                SetPitchState(CampLevel);
             }
             else
             {
-                if(Y > rollcal + rolltol)//Roll up ( Left down )
+                if(Y < rollcal - rolltol)//Roll up ( Left down )
                 {
                     Cio::is().Right(eValveStates::Hold);
                     Cio::is().Left(eValveStates::Fill);
                 }
-                else if(Y < rollcal - rolltol) //Roll down (Right Down)
+                else if(Y > rollcal + rolltol) //Roll down (Right Down)
                 {
                     Cio::is().Left(eValveStates::Hold);
                     Cio::is().Right(eValveStates::Fill);
@@ -453,29 +246,27 @@ void FsmCamp::LevelMachine()
 		    break;
 		
 		case CampRearHigh:
-			if(PitchEntered)
-			{
-                //rear low
-                if( Z > pitchcal + pitchtol )
-                {
-                    SetPitchState(CampRearLow);
-                }
-                //we're level
-                else if( (Z > pitchcal - pitchtol) && (Z < pitchcal + pitchtol))//we're level
-                {
-                    SetPitchState(CampLevel);
-                }
-			}
+            //rear low
+            if( Z > pitchcal + pitchtol )
+            {
+                SetPitchState(CampRearLow);
+            }
+                
+            //we're level
+            else if( (Z > pitchcal - pitchtol) && (Z < pitchcal + pitchtol))//we're level
+            {
+                SetPitchState(CampLevel);
+            }
 			else
 			{
-                if(Y > rollcal + rolltol)//Roll up ( Left down )
+                if(Y < rollcal - rolltol)//Roll up ( Left down )
                 {
                     Cio::is().Left(eValveStates::Hold);
                     Cio::is().Right(eValveStates::Dump);
                 }
-                else if(Y < rollcal - rolltol) //Roll down (Right Down)
+                else if(Y > rollcal + rolltol) //Roll down (Right Down)
                 {
-                    Cio::is().Left(eValveStates::Hold);
+                    Cio::is().Right(eValveStates::Hold);
                     Cio::is().Left(eValveStates::Dump);
                 }
                 else //Roll level
@@ -532,24 +323,23 @@ void FsmCamp::LevelMachine()
                 {
                     if( (Z > pitchcal - pitchtol) && (Z < pitchcal + pitchtol))
                     {
-                        // make sure we stay level for a bit before sleeping
-                        if(CTimer::IsTimedOut(3000, Start))
+                        //Check roll
+                        if(Y > rollcal + rolltol)//Roll up ( Left down )
                         {
-                            //sleep
-                            CSerial::is() << "leveled, Sleeping\n";
-				            Cio::is().Awake = false;
-				            Cio::is().Sleep();
-                            
-                            //Wakes up here
-                            SetPitchState(CampIniting);
+                            Cio::is().Left(eValveStates::Hold);
+                            Cio::is().Right(eValveStates::Dump);
                         }
-                    }  
-                    else
-                    {
-                        //Level not stable
-                        SetPitchState(CampIniting);
-                        Start = CTimer::GetTick();
-                    }              
+                        else if(Y < rollcal - rolltol) //Roll down (Right Down)
+                        {
+                            Cio::is().Right(eValveStates::Hold);
+                            Cio::is().Left(eValveStates::Dump);
+                        }
+                        else //Roll level
+                        {
+                            Cio::is().Left(eValveStates::Hold);
+                            Cio::is().Right(eValveStates::Hold);
+                        }
+                    }            
                 }            
             }
             else

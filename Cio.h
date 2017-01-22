@@ -15,7 +15,8 @@ enum class eValveStates
 {
 	Fill,
 	Dump,
-	Hold
+	Hold,
+    None
 };
 
 enum FillStates

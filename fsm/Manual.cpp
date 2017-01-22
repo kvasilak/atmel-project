@@ -54,6 +54,7 @@ void FsmManual::HandleEvent(eEvents evt)
 			}
 			break;
 		case eEvents::CampEvent:
+        //ignore button up events
 			if(Cio::is().CampSwitches())
 			{
 				m_SMManager.ChangeState(eStates::STATE_CAMP);

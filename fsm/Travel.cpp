@@ -63,15 +63,6 @@ void FsmTravel::HandleEvent(eEvents evt)
 					Start = CTimer::GetTick();
 				}
 			}
-			else if(Cio::is().ButtonWake)
-			{
-				//wait 5 seconds after getting to ride height then sleep
-				//only if the ign is off and we got a button wakeup
-				if(CTimer::IsTimedOut(5000, Start))
-				{
-					m_SMManager.ScheduleEvent(eEvents::IgnitionOffEvent);
-				}
-			}
 			
 			break;
 		case eEvents::RockerEvent:
@@ -86,62 +77,56 @@ void FsmTravel::HandleEvent(eEvents evt)
 			m_SMManager.ChangeState(eStates::STATE_CAMP);
 		break;
 		case eEvents::TravelEvent:
-			if(m_SMManager.ButtonWakeFirst)
+			if(Cio::is().TravelSwitches())
 			{
-				CLeds::is().TravelOn();
-				m_SMManager.ButtonWakeFirst = false;
-			}
-			else
-			{
-				if(Cio::is().TravelSwitches())
-				{
-					m_SMManager.ChangeState(eStates::STATE_MANUAL);
-				}
+				m_SMManager.ChangeState(eStates::STATE_MANUAL);
 			}
 		break;
 		case eEvents::CalibrateEvent:
 			m_SMManager.ChangeState(eStates::STATE_TRAVEL_CALIBRATE);
 			break;
-		case eEvents::IgnitionOnEvent:
-			//Cio::is().Awake = true;
-			Cio::is().Wakeup();
-			
-			Cio::is().ButtonWake = false;
-				
-			CLeds::is().TravelOn();
-			
-			//reset so we get back to ride height quickly
-			LeftSide.AtHeight(false);
-			RightSide.AtHeight(false);
-		
-			LeftSide.SetLongFilter(false);
-			RightSide.SetLongFilter(false);
-			
-			Starting = true;
-			CSerial::is() << " FsmTravel::Ignition On\r\n";
-			
-			break;
-			//Sleep as soon as the ign is off
-		case eEvents::IgnitionOffEvent:
-			//Cio::is().Awake = false;
-			Cio::is().ButtonWake = false;
-			CSerial::is() << " FsmTravel::Ignition Off\r\n";
-		
-			Cio::is().Sleep();
-			break;
-			//wakeup and stay awake as long in travel
-		case eEvents::ButtonWakeEvent:
-			if( !Cio::is().Awake)
-			{
-				//Cio::is().Awake = true;
-				Cio::is().Wakeup();
-				CLeds::is().TravelOn();
-		
-				Cio::is().ButtonWake = true;
+        case eEvents::ButtonWakeEvent:
+        case eEvents::IgnitionOnEvent:
+            if( !Cio::is().Awake)
+            {
+                Cio::is().Awake = true;
+                Cio::is().Wakeup();
+            
+                //Cio::is().ButtonWake = false;
+                
+                CLeds::is().TravelOn();
+            }            
+                //reset so we get back to ride height quickly
+                LeftSide.AtHeight(false);
+                RightSide.AtHeight(false);
+        
+                LeftSide.SetLongFilter(false);
+                RightSide.SetLongFilter(false);
+            
+                Starting = true;
+                CSerial::is() << " FsmTravel::Ignition On\r\n";
+                        
+            break;
 
-				CSerial::is() << " FsmCTravel::Button wake\r\n";
-			}
+			//let the manual state handle it
+		case eEvents::IgnitionOffEvent:
+			CSerial::is() << " FsmTravel::Ignition Off\r\n";
+            
+            Cio::is().Sleep();
+
 			break;
+        //case eEvents::ButtonWakeEvent:
+            //if( !Cio::is().Awake)
+            //{
+                //Cio::is().Awake = true;
+                //Cio::is().Wakeup();
+                //CLeds::is().TravelOn();
+        //
+               //// Cio::is().ButtonWake = true;
+//
+                //CSerial::is() << " FsmCTravel::Button wake\r\n";
+            //}
+
 		default:
 		break;
 	}
