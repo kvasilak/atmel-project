@@ -12,7 +12,7 @@
 #include "..\CSerial.h"
 #include "nvm.h"
 
-static const int16_t pitchtol = 20;//10;
+static const int16_t pitchtol = 10;
 static const int16_t rolltol = 5;//10;
 
 FsmCamp::FsmCamp(CController& SMManager) :
@@ -85,23 +85,24 @@ void FsmCamp::HandleEvent(eEvents evt)
 		break;
         case eEvents::ButtonWakeEvent:
         case eEvents::IgnitionOnEvent:
-
-            Cio::is().Awake = true;
+            if( Cio::is().Awake == false)
+            {            
+                Cio::is().Awake = true;
             
-            //Cio::is().ButtonWake = false;
+                //Cio::is().ButtonWake = false;
 
-           // ReadyToSleep = false;
-            IsLevel = false;
+               // ReadyToSleep = false;
+                IsLevel = false;
 
-            Cio::is().Wakeup();
-            CLeds::is().CampOn();
-            //relevel on wakeup
-            SetPitchState(CampIniting);
+                Cio::is().Wakeup();
+                CLeds::is().CampOn();
+                //relevel on wakeup
+                SetPitchState(CampIniting);
             
-            Start = CTimer::GetTick();
+                Start = CTimer::GetTick();
             
-            CSerial::is() << " FsmCamp::Ignition On\r\n";
-
+                CSerial::is() << " FsmCamp::Ignition On\r\n";
+            }
             break;
 
         //let the manual state handle it

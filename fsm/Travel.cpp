@@ -95,7 +95,7 @@ void FsmTravel::HandleEvent(eEvents evt)
                 //Cio::is().ButtonWake = false;
                 
                 CLeds::is().TravelOn();
-            }            
+                        
                 //reset so we get back to ride height quickly
                 LeftSide.AtHeight(false);
                 RightSide.AtHeight(false);
@@ -105,7 +105,7 @@ void FsmTravel::HandleEvent(eEvents evt)
             
                 Starting = true;
                 CSerial::is() << " FsmTravel::Ignition On\r\n";
-                        
+            }                        
             break;
 
 			//let the manual state handle it
