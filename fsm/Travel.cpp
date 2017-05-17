@@ -19,7 +19,9 @@ CState(SMManager, eStates::STATE_TRAVEL),
 LeftSide(LeftRear),
 RightSide(RightRear),
 Starting(true),
-Start(0)
+Start(0),
+filterwait(0),
+waiting(false)
 {
 }
 
@@ -31,8 +33,12 @@ void FsmTravel::OnEntry()
 
 	LeftSide.SetLongFilter(false);
 	RightSide.SetLongFilter(false);
+    
+    LeftSide.AtHeight(false);
+    RightSide.AtHeight(false);
 	
 	Starting = true;
+    waiting = false;
 
 	Start = CTimer::GetTick();
 	
@@ -54,13 +60,26 @@ void FsmTravel::HandleEvent(eEvents evt)
 				//switch to a slower filter as soon as we reach ride height
 				if(LeftSide.AtHeight() && RightSide.AtHeight() )
 				{
-					CSerial::is() << " *******Setting long travel Filter ******\r\n";
-					LeftSide.SetLongFilter(true);
-					RightSide.SetLongFilter(true);
+                    if(waiting == false)
+                    {
+                        filterwait = CTimer::GetTick();
+                        
+                        waiting = true;
+                    }   
+                    else
+                    {                   
+                        //wait a bit before setting long filter
+                        if(CTimer::IsTimedOut(filterwait, 2000))
+                        {
+					        CSerial::is() << " *******Setting long travel Filter ******\r\n";
+        //	testin				LeftSide.SetLongFilter(true);
+        //					RightSide.SetLongFilter(true);
 					
-					Starting = false;
+					        Starting = false;
 					
-					Start = CTimer::GetTick();
+					        Start = CTimer::GetTick();
+                        }         
+                    }                               
 				}
 			}
 			

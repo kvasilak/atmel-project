@@ -25,6 +25,8 @@ private:
 	CCorner RightSide;
 	bool Starting;
 	uint32_t Start;
+    uint32_t filterwait;
+    bool waiting;
 }; //Travel
 
 #endif //__TRAVEL_H__

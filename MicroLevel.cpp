@@ -124,7 +124,7 @@ int main(void)
 	
 	CSerial::is().Init();
 	
-	CSerial::is() << "\n\nMicrolevel V1.0\n" << "Copyright 2016 Keith Vasilakes\n\n";
+	CSerial::is() << "\n\nMicrolevel " << __DATE__ << "\nCopyright 2016 Keith Vasilakes\n\n";
 	
 	CTimer::Init();
 
