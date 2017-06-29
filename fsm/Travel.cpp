@@ -72,8 +72,8 @@ void FsmTravel::HandleEvent(eEvents evt)
                         if(CTimer::IsTimedOut(filterwait, 2000))
                         {
 					        CSerial::is() << " *******Setting long travel Filter ******\r\n";
-        //	testin				LeftSide.SetLongFilter(true);
-        //					RightSide.SetLongFilter(true);
+        				    LeftSide.SetLongFilter(true);
+        					RightSide.SetLongFilter(true);
 					
 					        Starting = false;
 					
