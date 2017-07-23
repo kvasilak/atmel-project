@@ -241,8 +241,14 @@ void CController::Run()
 
 			//LED brightness controlled by voltage on dimmer input
 			//Todo Scale to resistor divider
-			//Todo what to do about dash light dimmer
+			//
+            //Dash lamp dimmer varies from 0 to 12v when headlights are on
+            //and is zero volts when headlights are off
+            //so if voltage is near 0, we don't know what the brightness should be
+            //so we turn them on full
 			//CLeds::is().Dim(CADC::is().GetDimmer());
+            
+            //CSerial::is() << "Dim; " << CADC::is().GetDimmer() << "\n";
 		}
 		Time = CTimer::GetTick();
 	}

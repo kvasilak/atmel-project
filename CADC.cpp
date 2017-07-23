@@ -11,6 +11,7 @@
 #include <avr/eeprom.h>
 
 #include "nvm.h"
+#include "CSerial.h"
 
 // default constructor
 CADC::CADC()
@@ -62,8 +63,12 @@ uint16_t CADC::GetRightHeight()
 uint8_t CADC::GetDimmer()
 {
 	uint16_t dim = Read(3);
-	
+    
+    CSerial::is() << "Dim; " << dim << "\n";
+
 	dim /= 4;
+    
+    if(dim < 100) dim = 0xFF;
 	
 	return (uint8_t)dim;
 }

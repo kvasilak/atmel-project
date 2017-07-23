@@ -23,6 +23,7 @@ uint16_t a = 0;
 uint8_t b = 0;
 uint8_t txbuf[100];
 uint8_t rxbuf[100];
+volatile char mcusr __attribute__ ((section (".noinit")));
 
 #define TIMESTAMP_RES 1000 /* Timestamp resolution (1 per msec) */
 
@@ -116,6 +117,13 @@ void visual_stream_init(void)
 
 int main(void)
 {
+    mcusr=MCUSR;
+    
+    MCUSR=0;
+ //  uint8_t temp_mcusr = MCUSR;
+   //MCUSR = 0;
+
+    
 	CController Controller;
 
 	Cio::is().Init();
@@ -125,6 +133,8 @@ int main(void)
 	CSerial::is().Init();
 	
 	CSerial::is() << "\n\nMicrolevel " << __DATE__ << "\nCopyright 2016 Keith Vasilakes\n\n";
+    
+    CSerial::is() << "** reset Cause " << mcusr << "\n";
 	
 	CTimer::Init();
 

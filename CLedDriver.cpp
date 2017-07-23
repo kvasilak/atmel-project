@@ -41,6 +41,7 @@ void CLedDriver::Init()
 	  i2c_stop();
 }
 
+//brightness, 0 to 255
 void CLedDriver::Dim(uint8_t Brightness)
 {
 	WriteReg(0X0A, Brightness);

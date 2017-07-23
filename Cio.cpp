@@ -7,6 +7,7 @@
 
 #include <avr/io.h>
 #include <avr/power.h> //perihperal power control
+#include <avr/sleep.h>
 #include "Cio.h"
 #include "CLeds.h"
 #include "CSerial.h"
@@ -353,6 +354,8 @@ void Cio::Init()
 	EnableIgnGPIOInterrupt();
 	
 	Time = CTimer::GetTick();
+    
+    sleep_enable();
 }
 
 //update switch states and debounce
@@ -973,20 +976,22 @@ void Cio::Sleep()
 	
 	//turn off unnecessary peripherals
 	//minimal power savings
-    //power_all_disable();
+    power_all_disable();
 
 	FillPressed = false;
 	DumpPressed = false;
 	
 	//Set CPU to sleep, will wake up on an ignition IRQ
+    //button press or outside remote
  	cli();
  	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-	//set_sleep_mode(SLEEP_MODE_IDLE);
- 	
+   
  	// sleep_mode() has a possible race condition
  	sleep_enable();
  	sei();
  	sleep_cpu();
+     
+     power_all_enable();
  	sleep_disable();
 }
 
