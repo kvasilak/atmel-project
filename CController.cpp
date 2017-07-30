@@ -225,7 +225,6 @@ void CController::CheckEvent()
 	
 }
 
-//called on a 100ms timer
 void CController::Run()
 {
 	Cio::is().Run();

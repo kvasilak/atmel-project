@@ -31,18 +31,8 @@
 	    PITCH_STATES_LIST(ENUMIFY)
     }PitchStates_e;
 	
-	#define ROLL_STATES_LIST(macro)\
-	macro(RollHold),				\
-	macro(RollStateLeft),			\
-	macro(RollStateRight),			\
-	macro(RollStateLevel),			\
-	macro(RollStateLast)
-	
-	typedef enum
-	{
-		ROLL_STATES_LIST(ENUMIFY)
-	}RollStates_e;
-	
+#define FilterSize 100
+
 class FsmCamp :public virtual CState
 {
 	public:
@@ -52,11 +42,9 @@ class FsmCamp :public virtual CState
 	void OnExit();
 	
 	private:
-	void LevelIt();
     void LevelMachine();
 	void SetPitchState(PitchStates_e s);
-	void SetRollState(RollStates_e s);
-    bool LevelRoll(int16_t Y);
+    void FsmCamp::GetYZ(int16_t &y, int16_t &z);
 	
 	uint32_t Start;
 	uint32_t DebugDelay;
@@ -66,8 +54,10 @@ class FsmCamp :public virtual CState
 	PitchStates_e PitchState;
 	uint32_t DebugTime;
 	RollStates_e RollState;
-	bool PitchEntered;
-	bool RollEntered;
+
+    int16_t AvgX[FilterSize];
+    int16_t AvgY[FilterSize];
+    uint16_t FilterStep;
 
 }; //Camp
 
