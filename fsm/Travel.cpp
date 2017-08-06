@@ -55,33 +55,33 @@ void FsmTravel::HandleEvent(eEvents evt)
 			LeftSide.Run(nvm::is().GetLeftTravel());
 			RightSide.Run(nvm::is().GetRightTravel());
 			
-			if(Starting)
-			{
-				//switch to a slower filter as soon as we reach ride height
-				if(LeftSide.AtHeight() && RightSide.AtHeight() )
-				{
-                    if(waiting == false)
-                    {
-                        filterwait = CTimer::GetTick();
-                        
-                        waiting = true;
-                    }   
-                    else
-                    {                   
-                        //wait a bit before setting long filter
-                        if(CTimer::IsTimedOut(filterwait, 2000))
-                        {
-					        CSerial::is() << " *******Setting long travel Filter ******\r\n";
-        				    LeftSide.SetLongFilter(true);
-        					RightSide.SetLongFilter(true);
-					
-					        Starting = false;
-					
-					        Start = CTimer::GetTick();
-                        }         
-                    }                               
-				}
-			}
+			//if(Starting)
+			//{
+				////switch to a slower filter as soon as we reach ride height
+				//if(LeftSide.AtHeight() && RightSide.AtHeight() )
+				//{
+                    //if(waiting == false)
+                    //{
+                        //filterwait = CTimer::GetTick();
+                        //
+                        //waiting = true;
+                    //}   
+                    //else
+                    //{                   
+                        ////wait a bit before setting long filter
+                        //if(CTimer::IsTimedOut(filterwait, 10000))
+                        //{
+					        //CSerial::is() << " *******Setting long travel Filter ******\r\n";
+        				    //LeftSide.SetLongFilter(true);
+        					//RightSide.SetLongFilter(true);
+					//
+					        //Starting = false;
+					//
+					        //Start = CTimer::GetTick();
+                        //}         
+                    //}                               
+				//}
+			//}
 			
 			break;
 		case eEvents::RockerEvent:

@@ -75,12 +75,12 @@ class CCorner
     void AtHeight(bool at);
     bool AtHeight();
     int32_t GetHeight();
-    void FilterHeight(int32_t height, int32_t setpoint);
+    void FilterHeight( int32_t setpoint);
     bool IsMoving();
   
 	private:
 	int16_t DeadBand;			//how far the corner has to move before we try to adjust the position
-	int16_t HoldDeadBand; 	    //deadband + hysteresis
+    int16_t WideDeadBand;
 	Position corner;
 	uint32_t CycleTime;		    //The minimum time between valve state changes. Prevents valve chatter
 	ValveOp State;
@@ -107,6 +107,7 @@ class CCorner
     int16_t SmoothAvg[10];
     int32_t SmoothHeight;
     uint16_t Smooth(uint16_t value);
+    void FilterReset(void);
     
     bool LongFilter;
     int SlowAt;
@@ -118,6 +119,8 @@ class CCorner
     int32_t HeightSpeed;
     int32_t OldHeight;
     uint32_t SpeedTime;
+    int32_t HeightAverages[10];
+    int HeightAverageCount;
     
 };
 #endif //INCLUDE_CORNER_H

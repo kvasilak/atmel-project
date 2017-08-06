@@ -24,6 +24,7 @@
     macro(CampRearLow),     \
     macro(CampRearHigh),    \
 	macro(CampLevel),       \
+    macro(CampCompleteEnter), \
     macro(CampComplete)
     
     typedef enum
@@ -44,7 +45,7 @@ class FsmCamp :public virtual CState
 	private:
     void LevelMachine();
 	void SetPitchState(PitchStates_e s);
-    void FsmCamp::GetYZ(int16_t &y, int16_t &z);
+    void GetYZ(int16_t *y, int16_t *z);
 	
 	uint32_t Start;
 	uint32_t DebugDelay;
@@ -53,10 +54,9 @@ class FsmCamp :public virtual CState
 	bool ReadyToSleep;
 	PitchStates_e PitchState;
 	uint32_t DebugTime;
-	RollStates_e RollState;
 
-    int16_t AvgX[FilterSize];
     int16_t AvgY[FilterSize];
+    int16_t AvgZ[FilterSize];
     uint16_t FilterStep;
 
 }; //Camp

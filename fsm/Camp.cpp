@@ -11,6 +11,8 @@
 #include "..\CLeds.h"
 #include "..\CSerial.h"
 #include "nvm.h"
+#include "CTimer.h"
+#include "string.h"
 
 static const int16_t pitchtol = 10;
 static const int16_t rolltol = 5;//10;
@@ -42,8 +44,11 @@ void FsmCamp::OnEntry()
 	IsLevel  = false;
 	ReadyToSleep = false;
     
-    memset(AvgY, roll, FilterSize);
-    memset(AvgZ, pitch, FilterSize);
+    int16_t y,z;
+    GetYZ(&y, &z);
+    
+    memset(AvgY, y, FilterSize);
+    memset(AvgZ, z, FilterSize);
     FilterStep = 0;
 
     SetPitchState(CampIniting);
@@ -131,12 +136,11 @@ void FsmCamp::SetPitchState(PitchStates_e s)
 	CSerial::is() << "<\r\n";
 
 	PitchState = s;
-	PitchEntered = false;
 }
 
 
 //Get Filtered Y and Z
-void FsmCamp::GetYZ(int16_t &y, int16_t &z)
+void FsmCamp::GetYZ(int16_t *y, int16_t *z)
 {
     int16_t X=0;
 	int16_t Y=0;
@@ -145,8 +149,21 @@ void FsmCamp::GetYZ(int16_t &y, int16_t &z)
     int32_t YAvg;
     int32_t ZAvg;
 
+	//determine Pitch and roll errors
+	int16_t rollcal = nvm::is().GetCampY();
+	int16_t pitchcal = nvm::is().GetCampZ();
+    
     //Read Acccel
 	CMMA8451::is().ReadXYZ(X, Y, Z);
+    
+    if(CTimer::IsTimedOut(DebugTime, DebugDelay))
+    {
+        CSerial::is() << "X; " << X << ", Y; " << Y << ", Z; " << Z ;
+        
+        CSerial::is()  << "** roll err; " << Y - rollcal  << ";   pitch err; " << Z -pitchcal << "\n";
+        
+        DebugDelay = CTimer::GetTick();
+    }
 
     AvgY[FilterStep] = Y;
     AvgZ[FilterStep] = Z;
@@ -154,9 +171,9 @@ void FsmCamp::GetYZ(int16_t &y, int16_t &z)
     if(++FilterStep >= FilterSize) FilterStep = 0;
 
     YAvg = AvgY[0];
-    ZAvg = AvgZ[0];/
+    ZAvg = AvgZ[0];
 
-    for(int i=1;i<FilterSize; I++)
+    for(int i=1;i<FilterSize; i++)
     {
         YAvg += AvgY[i];
         ZAvg += AvgZ[i];
@@ -176,13 +193,13 @@ void FsmCamp::LevelMachine()
 
     static uint32_t Current = 0;
     static const uint32_t CheckTime = 100; //milliseconds
-    static uint32_t CompleteStart =  0
-    static const ReCheckTime = 5; // seconds before we recheck levelness once level
+    static uint32_t CompleteStart =  0;
+    static const uint32_t ReCheckTime = 5; // seconds before we recheck levelness once level
 
     //Only check level every 100ms
-    if(IsTimedOut(CheckTime, current)
+    if(CTimer::IsTimedOut(CheckTime, Current))
     {
-        current = CTimer::GetTick();
+        Current = CTimer::GetTick();
 
         GetYZ(&Y, &Z);
 
@@ -190,18 +207,7 @@ void FsmCamp::LevelMachine()
 	    int16_t rollcal = nvm::is().GetCampY();
 
 	    int16_t pitchcal = nvm::is().GetCampZ();
-        
-        //low pass filter pitch and roll
-	     	
-	    if(CTimer::IsTimedOut(DebugTime, DebugDelay))
-	    {
-		    CSerial::is() << "X; " << X << ", Y; " << Y << ", Z; " << Z ;
-		     	
-		    CSerial::is()  << "** roll err; " << Y - rollcal  << ";   pitch err; " << Z -pitchcal << "\n";
-		     	
-		    DebugDelay = CTimer::GetTick();
-	    }
-		     
+
 	    switch(PitchState)
 	    {
 		    case CampIniting:
@@ -365,7 +371,7 @@ void FsmCamp::LevelMachine()
                         }  
                         else //all level, restart timer for next check
                         {
-                            CompleteStart =  = CTimer::GetTick();
+                            CompleteStart =  CTimer::GetTick();
                         }          
                     }
                 }
@@ -376,5 +382,5 @@ void FsmCamp::LevelMachine()
             //    PitchEntered = true;
                 break;
 	    }
-    
+    }        
 }
