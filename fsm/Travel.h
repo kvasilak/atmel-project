@@ -12,6 +12,16 @@
 #include "State.h"
 #include "corner.h"
 
+ #define FILTER_STATES_LIST(macro) \
+ macro(FilterStart),     \
+ macro(FilterWait),     \
+ macro(FilterLong)
+ 
+ typedef enum
+ {
+     FILTER_STATES_LIST(ENUMIFY)
+ }FilterStates_e;
+
 class FsmTravel :public CState
 {
 	public:
@@ -27,6 +37,7 @@ private:
 	uint32_t Start;
     uint32_t filterwait;
     bool waiting;
+    FilterStates_e FilterState;
 }; //Travel
 
 #endif //__TRAVEL_H__

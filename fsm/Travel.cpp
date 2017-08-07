@@ -41,6 +41,8 @@ void FsmTravel::OnEntry()
     waiting = false;
 
 	Start = CTimer::GetTick();
+    
+    FilterState = FilterStart;
 	
 	CSerial::is() << " FsmTravel::OnEntry()\r\n";
 	//CSerial::is() << "Travel Cal vals; Left, " << nvm::is().GetLeftTravel() << ", Right, " << nvm::is().GetRightTravel() << "\n";
@@ -55,6 +57,46 @@ void FsmTravel::HandleEvent(eEvents evt)
 			LeftSide.Run(nvm::is().GetLeftTravel());
 			RightSide.Run(nvm::is().GetRightTravel());
 			
+            
+            switch(FilterState)
+            {
+                case FilterStart:
+                    if(LeftSide.AtHeight() && RightSide.AtHeight() )
+                    {
+                        filterwait = CTimer::GetTick();
+                        FilterState = FilterWait;
+                    }
+                    break;
+                case FilterWait:
+                     if(CTimer::IsTimedOut(filterwait, 10000))
+                     {
+                         CSerial::is() << " *******Setting long travel Filter ******\r\n";
+                         LeftSide.SetLongFilter(true);
+                         RightSide.SetLongFilter(true);
+                     
+                         FilterState = FilterLong;
+                     }     
+                     else
+                     {
+                         if((LeftSide.AtHeight() == false) || (RightSide.AtHeight() == false) )
+                         {
+                             //restart timer
+                             filterwait = CTimer::GetTick();
+                         }
+                     }                
+                    break;
+                case FilterLong:
+                     if((LeftSide.AtHeight() == false) || (RightSide.AtHeight() == false) )
+                     {
+                        //long filter turned off in Corner class                    
+                        FilterState = FilterStart;
+                     }
+                break;
+            }
+            
+            
+            
+            
 			//if(Starting)
 			//{
 				////switch to a slower filter as soon as we reach ride height
@@ -134,18 +176,6 @@ void FsmTravel::HandleEvent(eEvents evt)
             Cio::is().Sleep();
 
 			break;
-        //case eEvents::ButtonWakeEvent:
-            //if( !Cio::is().Awake)
-            //{
-                //Cio::is().Awake = true;
-                //Cio::is().Wakeup();
-                //CLeds::is().TravelOn();
-        //
-               //// Cio::is().ButtonWake = true;
-//
-                //CSerial::is() << " FsmCTravel::Button wake\r\n";
-            //}
-
 		default:
 		break;
 	}

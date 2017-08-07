@@ -45,40 +45,25 @@ CCorner::CCorner(Position p):
 {
 
 	LastTime 		= CTimer::GetTick();
-	filter_reg 		= GetHeight() << FILTER_SHIFT;
+	filter_reg 		= GetAvgHeight() << FILTER_SHIFT;
    
     UpdateTime = CTimer::GetTick();
 }
 
 void CCorner::Init(Position p)
 {
-    //int i;
-    //int32_t height = GetHeight();
-    
-    //initialize filters
-    //for(i=0; i<10; i++)
-    //{
-        //SmoothAvg[i] = height;      
-    //}
-    //
-    //for(i=0; i<100; i++)
-    //{
-        //HeightAvg[i] = height;      
-    //}
-    //
-    //filter_reg = (height << FILTER_SHIFT);
-
     count = 0;
     corner = p;
     SlowAt = 0;
     SmoothAt = 0;
     
     HeightSpeed = 0;
-    OldHeight = GetHeight();
-    SpeedTime = CTimer::GetTick();
     
     FilterReset();
     
+    OldHeight = GetAvgHeight();
+    SpeedTime = CTimer::GetTick();
+
     //just at the start
     HeightAverageCount = 0;
         for(int i=0;i<10;i++)
@@ -96,9 +81,9 @@ void CCorner::Limits(int16_t Low, int16_t high)
 }
 
 //Get the height of this corner
-int32_t CCorner::GetHeight()
+int16_t CCorner::GetHeight()
 {
-    int32_t height=0, h = 0;
+    int16_t h = 0;
     
     switch(corner)
    {
@@ -110,7 +95,14 @@ int32_t CCorner::GetHeight()
 			h = CADC::is().GetRightHeight();
             break;
    }   
+   return h;
+}   
    
+int32_t CCorner::GetAvgHeight()
+{
+    int32_t height=0;
+    int32_t h = GetHeight();
+    
   HeightAverages[HeightAverageCount++] = h;
   if(HeightAverageCount >= 10) HeightAverageCount = 0;
   
@@ -196,7 +188,7 @@ void CCorner::DumpOff()
 void CCorner::SetState(ValveOp s)
 {
 	static const char *CornerName[] = {"Left,", "Right,"};
-   static const char *StateStrs[] = {VALVE_STATES_LIST(STRINGIFY)};
+    static const char *StateStrs[] = {VALVE_STATES_LIST(STRINGIFY)};
 
     CSerial::is() << ">Corner,";
     CSerial::is() << CornerName[corner];
@@ -224,7 +216,10 @@ void CCorner::DumpExit()
 void CCorner::FilterReset()
 {
     int i;
-    int32_t height 			= GetHeight();
+
+    int16_t height 			= GetHeight();
+    
+    CSerial::is() << "Filter reset " << height << "\n";
      
     
     filter_reg = (height << FILTER_SHIFT);
@@ -239,6 +234,7 @@ void CCorner::FilterReset()
     {
         HeightAvg[i] = height;
     }
+    
 }
 
 uint16_t CCorner::Average(uint16_t value)
@@ -325,7 +321,7 @@ bool CCorner::AtHeight()
 //And two simple FIR filters
 void CCorner::FilterHeight( int32_t setpoint)
 {
-    int32_t height 			= GetHeight();
+    int32_t height 			= GetAvgHeight();
     
 	//sample Slowly
 	if(CTimer::IsTimedOut(CycleTime, LastTime) )
@@ -369,32 +365,26 @@ void CCorner::FilterHeight( int32_t setpoint)
            switch(corner)
            {
                 case LeftRear:
-                   // CSerial::is() << ">Cnr, L_Err,";
-                    //CSerial::is() << uint16_t(height - setpoint);
-                    //CSerial::is() << "<";
-
-                    CSerial::is() << "L_Hght: ";
-                    CSerial::is() << uint16_t(height);
-
-                    CSerial::is() << " (";
-                    CSerial::is() << uint16_t(height - setpoint);
-                    CSerial::is() << ")\n";
-
+                    CSerial::is() << "L Height: ";
                     break;
                 case RightRear:
-                   // CSerial::is() << ">Cnr, R_Err,";
-                   // CSerial::is() << uint16_t(height - setpoint);
-                    //CSerial::is() << "<";
-
-                    CSerial::is() << "R_Hght: ";
-                    CSerial::is() << uint16_t(height);
-
-                    CSerial::is() << " (";
-                    CSerial::is() << uint16_t(height - setpoint);
-                    CSerial::is() << ")\n";                
-
+                    CSerial::is() << "R Height: ";
                     break;
            } 
+            CSerial::is() << uint16_t(height);
+                               
+            CSerial::is() << " [";
+            CSerial::is() << uint16_t(slowheight);
+            CSerial::is() << "]";
+
+            CSerial::is() << " (";
+            CSerial::is() << uint16_t(height - setpoint);
+            CSerial::is() << ")";
+                               
+            CSerial::is() << " [";
+            CSerial::is() << uint16_t(slowheight - setpoint);
+            CSerial::is() << "]\n";
+                               
            UpdateTime = CTimer::GetTick();
         }
     }
@@ -404,7 +394,7 @@ void CCorner::FilterHeight( int32_t setpoint)
 
 void CCorner::Run(int32_t setpoint)
 {		
-    int16_t height = GetHeight();
+    int16_t height = GetAvgHeight();
     FilterHeight(setpoint); 
 
     switch (State)
@@ -428,47 +418,43 @@ void CCorner::Run(int32_t setpoint)
             //below setpoint
             if( slowheight < (setpoint - DeadBand))
             {
-                //minimum hold time so we don't go crazy hunting
-                //except in manual mode, react fast!
-                //if((LongFilter==false) || CTimer::IsTimedOut(5000, HoldOffTime))
-                //{
-                    SetState(ValveFilling);
-                    FillOn();
+                LongFilter = false;
+                IsAtHeight = false;
+                SetState(ValveFilling);
+                FillOn();
                     
-                    //if within WideDeadBand, only pulse the valve
-                    //so we don't over shoot the setpoint due to the long lag time
+                //if within WideDeadBand, only pulse the valve
+                //so we don't over shoot the setpoint due to the long lag time
                     
-                    if(height > (setpoint - WideDeadBand) )
-                    {                        
-                        //calc total pulse time as a multiple of deadbands from setpoint
-                        //we know height < setpoint or we wouldn't be here
-                        PulseTotal =(abs(setpoint - height) / DeadBand) * PulseTime; // pulsetime = 250ms
-                        PulseStart = CTimer::GetTick();
+                if(height > (setpoint - WideDeadBand) )
+                {                        
+                    //calc total pulse time as a multiple of deadbands from setpoint
+                    //we know height < setpoint or we wouldn't be here
+                    PulseTotal =(abs(setpoint - height) / DeadBand) * PulseTime; // pulsetime = 250ms
+                    PulseStart = CTimer::GetTick();
 
-                        SetState(ValveFillPulse);
-                    }
-                //}
+                    SetState(ValveFillPulse);
+                }
             }
             else if(slowheight > (setpoint + DeadBand)) //>524
             {
-                //if(!LongFilter || CTimer::IsTimedOut(5000, HoldOffTime))
-                //{
-                    SetState(ValveDumping);
-                    DumpOn();
+                LongFilter = false;
+                IsAtHeight = false;
+                SetState(ValveDumping);
+                DumpOn();
                     
-                    //if within WideDeadBand, only pulse the valve
-                    //so we don't over shoot the setpoint due to the long lag time
+                //if within WideDeadBand, only pulse the valve
+                //so we don't over shoot the setpoint due to the long lag time
                     
-                    if(height < (setpoint + WideDeadBand) )
-                    {                        
-                        //calc total pulse time as a multiple of deadbands from setpoint
-                        //we know height > setpoint or we wouldn't be here
-                        PulseTotal = (abs(height - setpoint) / DeadBand) * PulseTime; // pulsetime = 250ms
-                        PulseStart = CTimer::GetTick();
+                if(height < (setpoint + WideDeadBand) )
+                {                        
+                    //calc total pulse time as a multiple of deadbands from setpoint
+                    //we know height > setpoint or we wouldn't be here
+                    PulseTotal = (abs(height - setpoint) / DeadBand) * PulseTime; // pulsetime = 250ms
+                    PulseStart = CTimer::GetTick();
 
-                        SetState(ValveDumpPulse);
-                    }
-                //}
+                    SetState(ValveDumpPulse);
+                }
             }
             else //within +- 1 deadband
             {

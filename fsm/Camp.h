@@ -32,7 +32,7 @@
 	    PITCH_STATES_LIST(ENUMIFY)
     }PitchStates_e;
 	
-#define FilterSize 100
+#define FilterSize 10
 
 class FsmCamp :public virtual CState
 {
@@ -45,7 +45,7 @@ class FsmCamp :public virtual CState
 	private:
     void LevelMachine();
 	void SetPitchState(PitchStates_e s);
-    void GetYZ(int16_t *y, int16_t *z);
+    void GetYZ(int16_t &slowy, int16_t &slowz, int16_t &fasty, int16_t &fastz);
 	
 	uint32_t Start;
 	uint32_t DebugDelay;
@@ -55,8 +55,8 @@ class FsmCamp :public virtual CState
 	PitchStates_e PitchState;
 	uint32_t DebugTime;
 
-    int16_t AvgY[FilterSize];
-    int16_t AvgZ[FilterSize];
+    int32_t AvgY[FilterSize];
+    int32_t AvgZ[FilterSize];
     uint16_t FilterStep;
 
 }; //Camp

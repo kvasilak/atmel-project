@@ -74,7 +74,7 @@ class CCorner
     void SetLongFilter(bool slow);
     void AtHeight(bool at);
     bool AtHeight();
-    int32_t GetHeight();
+    int16_t GetHeight();
     void FilterHeight( int32_t setpoint);
     bool IsMoving();
   
@@ -108,6 +108,7 @@ class CCorner
     int32_t SmoothHeight;
     uint16_t Smooth(uint16_t value);
     void FilterReset(void);
+    int32_t GetAvgHeight();
     
     bool LongFilter;
     int SlowAt;
