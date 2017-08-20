@@ -217,10 +217,7 @@ void CCorner::FilterReset()
 {
     int i;
 
-    int16_t height 			= GetHeight();
-    
-    CSerial::is() << "Filter reset " << height << "\n";
-     
+    int32_t height 			= GetHeight();
     
     filter_reg = (height << FILTER_SHIFT);
     
@@ -235,6 +232,9 @@ void CCorner::FilterReset()
         HeightAvg[i] = height;
     }
     
+    int32_t slowheight = (filter_reg >> FILTER_SHIFT);
+    
+    CSerial::is() << "Filter reset " << height << ", reg " << slowheight <<"\n";
 }
 
 uint16_t CCorner::Average(uint16_t value)
@@ -289,9 +289,11 @@ void CCorner::SetLongFilter(bool slow)
     }
     
     //Always Reset IIR filter
-    filter_reg = (SmoothHeight << FILTER_SHIFT);
+   // filter_reg = (GetHeight() << FILTER_SHIFT);
     
     LongFilter = slow;
+    
+    IsAtHeight = false;
 	
 	if(slow)
 	{
@@ -350,7 +352,7 @@ void CCorner::FilterHeight( int32_t setpoint)
         }
         else
         {
-            SmoothHeight = height;
+            //SmoothHeight = height;
             
             filter_reg = filter_reg - (filter_reg >> FILTER_SHIFT) + height;
 
@@ -371,18 +373,18 @@ void CCorner::FilterHeight( int32_t setpoint)
                     CSerial::is() << "R Height: ";
                     break;
            } 
-            CSerial::is() << uint16_t(height);
+            CSerial::is() << (int16_t)height;
                                
             CSerial::is() << " [";
-            CSerial::is() << uint16_t(slowheight);
+            CSerial::is() << (int16_t)slowheight;
             CSerial::is() << "]";
 
             CSerial::is() << " (";
-            CSerial::is() << uint16_t(height - setpoint);
+            CSerial::is() << (int16_t)(height - setpoint);
             CSerial::is() << ")";
                                
             CSerial::is() << " [";
-            CSerial::is() << uint16_t(slowheight - setpoint);
+            CSerial::is() << (int16_t)(slowheight - setpoint);
             CSerial::is() << "]\n";
                                
            UpdateTime = CTimer::GetTick();
@@ -418,8 +420,8 @@ void CCorner::Run(int32_t setpoint)
             //below setpoint
             if( slowheight < (setpoint - DeadBand))
             {
-                LongFilter = false;
-                IsAtHeight = false;
+                SetLongFilter(false);
+                //IsAtHeight = false;
                 SetState(ValveFilling);
                 FillOn();
                     
@@ -438,8 +440,8 @@ void CCorner::Run(int32_t setpoint)
             }
             else if(slowheight > (setpoint + DeadBand)) //>524
             {
-                LongFilter = false;
-                IsAtHeight = false;
+               SetLongFilter(false);
+                //IsAtHeight = false;
                 SetState(ValveDumping);
                 DumpOn();
                     

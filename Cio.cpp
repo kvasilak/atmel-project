@@ -24,10 +24,6 @@ volatile bool Cio::IgnitionChanged = false;
 volatile bool Cio::ButtonChanged = false;
 volatile uint8_t ispa;
 
-#define REV3_PCB
-
-
-
 // default constructor
 Cio::Cio() :
 Awake(false),
@@ -41,278 +37,169 @@ DumpPressed(false)
 //Read using  PINx
 //Write using PORTx
 void Cio::Direction()
-{
-	#ifdef REV2_PCB
-		//port A
-		DDRA = 0x0C;
+{      
+	//port A
+	DDRA = 0xF0;
 		
-		//0		ADC		0	Left Height
-		//1		ADC		0	Right height
-		//2		Out		1	power up
-		//3		OUt		1	Compressor
+	//0		ADC		0	Left Height
+	//1		ADC		0	Right height
+	//2		In		0	Ignition on
+	//3		ADC		0	Dimming
 		
-		//4		in		0	Remote RU
-		//5		in		0	Remote RD
-		//6		in		0	Remote LU
-		//7		in		0	Remote LD
+	//4		out		1	RD 
+	//5		out 	1	RU
+	//6		out		1	LD
+	//7		out		1	LU
 		
+	#define IGNITION_ON_BIT			2
+	#define IGNITION_ON_PORT		PINA
 		
-		DDRB = 0xF0;
+	#define SOLENOID_RD_BIT			4
+	#define SOLENOID_RD_PORT		PORTA
 		
-		//port B
-		//0		in		0	Remote up
-		//1		in		0	Remote Down
-		//2		in		0	Remote Travel
-		//3		in		0	Remote Camp
+	#define SOLENOID_RU_BIT			5
+	#define SOLENOID_RU_PORT		PORTA
 		
-		//4		Out		1	Right Up
-		//5		Out		1	Right Down
-		//6		Out		1	Left up
-		//7		Out		1	Left Down
+	#define SOLENOID_LD_BIT			6
+	#define SOLENOID_LD_PORT		PORTA
 		
-		//DDRC = 0x;
-		//Port C
-		//0		SCL
-		//1		SDA
-		//2		JTAG
-		//3		JTAG
-		//4		JTAG
-		//5		JTAG
-		//6		in		Outside valid
-		//7		in		Steering Valid
+	#define SOLENOID_LU_BIT			7
+	#define SOLENOID_LU_PORT		PORTA
 		
-		DDRD = 0x02;
-		//Port D
-		//0		RX		0	Debug serial
-		//1		TX		1	Debug serial
-		//2		in		0	Calibrate
-		//3		in		0	Ignition On
+	DDRB = 0x00;
 		
-		//4		in		0	switch Down
-		//5		in		0	switch Up
-		//6		in		0	switch Travel
-		//7		in		0	switch Camp
-		#endif
+	//port B
+	//0		in		0	Remote LD
+	//1		in		0	Remote LU
+	//2		in		0	Remote RD
+	//3		in		0	Remote Camp
 		
-	#ifdef REV3_PCB
-		//port A
-		DDRA = 0xF0;
+	//4		in 		0	Remote RU
+	//5		in 		0	Remote travel
+	//6		in 		0	Remote down
+	//7		in		0	Remote up
 		
-		//0		ADC		0	Left Height
-		//1		ADC		0	Right height
-		//2		In		0	Ignition on
-		//3		ADC		0	Dimming
+	#define REMOTE_LD_BIT		1/*0*/
+	#define REMOTE_LD_PORT		PINB
 		
-		//4		out		1	RD 
-		//5		out 	1	RU
-		//6		out		1	LD
-		//7		out		1	LU
+	#define REMOTE_LU_BIT		4/*1*/
+	#define REMOTE_LU_PORT		PINB
 		
-		#define IGNITION_ON_BIT			2
-		#define IGNITION_ON_PORT		PINA
+	#define REMOTE_RD_BIT		0/*2*/
+	#define REMOTE_RD_PORT		PINB
 		
-		#define SOLENOID_RD_BIT			4
-		#define SOLENOID_RD_PORT		PORTA
+	#define REMOTE_CAMP_BIT		7/*3*/
+	#define REMOTE_CAMP_PORT	PINB
 		
-		#define SOLENOID_RU_BIT			5
-		#define SOLENOID_RU_PORT		PORTA
+	#define REMOTE_RU_BIT		2/*4*/
+	#define REMOTE_RU_PORT		PINB
 		
-		#define SOLENOID_LD_BIT			6
-		#define SOLENOID_LD_PORT		PORTA
+	#define REMOTE_TRAVEL_BIT	5
+	#define REMOTE_TRAVEL_PORT	PINB
 		
-		#define SOLENOID_LU_BIT			7
-		#define SOLENOID_LU_PORT		PORTA
+	#define REMOTE_DOWN_BIT		6
+	#define REMOTE_DOWN_PORT	PINB
 		
-		DDRB = 0x00;
+	#define REMOTE_UP_BIT		3/*7*/
+	#define REMOTE_UP_PORT		PINB
 		
-		//port B
-		//0		in		0	Remote LD
-		//1		in		0	Remote LU
-		//2		in		0	Remote RD
-		//3		in		0	Remote Camp
+	DDRC = 0x80;
+	//Port C
+	//0		SCL
+	//1		SDA
+	//2		JTAG
+	//3		JTAG
+	//4		JTAG
+	//5		JTAG
+	//6		in		0 spare
+	//7		out		1 Compressor on
 		
-		//4		in 		0	Remote RU
-		//5		in 		0	Remote travel
-		//6		in 		0	Remote down
-		//7		in		0	Remote up
+	#define COMPRESSOR_ON_BIT	7
+	#define COMPRESSOR_ON_PORT	PORTC
 		
-		#define REMOTE_LD_BIT		1/*0*/
-		#define REMOTE_LD_PORT		PINB
+	DDRD = 0x06;
+	//Port D
+	//0		RX		0	Debug serial
+	//1		TX		1	Debug serial
+	//2		out		0	Power up
+	//3		in		0	Travel
 		
-		#define REMOTE_LU_BIT		4/*1*/
-		#define REMOTE_LU_PORT		PINB
+	//4		in		0	Calibrate
+	//5		in		0	Camp
+	//6		in		0	Down
+	//7		in		0	up
 		
-		#define REMOTE_RD_BIT		0/*2*/
-		#define REMOTE_RD_PORT		PINB
+	#define POWER_ON_BIT			2
+	#define POWER_ON_PORT			PORTD
 		
-		#define REMOTE_CAMP_BIT		7/*3*/
-		#define REMOTE_CAMP_PORT	PINB
+	#define TRAVEL_BUTTON_BIT		3
+	#define TRAVEL_BUTTON_PORT		PIND
 		
-		#define REMOTE_RU_BIT		2/*4*/
-		#define REMOTE_RU_PORT		PINB
+	#define CALIBRATE_BUTTON_BIT	4
+	#define CALIBRATE_BUTTON_PORT	PIND
 		
-		#define REMOTE_TRAVEL_BIT	5
-		#define REMOTE_TRAVEL_PORT	PINB
+	#define CAMP_BUTTON_BIT			5
+	#define CAMP_BUTTON_PORT		PIND
 		
-		#define REMOTE_DOWN_BIT		6
-		#define REMOTE_DOWN_PORT	PINB
+	#define DOWN_BUTTON_BIT			7
+	#define DOWN_BUTTON_PORT		PIND
 		
-		#define REMOTE_UP_BIT		3/*7*/
-		#define REMOTE_UP_PORT		PINB
-		
-		DDRC = 0x80;
-		//Port C
-		//0		SCL
-		//1		SDA
-		//2		JTAG
-		//3		JTAG
-		//4		JTAG
-		//5		JTAG
-		//6		in		0 spare
-		//7		out		1 Compressor on
-		
-		#define COMPRESSOR_ON_BIT	7
-		#define COMPRESSOR_ON_PORT	PORTC
-		
-		DDRD = 0x06;
-		//Port D
-		//0		RX		0	Debug serial
-		//1		TX		1	Debug serial
-		//2		out		0	Power up
-		//3		in		0	Travel
-		
-		//4		in		0	Calibrate
-		//5		in		0	Camp
-		//6		in		0	Down
-		//7		in		0	up
-		
-		#define POWER_ON_BIT			2
-		#define POWER_ON_PORT			PORTD
-		
-		#define TRAVEL_BUTTON_BIT		3
-		#define TRAVEL_BUTTON_PORT		PIND
-		
-		#define CALIBRATE_BUTTON_BIT	4
-		#define CALIBRATE_BUTTON_PORT	PIND
-		
-		#define CAMP_BUTTON_BIT			5
-		#define CAMP_BUTTON_PORT		PIND
-		
-		#define DOWN_BUTTON_BIT			7
-		#define DOWN_BUTTON_PORT		PIND
-		
-		#define UP_BUTTON_BIT			6
-		#define UP_BUTTON_PORT			PIND
-		
-		
-		#endif
+	#define UP_BUTTON_BIT			6
+	#define UP_BUTTON_PORT			PIND
 }
 
 void Cio::Pullups()
 {
-	#ifdef REV2_PCB
-		//port A
-		PORTA = 0xf0;
 		
-		//0		ADC		0	Left Height
-		//1		ADC		0	Right height
-		//2		Out		0	power up
-		//3		OUt		0	Compressor
+	//port A
+	PORTA = 0x00;
 		
-		//4		in		1	Remote RU
-		//5		in		1	Remote RD
-		//6		in		1	Remote LU
-		//7		in		1	Remote LD
+	//0		ADC		0	Left Height
+	//1		ADC		0	Right height
+	//2		In		0	Ignition on
+	//3		ADC		0	Dimming
 		
-		
-		PORTB = 0x00;
-		
-		//port B
-		//0		in		1	Remote up
-		//1		in		1	Remote Down
-		//2		in		1	Remote Travel
-		//3		in		1	Remote Camp
-		
-		//4		Out		0	Right Up
-		//5		Out		0	Right Down
-		//6		Out		0	Left up
-		//7		Out		0	Left Down
-		
-		//DDRC = 0x;
-		//Port C
-		//0		SCL
-		//1		SDA
-		//2		JTAG
-		//3		JTAG
-		//4		JTAG
-		//5		JTAG
-		//6		in		Outside valid
-		//7		in		Steering Valid
-		
-		PORTD = 0x00;
-		//Port D
-		//0		RX		0	Debug serial
-		//1		TX		0	Debug serial
-		//2		in		0	Calibrate
-		//3		in		0	Ignition On
-		
-		//4		in		0	switch Down
-		//5		in		0	switch Up
-		//6		in		0	switch Travel
-		//7		in		0	switch Camp
-		#endif
-		
-#ifdef REV3_PCB
-		//port A
-		PORTA = 0x00;
-		
-		//0		ADC		0	Left Height
-		//1		ADC		0	Right height
-		//2		In		0	Ignition on
-		//3		ADC		0	Dimming
-		
-		//4		out		0	RD
-		//5		out 	0	RU
-		//6		out		0	LD
-		//7		out		0	LU
+	//4		out		0	RD
+	//5		out 	0	RU
+	//6		out		0	LD
+	//7		out		0	LU
 		
 		
-		PORTB = 0xFF;
+	PORTB = 0xFF;
 		
-		//port B
-		//0		in		1	Remote LD
-		//1		in		1	Remote LU
-		//2		in		1	Remote RD
-		//3		in		1	Remote Camp
+	//port B
+	//0		in		1	Remote LD
+	//1		in		1	Remote LU
+	//2		in		1	Remote RD
+	//3		in		1	Remote Camp
 		
-		//4		in 		1	Remote RU
-		//5		in 		1	Remote travel
-		//6		in 		1	Remote down
-		//7		in		1	Remote up
+	//4		in 		1	Remote RU
+	//5		in 		1	Remote travel
+	//6		in 		1	Remote down
+	//7		in		1	Remote up
 		
-		//PORTC = 0x00;
-		//Port C
-		//0		SCL
-		//1		SDA
-		//2		JTAG
-		//3		JTAG
-		//4		JTAG
-		//5		JTAG
-		//6		in		0 spare
-		//7		out		0 Compressor on
+	//PORTC = 0x00;
+	//Port C
+	//0		SCL
+	//1		SDA
+	//2		JTAG
+	//3		JTAG
+	//4		JTAG
+	//5		JTAG
+	//6		in		0 spare
+	//7		out		0 Compressor on
 		
-		PORTD = 0xF8;
-		//Port D
-		//0		RX		0	Debug serial
-		//1		TX		0	Debug serial
-		//2		out		0	Power up
-		//3		in		1	Travel
+	PORTD = 0xF8;
+	//Port D
+	//0		RX		0	Debug serial
+	//1		TX		0	Debug serial
+	//2		out		0	Power up
+	//3		in		1	Travel
 		
-		//4		in		1	Calibrate
-		//5		in		1	Camp
-		//6		in		1	Down
-		//7		in		1	up
-#endif
+	//4		in		1	Calibrate
+	//5		in		1	Camp
+	//6		in		1	Down
+	//7		in		1	up
 }
 
 
@@ -323,21 +210,11 @@ void Cio::Init()
 	Pullups();
 	
 	//use to debounce switch inputs
-//#ifdef REV2_PCB
-	//PushCalibrate.Attach(IO_PORTD, PORTD2);
-	//RockerDown.Attach(IO_PORTD, PORTD4);
-	//ButtonUp.Attach(IO_PORTD, PORTD5);
-	//PushTravel.Attach(IO_PORTD, PORTD6);
-	//PushCamp.Attach(IO_PORTD, PORTD7);
-//#endif
-
-#ifdef REV3_PCB	
 	PushTravel.Attach(IO_PORTD, PORTD3);
 	PushCalibrate.Attach(IO_PORTD, PORTD4);
 	PushCamp.Attach(IO_PORTD, PORTD5);
 	ButtonDown.Attach(IO_PORTD, PORTD6);
 	ButtonUp.Attach(IO_PORTD, PORTD7);
-#endif
 	
 
 	//setup initial values

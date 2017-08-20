@@ -45,7 +45,7 @@ void FsmTravel::OnEntry()
     FilterState = FilterStart;
 	
 	CSerial::is() << " FsmTravel::OnEntry()\r\n";
-	//CSerial::is() << "Travel Cal vals; Left, " << nvm::is().GetLeftTravel() << ", Right, " << nvm::is().GetRightTravel() << "\n";
+	CSerial::is() << "Travel Cal vals; Left, " << nvm::is().GetLeftTravel() << ", Right, " << nvm::is().GetRightTravel() << "\n";
 }
 
 void FsmTravel::HandleEvent(eEvents evt)
