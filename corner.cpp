@@ -288,9 +288,6 @@ void CCorner::SetLongFilter(bool slow)
         FilterReset();
     }
     
-    //Always Reset IIR filter
-   // filter_reg = (GetHeight() << FILTER_SHIFT);
-    
     LongFilter = slow;
     
     IsAtHeight = false;
