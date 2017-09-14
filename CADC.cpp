@@ -62,13 +62,13 @@ uint16_t CADC::GetRightHeight()
 
 uint8_t CADC::GetDimmer()
 {
-	uint16_t dim = Read(3);
-    
-    CSerial::is() << "Dim; " << dim << "\n";
+	uint16_t d = Read(3);
 
-	dim /= 4;
+	uint8_t dim = d / 4;
     
-    if(dim < 100) dim = 0xFF;
+    if(dim == 0) dim = 0xFF;
+    
+    CSerial::is() << "Dim; " << d << ", " << dim << "\n";
 	
 	return (uint8_t)dim;
 }

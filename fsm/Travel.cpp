@@ -68,7 +68,7 @@ void FsmTravel::HandleEvent(eEvents evt)
                     }
                     break;
                 case FilterWait:
-                     if(CTimer::IsTimedOut(filterwait, 10000))
+                     if(CTimer::IsTimedOut(filterwait, 1000))
                      {
                          CSerial::is() << " *******Setting long travel Filter ******\r\n";
                          LeftSide.SetLongFilter(true);

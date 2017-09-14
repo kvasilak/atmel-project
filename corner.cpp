@@ -289,15 +289,14 @@ void CCorner::SetLongFilter(bool slow)
     }
     
     LongFilter = slow;
-    
-    IsAtHeight = false;
-	
+
 	if(slow)
 	{
 		CycleTime = 5000; //5 seconds between readings
 	}
 	else
 	{
+        IsAtHeight = false;
 		CycleTime = 100; //back to fast updates
 	}
 	
@@ -418,7 +417,6 @@ void CCorner::Run(int32_t setpoint)
             if( slowheight < (setpoint - DeadBand))
             {
                 SetLongFilter(false);
-                //IsAtHeight = false;
                 SetState(ValveFilling);
                 FillOn();
                     
@@ -438,7 +436,6 @@ void CCorner::Run(int32_t setpoint)
             else if(slowheight > (setpoint + DeadBand)) //>524
             {
                SetLongFilter(false);
-                //IsAtHeight = false;
                 SetState(ValveDumping);
                 DumpOn();
                     
