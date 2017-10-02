@@ -28,6 +28,7 @@
 #include "CSerial.h"
 #include "CTimer.h"
 #include "CADC.h"
+#include "CLeds.h"
 
 //This class is responsible for managing the height of a corner.
 //There is one instance of this class for each corner of the vehicle usually 4
@@ -292,7 +293,7 @@ void CCorner::SetLongFilter(bool slow)
 
 	if(slow)
 	{
-		CycleTime = 5000; //5 seconds between readings
+		CycleTime = 1000; //seconds between readings
 	}
 	else
 	{
@@ -324,14 +325,14 @@ void CCorner::FilterHeight( int32_t setpoint)
 	//sample Slowly
 	if(CTimer::IsTimedOut(CycleTime, LastTime) )
 	{        
-        if( LongFilter)
-        {
+        //if( LongFilter)
+        //{
             //fast smoothing filter to take out sampling noise
             SmoothHeight = Smooth(height);
             
-            if(count >9)
-            {
-                count = 0;
+           // if(count >9)
+           // {
+            //    count = 0;
             
                 //Longer filter to take out bumps and roll
                 AverageHeight = Average( SmoothHeight);
@@ -342,19 +343,19 @@ void CCorner::FilterHeight( int32_t setpoint)
 
                 // Scale output for unity gain.
                 slowheight = (filter_reg >> FILTER_SHIFT);
-            }
+           // }
             
-            count++;
-        }
-        else
-        {
-            //SmoothHeight = height;
-            
-            filter_reg = filter_reg - (filter_reg >> FILTER_SHIFT) + height;
-
-            // Scale output for unity gain.
-            slowheight = (filter_reg >> FILTER_SHIFT);
-        }
+           // count++;
+        //}
+        //else
+        //{
+            ////SmoothHeight = height;
+            //
+            //filter_reg = filter_reg - (filter_reg >> FILTER_SHIFT) + height;
+//
+            //// Scale output for unity gain.
+            //slowheight = (filter_reg >> FILTER_SHIFT);
+        //}
 
 		LastTime = CTimer::GetTick();       
         
@@ -400,22 +401,23 @@ void CCorner::Run(int32_t setpoint)
         case ValveIniting: 
             FillOff();
             DumpOff();
-            SetState(ValveHoldEntry);
+            SetState(ValveHolding);
             //filter_reg = (height << FILTER_SHIFT);
             HoldOffTime = CTimer::GetTick();
             break;
         case ValveHoldEntry:
-            if(CTimer::IsTimedOut(5000, HoldOffTime))
-            {              
-                HoldOffTime = CTimer::GetTick();
+            //if(CTimer::IsTimedOut(500, HoldOffTime))
+            //{              
+            //    HoldOffTime = CTimer::GetTick();
                 DoPulse = false;
                 SetState(ValveHolding);
-            }
+            //}
             break;
         case ValveHolding:
             //below setpoint
             if( slowheight < (setpoint - DeadBand))
             {
+                Cio::is().BlinkTravel(true);
                 SetLongFilter(false);
                 SetState(ValveFilling);
                 FillOn();
@@ -435,7 +437,8 @@ void CCorner::Run(int32_t setpoint)
             }
             else if(slowheight > (setpoint + DeadBand)) //>524
             {
-               SetLongFilter(false);
+                Cio::is().BlinkTravel(true);
+                SetLongFilter(false);
                 SetState(ValveDumping);
                 DumpOn();
                     
@@ -454,8 +457,8 @@ void CCorner::Run(int32_t setpoint)
             }
             else //within +- 1 deadband
             {
-                 //might not be perfectly at height, but should be pretty close
-                 IsAtHeight = true;
+                //might not be perfectly at height, but should be pretty close
+                IsAtHeight = true;
             }
 
             break;

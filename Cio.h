@@ -87,6 +87,8 @@ public:
 		DumpPressed = false;
 	}
 
+    void BlinkTravel(bool blink);
+    
 	void Sleep();
 	void Wakeup();
 	bool IsIgnitionOn(void);
@@ -114,6 +116,8 @@ private:
 	bool DumpPressed;
 	
 	uint32_t Time;
+    bool BlinkTravelEn;
+    uint32_t Blink;
 
 }; //Cio
 

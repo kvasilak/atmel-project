@@ -28,6 +28,7 @@ waiting(false)
 void FsmTravel::OnEntry()
 {
 	CLeds::is().TravelOn();
+    Cio::is().BlinkTravel(true);
 	LeftSide.Init(LeftRear);
 	RightSide.Init(RightRear);
 
@@ -70,9 +71,12 @@ void FsmTravel::HandleEvent(eEvents evt)
                 case FilterWait:
                      if(CTimer::IsTimedOut(filterwait, 1000))
                      {
-                         CSerial::is() << " *******Setting long travel Filter ******\r\n";
-                         LeftSide.SetLongFilter(true);
-                         RightSide.SetLongFilter(true);
+                        CSerial::is() << " *******Setting long travel Filter ******\r\n";
+                        LeftSide.SetLongFilter(true);
+                        RightSide.SetLongFilter(true);
+                         
+                        Cio::is().BlinkTravel(false);
+                        CLeds::is().TravelOn();
                      
                          FilterState = FilterLong;
                      }     
@@ -93,38 +97,6 @@ void FsmTravel::HandleEvent(eEvents evt)
                      }
                 break;
             }
-            
-            
-            
-            
-			//if(Starting)
-			//{
-				////switch to a slower filter as soon as we reach ride height
-				//if(LeftSide.AtHeight() && RightSide.AtHeight() )
-				//{
-                    //if(waiting == false)
-                    //{
-                        //filterwait = CTimer::GetTick();
-                        //
-                        //waiting = true;
-                    //}   
-                    //else
-                    //{                   
-                        ////wait a bit before setting long filter
-                        //if(CTimer::IsTimedOut(filterwait, 10000))
-                        //{
-					        //CSerial::is() << " *******Setting long travel Filter ******\r\n";
-        				    //LeftSide.SetLongFilter(true);
-        					//RightSide.SetLongFilter(true);
-					//
-					        //Starting = false;
-					//
-					        //Start = CTimer::GetTick();
-                        //}         
-                    //}                               
-				//}
-			//}
-			
 			break;
 		case eEvents::RockerEvent:
 		case eEvents::OutSideEvent:
@@ -183,6 +155,7 @@ void FsmTravel::HandleEvent(eEvents evt)
 
 void FsmTravel::OnExit()
 {
+    Cio::is().BlinkTravel(false);
 	CSerial::is() << " FsmTravel::OnExit()\r\n";
 	CLeds::is().TravelOff();
 }

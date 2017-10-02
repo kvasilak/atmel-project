@@ -29,7 +29,8 @@ Cio::Cio() :
 Awake(false),
 ButtonWake(false),
 FillPressed(false),
-DumpPressed(false)
+DumpPressed(false),
+BlinkTravelEn(false)
 {
 } //Cio
 
@@ -238,12 +239,37 @@ void Cio::Init()
 //update switch states and debounce
 void Cio::Run()
 {
+    static bool TravelBlinkon = true;
+    
+    if(BlinkTravelEn)
+    {
+        
+        if(CTimer::IsTimedOut(250, Blink))
+        {
+            if(TravelBlinkon)
+            {
+                TravelBlinkon = false;
+                CLeds::is().TravelOff();
+            }
+            else
+            {
+                TravelBlinkon = true;
+                CLeds::is().TravelOn();
+            }
+            
+            Blink = CTimer::GetTick();
+        }
+    };
+    
+    
 	//debounce inputs
 	ButtonDown.Update();
 	ButtonUp.Update();
 	PushTravel.Update();
 	PushCamp.Update();
 	PushCalibrate.Update();
+    
+    
 }
 
 //PCInt2 on pin 35
@@ -910,6 +936,24 @@ void Cio::UpdateButtons()
 		LeftDumpOff();
 		RightDumpOff();
 	}
+}
+
+void Cio::BlinkTravel(bool blink)
+{
+    if( blink == true)
+    {
+        if(BlinkTravelEn == false)
+        {
+            BlinkTravelEn = true;
+             Blink = CTimer::GetTick();
+        }
+    }
+    else
+    {
+        BlinkTravelEn = false;
+        CLeds::is().TravelOn();
+    }
+   
 }
 
 
