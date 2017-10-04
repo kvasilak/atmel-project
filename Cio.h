@@ -111,6 +111,13 @@ private:
 	void Direction(void);
 	void Pullups(void);
 	void EnableIgnGPIOInterrupt(void);
+    
+    void CalcSpeed(void);
+    void TravelBlink(void);
+    void LeftUpBlink(void);
+    void LeftDownBlink(void);
+    void RightUpBlink(void);
+    void RightDownBlink(void);
 
 	bool FillPressed;
 	bool DumpPressed;
@@ -118,6 +125,15 @@ private:
 	uint32_t Time;
     bool BlinkTravelEn;
     uint32_t Blink;
+    
+    uint32_t LeftSpeed;
+    uint32_t RightSpeed;
+    uint32_t SpeedTime;
+    
+    bool FillLeft;
+    bool FillRight;
+    bool DumpLeft;
+    bool DumpRight;
 
 }; //Cio
 

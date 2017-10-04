@@ -30,7 +30,9 @@ Awake(false),
 ButtonWake(false),
 FillPressed(false),
 DumpPressed(false),
-BlinkTravelEn(false)
+BlinkTravelEn(false),
+LeftSpeed(0),
+RightSpeed(0)
 {
 } //Cio
 
@@ -236,31 +238,150 @@ void Cio::Init()
     sleep_enable();
 }
 
-//update switch states and debounce
-void Cio::Run()
+void Cio::TravelBlink()
 {
-    static bool TravelBlinkon = true;
+    static bool blinkon = true;
     
     if(BlinkTravelEn)
     {
-        
-        if(CTimer::IsTimedOut(250, Blink))
+        if(blinkon)
         {
-            if(TravelBlinkon)
+            blinkon = false;
+            CLeds::is().TravelOff();
+        }
+        else
+        {
+            blinkon = true;
+            CLeds::is().TravelOn();
+        }
+    }    
+}
+
+ void Cio::LeftUpBlink()
+ {
+     static bool blinkon = true;
+     
+      if(FillLeft)
+      {
+          if(LeftSpeed >2)
+          {
+               CLeds::is().LeftFillOn();
+          }
+          else
+          {
+              if(blinkon)
+              {
+                  blinkon = false;
+                  CLeds::is().LeftFillOff();
+              }
+              else
+              {
+                  blinkon = true;
+                  CLeds::is().LeftFillOn();
+              }
+          }
+      }
+ }
+ 
+ void Cio::LeftDownBlink()
+ {
+     static bool blinkon = true;
+     
+      if(DumpLeft)
+      {
+          if(LeftSpeed >2)
+          {
+              CLeds::is().LeftDumpOn();
+          }
+          else
+          {
+              if(blinkon)
+              {
+                  blinkon = false;
+                  CLeds::is().LeftDumpOff();
+              }
+              else
+              {
+                  blinkon = true;
+                  CLeds::is().LeftDumpOn();
+              }
+          }
+      }
+ }
+ 
+ void Cio::RightUpBlink()
+ {
+     static bool blinkon = true;
+     
+      if(FillRight)
+      {
+          CSerial::is() << "speed,  " << RightSpeed << ", " << LeftSpeed << "\n";
+          
+          if(RightSpeed >2)
+          {
+              CLeds::is().RightFillOn();
+          }
+          else
+          {
+              if(blinkon)
+              {
+                  blinkon = false;
+                  CLeds::is().RightFillOff();
+              }
+              else
+              {
+                  blinkon = true;
+                  CLeds::is().RightFillOn();
+              }
+          }
+      }
+ }
+ 
+ void Cio::RightDownBlink()
+{
+    static bool blinkon = true;
+    
+    if(DumpRight)
+    {
+        if(RightSpeed >2)
+        {
+            CLeds::is().RightDumpOn();
+        }
+        else
+        {
+            if(blinkon)
             {
-                TravelBlinkon = false;
-                CLeds::is().TravelOff();
+                blinkon = false;
+                CLeds::is().RightDumpOff();
             }
             else
             {
-                TravelBlinkon = true;
-                CLeds::is().TravelOn();
+                blinkon = true;
+                CLeds::is().RightDumpOn();
             }
-            
-            Blink = CTimer::GetTick();
         }
-    };
-    
+    }
+}
+
+//update switch states and debounce
+void Cio::Run()
+{
+
+    //check if we should be moving
+    //if filling or dumping IsMoving() should be true
+    CalcSpeed();
+
+    if(CTimer::IsTimedOut(250, Blink))
+    {
+        
+        TravelBlink();
+        LeftUpBlink();
+        LeftDownBlink();
+        RightUpBlink();
+        RightDownBlink();
+        
+        Blink = CTimer::GetTick();
+    }
     
 	//debounce inputs
 	ButtonDown.Update();
@@ -762,6 +883,8 @@ void Cio::Left(eValveStates s)
 void Cio::RightFillOn()
 {
 	//CSerial::is() << "*RightFillOn\n";
+    
+    FillRight = true;
 	
 	SOLENOID_RU_PORT |= _BV(SOLENOID_RU_BIT);
 	CLeds::is().RightFillOn();
@@ -770,6 +893,8 @@ void Cio::RightFillOn()
 void Cio::RightFillOff()
 {
 	//CSerial::is() << "*RightFillOff\n";
+    
+    FillRight = false;
 	
 	SOLENOID_RU_PORT &= ~_BV(SOLENOID_RU_BIT);
 	CLeds::is().RightFillOff();
@@ -778,6 +903,8 @@ void Cio::RightFillOff()
 void Cio::RightDumpOn()
 {
 	//CSerial::is() << "*RightDumpOn\n";
+    
+    DumpRight = true;
 	
 	SOLENOID_RD_PORT |= _BV(SOLENOID_RD_BIT);
 	CLeds::is().RightDumpOn();
@@ -786,6 +913,7 @@ void Cio::RightDumpOn()
 void Cio::RightDumpOff()
 {
 	//CSerial::is() << "*RightDumpOff\n";
+    DumpRight = false;
 	
 	SOLENOID_RD_PORT &= ~_BV(SOLENOID_RD_BIT);
 	CLeds::is().RightDumpOff();
@@ -795,6 +923,8 @@ void Cio::RightDumpOff()
 void Cio::LeftFillOn()
 {
 	//CSerial::is() << "*LeftFillOn\n";
+    
+    FillLeft = true;
 	
 	SOLENOID_LU_PORT |= _BV(SOLENOID_LU_BIT);
 	CLeds::is().LeftFillOn();
@@ -803,6 +933,8 @@ void Cio::LeftFillOn()
 void Cio::LeftFillOff()
 {
 	//CSerial::is() << "*LeftFillOff\n";
+    
+    FillLeft = false;
 	
 	SOLENOID_LU_PORT &= ~_BV(SOLENOID_LU_BIT);
 	CLeds::is().LeftFillOff();
@@ -811,6 +943,8 @@ void Cio::LeftFillOff()
 void Cio::LeftDumpOn()
 {
 	//CSerial::is() << "*LeftDumpOn\n";
+    
+    DumpLeft = true;
 	
 	SOLENOID_LD_PORT |= _BV(SOLENOID_LD_BIT);
 	CLeds::is().LeftDumpOn();
@@ -819,6 +953,8 @@ void Cio::LeftDumpOn()
 void Cio::LeftDumpOff()
 {
 	//CSerial::is() << "*LeftDumpOff\n";
+    
+    DumpLeft = false;
 	
 	SOLENOID_LD_PORT &= ~_BV(SOLENOID_LD_BIT);
 	CLeds::is().LeftDumpOff();
@@ -955,6 +1091,46 @@ void Cio::BlinkTravel(bool blink)
     }
    
 }
+
+void Cio::CalcSpeed()
+{
+    static uint16_t oldleft= CADC::is().GetLeftHeight();
+    static uint16_t oldright= CADC::is().GetRightHeight();
+
+    //calculate speed, counts/second
+    if(CTimer::IsTimedOut(1000, SpeedTime))
+    {
+        uint16_t left = CADC::is().GetLeftHeight();
+        uint16_t right = CADC::is().GetRightHeight();
+        
+        if(left > oldleft)
+        {
+            LeftSpeed = left - oldleft;
+        }
+        else
+        {
+            LeftSpeed = oldleft - left;
+        }
+        
+        if(right > oldright)
+        {
+            RightSpeed = right - oldright;
+        }
+        else
+        {
+            RightSpeed = oldright - right;
+        }
+        
+        oldright = right;
+        oldleft = left;
+        
+        CSerial::is() << "speed,  " << RightSpeed << ", " << LeftSpeed << "\n";
+
+        SpeedTime = CTimer::GetTick();
+    }
+}
+
+
 
 
 // ignition changed
