@@ -28,6 +28,18 @@ void CADC::Init()
 	ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 	
 	DIDR0 = 0x0B; //disable Digital on ADC 1 and 2 and 4
+    
+    LeftHeightAverageCount = 0;
+    for(int i=0;i<10;i++)
+    {
+        LeftHeightAverages[i] = GetLeftHeight();
+    }
+    
+    RightHeightAverageCount = 0;
+    for(int i=0;i<10;i++)
+    {
+        RightHeightAverages[i] = GetRightHeight();
+    }
 }
 
 uint16_t CADC::Read(uint8_t ch)
@@ -50,9 +62,45 @@ uint16_t CADC::Read(uint8_t ch)
 	return ADC;
 }
 
-uint16_t CADC::GetLeftHeight()
+uint16_t CADC::GetLeftHeight(void)
 {
 	return Read(0);
+}
+
+int32_t CADC::GetRightAvgHeight(void)
+{
+    int32_t height=0;
+    int32_t h = GetLeftHeight();
+    
+    LeftHeightAverages[LeftHeightAverageCount++] = h;
+    if(LeftHeightAverageCount >= 10) LeftHeightAverageCount = 0;
+    
+    for(int i=0;i<10;i++)
+    {
+        height += LeftHeightAverages[i];
+    }
+    
+    height /= 10;
+    
+    return height;
+}
+    
+int32_t CADC::GetLeftAvgHeight(void)
+{
+    int32_t height=0;
+    int32_t h = GetLeftHeight();
+    
+    LeftHeightAverages[LeftHeightAverageCount++] = h;
+    if(LeftHeightAverageCount >= 10) LeftHeightAverageCount = 0;
+    
+    for(int i=0;i<10;i++)
+    {
+        height += LeftHeightAverages[i];
+    }
+    
+    height /= 10;
+    
+    return height;
 }
 
 uint16_t CADC::GetRightHeight()

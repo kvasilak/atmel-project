@@ -29,10 +29,19 @@ public:
 	uint8_t GetDimmer(void);
 	bool LeftHeightOK(void);
 	bool RightHeightOK(void);
+    
+    int32_t GetLeftAvgHeight(void);
+    int32_t GetRightAvgHeight(void);
 
 private:
 CADC();
 	CADC& operator=( const CADC &c );
+    
+    int32_t LeftHeightAverages[10];
+    int LeftHeightAverageCount;
+    
+    int32_t RightHeightAverages[10];
+    int RightHeightAverageCount;
 
 }; //CADC
 

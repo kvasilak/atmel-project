@@ -32,7 +32,8 @@ FillPressed(false),
 DumpPressed(false),
 BlinkTravelEn(false),
 LeftSpeed(0),
-RightSpeed(0)
+RightSpeed(0),
+SpeedTime(0)
 {
 } //Cio
 
@@ -235,128 +236,109 @@ void Cio::Init()
 	
 	Time = CTimer::GetTick();
     
+    Blink = CTimer::GetTick();
+    
     sleep_enable();
 }
 
-void Cio::TravelBlink()
+void Cio::TravelBlink(bool blink)
 {
-    static bool blinkon = true;
-    
     if(BlinkTravelEn)
     {
-        if(blinkon)
+        if(blink)
         {
-            blinkon = false;
             CLeds::is().TravelOff();
         }
         else
         {
-            blinkon = true;
             CLeds::is().TravelOn();
         }
     }    
 }
 
- void Cio::LeftUpBlink()
+ void Cio::LeftUpBlink(bool blink)
  {
-     static bool blinkon = true;
-     
       if(FillLeft)
       {
-          if(LeftSpeed >2)
+          if(LeftSpeed >1)
           {
                CLeds::is().LeftFillOn();
           }
           else
           {
-              if(blinkon)
+              if(blink)
               {
-                  blinkon = false;
                   CLeds::is().LeftFillOff();
               }
               else
               {
-                  blinkon = true;
                   CLeds::is().LeftFillOn();
               }
           }
       }
  }
  
- void Cio::LeftDownBlink()
+ void Cio::LeftDownBlink(bool blink)
  {
-     static bool blinkon = true;
-     
       if(DumpLeft)
       {
-          if(LeftSpeed >2)
+          if(LeftSpeed  >1)
           {
               CLeds::is().LeftDumpOn();
           }
           else
           {
-              if(blinkon)
+              if(blink)
               {
-                  blinkon = false;
                   CLeds::is().LeftDumpOff();
               }
               else
               {
-                  blinkon = true;
                   CLeds::is().LeftDumpOn();
               }
           }
       }
  }
  
- void Cio::RightUpBlink()
+ void Cio::RightUpBlink(bool blink)
  {
-     static bool blinkon = true;
-     
       if(FillRight)
-      {
-          CSerial::is() << "speed,  " << RightSpeed << ", " << LeftSpeed << "\n";
-          
-          if(RightSpeed >2)
+      {         
+          if(RightSpeed >1)
           {
               CLeds::is().RightFillOn();
           }
           else
           {
-              if(blinkon)
+              if(blink)
               {
-                  blinkon = false;
                   CLeds::is().RightFillOff();
               }
               else
               {
-                  blinkon = true;
                   CLeds::is().RightFillOn();
               }
           }
       }
  }
  
- void Cio::RightDownBlink()
+ void Cio::RightDownBlink(bool blink)
 {
-    static bool blinkon = true;
-    
+
     if(DumpRight)
     {
-        if(RightSpeed >2)
+        if(RightSpeed >1)
         {
             CLeds::is().RightDumpOn();
         }
         else
         {
-            if(blinkon)
+            if(blink)
             {
-                blinkon = false;
                 CLeds::is().RightDumpOff();
             }
             else
             {
-                blinkon = true;
                 CLeds::is().RightDumpOn();
             }
         }
@@ -366,19 +348,22 @@ void Cio::TravelBlink()
 //update switch states and debounce
 void Cio::Run()
 {
-
+    static bool blinkon = true;
+       
     //check if we should be moving
     //if filling or dumping IsMoving() should be true
     CalcSpeed();
 
     if(CTimer::IsTimedOut(250, Blink))
-    {
+    {       
         
-        TravelBlink();
-        LeftUpBlink();
-        LeftDownBlink();
-        RightUpBlink();
-        RightDownBlink();
+        TravelBlink(blinkon);
+        LeftUpBlink(blinkon);
+        LeftDownBlink(blinkon);
+        RightUpBlink(blinkon);
+        RightDownBlink(blinkon);
+        
+        blinkon = !blinkon;
         
         Blink = CTimer::GetTick();
     }
@@ -1094,14 +1079,14 @@ void Cio::BlinkTravel(bool blink)
 
 void Cio::CalcSpeed()
 {
-    static uint16_t oldleft= CADC::is().GetLeftHeight();
-    static uint16_t oldright= CADC::is().GetRightHeight();
+    static uint16_t oldleft= CADC::is().GetLeftAvgHeight();
+    static uint16_t oldright= CADC::is().GetRightAvgHeight();
 
     //calculate speed, counts/second
-    if(CTimer::IsTimedOut(1000, SpeedTime))
+    if(CTimer::IsTimedOut(3000, SpeedTime))
     {
-        uint16_t left = CADC::is().GetLeftHeight();
-        uint16_t right = CADC::is().GetRightHeight();
+        uint16_t left = CADC::is().GetLeftAvgHeight();
+        uint16_t right = CADC::is().GetRightAvgHeight();
         
         if(left > oldleft)
         {

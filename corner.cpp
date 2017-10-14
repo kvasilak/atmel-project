@@ -62,15 +62,15 @@ void CCorner::Init(Position p)
     
     FilterReset();
     
-    OldHeight = GetAvgHeight();
-    SpeedTime = CTimer::GetTick();
+    //OldHeight = GetAvgHeight();
+    //SpeedTime = CTimer::GetTick();
 
     //just at the start
-    HeightAverageCount = 0;
-        for(int i=0;i<10;i++)
-    {
-        HeightAverages[i] = GetHeight();
-    }
+    //HeightAverageCount = 0;
+        //for(int i=0;i<10;i++)
+    //{
+        //HeightAverages[i] = GetHeight();
+    //}
     
     
     SetState(ValveIniting);
@@ -81,57 +81,71 @@ void CCorner::Limits(int16_t Low, int16_t high)
     LimitHigh = high -2;
 }
 
-//Get the height of this corner
-int16_t CCorner::GetHeight()
-{
-    int16_t h = 0;
-    
-    switch(corner)
-   {
-        case LeftRear:
-			h = CADC::is().GetLeftHeight();
-			//
-            break;
-        case RightRear:
-			h = CADC::is().GetRightHeight();
-            break;
-   }   
-   return h;
-}   
+////Get the height of this corner
+//int16_t CCorner::GetHeight()
+//{
+    //int16_t h = 0;
+    //
+    //switch(corner)
+   //{
+        //case LeftRear:
+			//h = CADC::is().GetLeftHeight();
+			////
+            //break;
+        //case RightRear:
+			//h = CADC::is().GetRightHeight();
+            //break;
+   //}   
+   //return h;
+//}   
    
 int32_t CCorner::GetAvgHeight()
 {
-    int32_t height=0;
-    int32_t h = GetHeight();
+    int32_t h = 0;
     
-  HeightAverages[HeightAverageCount++] = h;
-  if(HeightAverageCount >= 10) HeightAverageCount = 0;
-  
-  for(int i=0;i<10;i++)
-  {
-      height += HeightAverages[i];
-  }     
-  
-  height /= 10;
-   
-   //calculate speed, counts/second
-   if(CTimer::IsTimedOut(1000, SpeedTime))
-   {
-        if(height > OldHeight)
-        {
-            HeightSpeed = height - OldHeight;
-        }
-        else
-        {
-            HeightSpeed = OldHeight - height;
-        }
-        
-        OldHeight = height;
-        SpeedTime = CTimer::GetTick();
-   }
-   
-   return height;
-}
+    switch(corner)
+    {
+        case LeftRear:
+        h = CADC::is().GetLeftAvgHeight();
+    
+        break;
+    case RightRear:
+        h = CADC::is().GetRightAvgHeight();
+        break;
+    }
+    return h;
+}    
+    //int32_t height=0;
+    //int32_t h = GetHeight();
+    //
+  //HeightAverages[HeightAverageCount++] = h;
+  //if(HeightAverageCount >= 10) HeightAverageCount = 0;
+  //
+  //for(int i=0;i<10;i++)
+  //{
+      //height += HeightAverages[i];
+  //}     
+  //
+  //height /= 10;
+   //
+   ////calculate speed, counts/second
+   //if(CTimer::IsTimedOut(1000, SpeedTime))
+   //{
+        //if(height > OldHeight)
+        //{
+            //HeightSpeed = height - OldHeight;
+        //}
+        //else
+        //{
+            //HeightSpeed = OldHeight - height;
+        //}
+        //
+        //OldHeight = height;
+        //SpeedTime = CTimer::GetTick();
+   //}
+   //
+   //return height;
+//}
 
 //open or close the fill solenoid for this corner
 void CCorner::FillOn()
@@ -218,7 +232,7 @@ void CCorner::FilterReset()
 {
     int i;
 
-    int32_t height 			= GetHeight();
+    int32_t height 			= GetAvgHeight();
     
     filter_reg = (height << FILTER_SHIFT);
     
@@ -325,37 +339,19 @@ void CCorner::FilterHeight( int32_t setpoint)
 	//sample Slowly
 	if(CTimer::IsTimedOut(CycleTime, LastTime) )
 	{        
-        //if( LongFilter)
-        //{
-            //fast smoothing filter to take out sampling noise
-            SmoothHeight = Smooth(height);
+        //fast smoothing filter to take out sampling noise
+        SmoothHeight = Smooth(height);
             
-           // if(count >9)
-           // {
-            //    count = 0;
-            
-                //Longer filter to take out bumps and roll
-                AverageHeight = Average( SmoothHeight);
+        //Longer filter to take out bumps and roll
+        AverageHeight = Average( SmoothHeight);
 
-                //IIR filter to take out even more bump and roll
-                // Update IIR filter with current sample.
-                filter_reg = filter_reg - (filter_reg >> FILTER_SHIFT) + AverageHeight;
+        //IIR filter to take out even more bump and roll
+        // Update IIR filter with current sample.
+        filter_reg = filter_reg - (filter_reg >> FILTER_SHIFT) + AverageHeight;
 
-                // Scale output for unity gain.
-                slowheight = (filter_reg >> FILTER_SHIFT);
-           // }
-            
-           // count++;
-        //}
-        //else
-        //{
-            ////SmoothHeight = height;
-            //
-            //filter_reg = filter_reg - (filter_reg >> FILTER_SHIFT) + height;
-//
-            //// Scale output for unity gain.
-            //slowheight = (filter_reg >> FILTER_SHIFT);
-        //}
+        // Scale output for unity gain.
+        slowheight = (filter_reg >> FILTER_SHIFT);
+
 
 		LastTime = CTimer::GetTick();       
         

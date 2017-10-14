@@ -113,11 +113,11 @@ private:
 	void EnableIgnGPIOInterrupt(void);
     
     void CalcSpeed(void);
-    void TravelBlink(void);
-    void LeftUpBlink(void);
-    void LeftDownBlink(void);
-    void RightUpBlink(void);
-    void RightDownBlink(void);
+    void TravelBlink(bool blink);
+    void LeftUpBlink(bool blink);
+    void LeftDownBlink(bool blink);
+    void RightUpBlink(bool blink);
+    void RightDownBlink(bool blink);
 
 	bool FillPressed;
 	bool DumpPressed;
