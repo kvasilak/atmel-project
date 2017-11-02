@@ -70,14 +70,14 @@ uint16_t CADC::GetLeftHeight(void)
 int32_t CADC::GetRightAvgHeight(void)
 {
     int32_t height=0;
-    int32_t h = GetLeftHeight();
+    int32_t h = GetRightHeight();
     
-    LeftHeightAverages[LeftHeightAverageCount++] = h;
-    if(LeftHeightAverageCount >= 10) LeftHeightAverageCount = 0;
+    RightHeightAverages[RightHeightAverageCount++] = h;
+    if(RightHeightAverageCount >= 10) RightHeightAverageCount = 0;
     
     for(int i=0;i<10;i++)
     {
-        height += LeftHeightAverages[i];
+        height += RightHeightAverages[i];
     }
     
     height /= 10;

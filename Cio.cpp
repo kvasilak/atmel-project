@@ -33,7 +33,12 @@ DumpPressed(false),
 BlinkTravelEn(false),
 LeftSpeed(0),
 RightSpeed(0),
-SpeedTime(0)
+SpeedTimeRight(0),
+SpeedTimeLeft(0),
+FillLeft(false),
+FillRight(false),
+DumpLeft(false),
+DumpRight(false)
 {
 } //Cio
 
@@ -835,8 +840,7 @@ void Cio::Right(eValveStates s)
 void Cio::Left(eValveStates s)
 {
     static eValveStates last = eValveStates::None;
-   
-    
+
     if(s != last)
     {
         last = s;
@@ -870,9 +874,13 @@ void Cio::RightFillOn()
 	//CSerial::is() << "*RightFillOn\n";
     
     FillRight = true;
+    
+    SpeedTimeRight = CTimer::GetTick();
+    oldright= CADC::is().GetRightAvgHeight();
+    RightSpeed = 10; // anything >1
 	
 	SOLENOID_RU_PORT |= _BV(SOLENOID_RU_BIT);
-	CLeds::is().RightFillOn();
+	//CLeds::is().RightFillOn();
 }
 
 void Cio::RightFillOff()
@@ -890,9 +898,13 @@ void Cio::RightDumpOn()
 	//CSerial::is() << "*RightDumpOn\n";
     
     DumpRight = true;
-	
+    
+    SpeedTimeRight = CTimer::GetTick();
+    oldright= CADC::is().GetRightAvgHeight();
+    RightSpeed = 10; // anything >1
+    
 	SOLENOID_RD_PORT |= _BV(SOLENOID_RD_BIT);
-	CLeds::is().RightDumpOn();
+	//CLeds::is().RightDumpOn();
 }
 
 void Cio::RightDumpOff()
@@ -910,9 +922,13 @@ void Cio::LeftFillOn()
 	//CSerial::is() << "*LeftFillOn\n";
     
     FillLeft = true;
+    
+    SpeedTimeLeft = CTimer::GetTick();
+    oldleft= CADC::is().GetLeftAvgHeight();
+    LeftSpeed = 10; // anything >1
 	
 	SOLENOID_LU_PORT |= _BV(SOLENOID_LU_BIT);
-	CLeds::is().LeftFillOn();
+	//CLeds::is().LeftFillOn();
 }
 
 void Cio::LeftFillOff()
@@ -930,9 +946,12 @@ void Cio::LeftDumpOn()
 	//CSerial::is() << "*LeftDumpOn\n";
     
     DumpLeft = true;
+    SpeedTimeLeft = CTimer::GetTick();
+    oldleft= CADC::is().GetLeftAvgHeight();
+    LeftSpeed = 10; // anything >1
 	
 	SOLENOID_LD_PORT |= _BV(SOLENOID_LD_BIT);
-	CLeds::is().LeftDumpOn();
+	//CLeds::is().LeftDumpOn();
 }
 
 void Cio::LeftDumpOff()
@@ -1079,24 +1098,18 @@ void Cio::BlinkTravel(bool blink)
 
 void Cio::CalcSpeed()
 {
-    static uint16_t oldleft= CADC::is().GetLeftAvgHeight();
-    static uint16_t oldright= CADC::is().GetRightAvgHeight();
-
     //calculate speed, counts/second
-    if(CTimer::IsTimedOut(3000, SpeedTime))
+    CalcRightSpeed();
+    CalcLeftSpeed();
+   // CSerial::is() << "speed,  " << RightSpeed << ", " << LeftSpeed << "\n";
+}
+
+void Cio::CalcRightSpeed()
+{
+    uint16_t right = CADC::is().GetRightAvgHeight();
+    
+    if(CTimer::IsTimedOut(10000, SpeedTimeRight))
     {
-        uint16_t left = CADC::is().GetLeftAvgHeight();
-        uint16_t right = CADC::is().GetRightAvgHeight();
-        
-        if(left > oldleft)
-        {
-            LeftSpeed = left - oldleft;
-        }
-        else
-        {
-            LeftSpeed = oldleft - left;
-        }
-        
         if(right > oldright)
         {
             RightSpeed = right - oldright;
@@ -1105,17 +1118,35 @@ void Cio::CalcSpeed()
         {
             RightSpeed = oldright - right;
         }
+        SpeedTimeRight = CTimer::GetTick();
         
         oldright = right;
-        oldleft = left;
-        
-        CSerial::is() << "speed,  " << RightSpeed << ", " << LeftSpeed << "\n";
-
-        SpeedTime = CTimer::GetTick();
-    }
+    }    
+    
+    
 }
 
-
+void Cio::CalcLeftSpeed(void)
+{
+    uint16_t left = CADC::is().GetLeftAvgHeight();
+    
+    if(CTimer::IsTimedOut(10000, SpeedTimeLeft))
+    {
+        if(left > oldleft)
+        {
+            LeftSpeed = left - oldleft;
+        }
+        else
+        {
+            LeftSpeed = oldleft - left;
+        }
+        SpeedTimeLeft = CTimer::GetTick();
+        
+        oldleft = left;
+    }
+    
+    
+}
 
 
 // ignition changed

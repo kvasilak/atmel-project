@@ -141,7 +141,7 @@ void FsmTravel::HandleEvent(eEvents evt)
             }                        
             break;
 
-			//let the manual state handle it
+			//let the manua heightstate handle it
 		case eEvents::IgnitionOffEvent:
 			CSerial::is() << " FsmTravel::Ignition Off\r\n";
             

@@ -118,6 +118,8 @@ private:
     void LeftDownBlink(bool blink);
     void RightUpBlink(bool blink);
     void RightDownBlink(bool blink);
+    void CalcLeftSpeed(void);
+    void CalcRightSpeed(void);
 
 	bool FillPressed;
 	bool DumpPressed;
@@ -128,7 +130,10 @@ private:
     
     uint32_t LeftSpeed;
     uint32_t RightSpeed;
-    uint32_t SpeedTime;
+    uint32_t SpeedTimeRight;
+    uint32_t SpeedTimeLeft;
+    uint16_t oldleft;
+    uint16_t oldright;
     
     bool FillLeft;
     bool FillRight;
