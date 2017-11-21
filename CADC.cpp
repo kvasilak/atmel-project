@@ -112,11 +112,23 @@ uint8_t CADC::GetDimmer()
 {
 	uint16_t d = Read(3);
 
-	uint8_t dim = d / 4;
+	uint8_t dim;
     
-    if(dim == 0) dim = 0xFF;
+    dim = d/4;
+
+    if(d < 64)
+    {
+        dim = d/2;
+    }
     
-    CSerial::is() << "Dim; " << d << ", " << dim << "\n";
+    if(d < 32)
+    {
+        dim = d/2; //less sensitive the dimmer we go
+    }     
+    
+    if(d == 0) dim = 1; //64;
+    
+    //CSerial::is() << "Dim; " << d << ", " << dim << "\n";
 	
 	return (uint8_t)dim;
 }
