@@ -120,10 +120,7 @@ int main(void)
     mcusr=MCUSR;
     
     MCUSR=0;
- //  uint8_t temp_mcusr = MCUSR;
-   //MCUSR = 0;
 
-    
 	CController Controller;
 
 	Cio::is().Init();
@@ -139,7 +136,6 @@ int main(void)
 	CTimer::Init();
 
 	CLeds::is().Init();
-	CLeds::is().Dim(100);
 	
 	Controller.Init();
 	

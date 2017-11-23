@@ -245,7 +245,8 @@ void CController::Run()
             //and is zero volts when headlights are off
             //so if voltage is near 0, we don't know what the brightness should be
             //so we turn them on full
-			CLeds::is().Dim(CADC::is().GetDimmer());
+			
+            CLeds::is().Dim(CADC::is().GetDimmer());
             
             //CSerial::is() << "Dim; " << CADC::is().GetDimmer() << "\n";
 		}
