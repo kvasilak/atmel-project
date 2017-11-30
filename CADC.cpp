@@ -129,7 +129,7 @@ uint8_t CADC::GetDimmer()
 	uint16_t d = Read(3)/4;
     uint8_t dim = BrightnessLU[d];
     
-    CSerial::is() << "Dim; " << d << ", " << dim << "\n";
+   // CSerial::is() << "Dim; " << d << ", " << dim << "\n";
 	
 	return (uint8_t)dim;
 }
