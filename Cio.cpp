@@ -1045,9 +1045,9 @@ void Cio::Wakeup()
 	CompressorOn();
 	
 	CLeds::is().Init();
-	//CLeds::is().Init();
-	//CLeds::is().Init();
-	//CLeds::is().Init();
+	CLeds::is().Init();
+	CLeds::is().Init();
+	CLeds::is().Init();
 	
 	CLeds::is().ActiveOn();
 	

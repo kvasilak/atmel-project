@@ -246,9 +246,9 @@ void CController::Run()
             //so if voltage is near 0, we don't know what the brightness should be
             //so we turn them on full
 			
-            CLeds::is().Dim(CADC::is().GetDimmer());
+            CLeds::is().Dim(10);//CADC::is().GetDimmer());
             
-            //CSerial::is() << "Dim; " << CADC::is().GetDimmer() << "\n";
+           // CSerial::is() << "Dim; " << CADC::is().GetDimmer() << "\n";
 		}
 		Time = CTimer::GetTick();
 	}

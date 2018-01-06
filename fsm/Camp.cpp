@@ -14,8 +14,13 @@
 #include "CTimer.h"
 #include "string.h"
 
-static const int16_t pitchtol = 20;
-static const int16_t rolltol = 20;//10;
+static const int16_t PitchTol = 20;
+static const int16_t RollTol = 20;//10;
+
+#define ONE_G 4096    // 2g mode so 4096 counts per G
+#define HALF_G 2048   // 1/2 G = 2048
+#define Third_G 1356  // 1/3 G = 1365
+#define QUARTER_G 1024 // 1/4 G = 1024
 
 FsmCamp::FsmCamp(CController& SMManager) :
 CState(SMManager, eStates::STATE_CAMP),
@@ -23,23 +28,27 @@ Start(0),
 MinTime(100),
 IsLevel(false),
 ReadyToSleep(false),
-DebugTime(1000)
+DebugTime(1000),
+Roll(0),
+SlowRoll(0),
+Pitch(0),
+SlowPitch(0)
+PowerLevel(true)
 {
 }
 
 void FsmCamp::OnEntry()
 {
 	CLeds::is().CampOn();
-	
-	int16_t roll = nvm::is().GetCampY();
- 	int16_t pitch = nvm::is().GetCampZ();
+    
+    CMMA8451::is().writeRegister8(0x2A, 0x3d); //slow rate, low noise, Active
+    	
+    CMMA8451::is().writeRegister8(0x2B, 2); //high res
+    
+    GetPitchRollCal();
 
-	CSerial::is() << " FsmCamp::OnEntry(), roll cal; " << roll << " pitch cal; " << pitch << " tol; " << pitchtol << "\r\n";
+	CSerial::is() << " FsmCamp::OnEntry(), roll cal; " << RollCal << " pitch cal; " << PitchCal << " tol; " << pitchtol << "\r\n";
 	Start = CTimer::GetTick();
-	
-	CMMA8451::is().writeRegister8(0x2A, 0x3d); //slow rate, low noise, Active
-	
-	CMMA8451::is().writeRegister8(0x2B, 2); //high res
 	
 	IsLevel  = false;
 	ReadyToSleep = false;
@@ -49,6 +58,7 @@ void FsmCamp::OnEntry()
     
     for(int i=0; i<FilterSize; i++)
     {
+        AvgX[i] = x;
         AvgY[i] = y;
         AvgZ[i] = z;        
     }
@@ -153,11 +163,7 @@ void FsmCamp::GetYZ(int16_t &slowy, int16_t &slowz,int16_t &fasty, int16_t &fast
     int32_t YAvg;
     int32_t ZAvg;
 
-	//determine Pitch and roll errors
-	int32_t rollcal = nvm::is().GetCampY();
-	int32_t pitchcal = nvm::is().GetCampZ();
-    
-    //Read Acccel
+	//Read Acccel
 	CMMA8451::is().ReadXYZ(X, Y, Z);
     fasty = Y;
     fastz = Z;
@@ -184,25 +190,115 @@ void FsmCamp::GetYZ(int16_t &slowy, int16_t &slowz,int16_t &fasty, int16_t &fast
     
      if(CTimer::IsTimedOut(DebugTime, DebugDelay))
      {
-         CSerial::is() << "Roll;  " << Y << ", Avg; " <<  (int16_t)YAvg << ", err; " << (int16_t)(YAvg - rollcal) << "\n";
-         CSerial::is() << "Pitch; " << Z <<  ", Avg; " <<  (int16_t)ZAvg << ", err; " << (int16_t)(ZAvg -pitchcal) << "\n";
-        // CSerial::is() << "Roll;  " << Y << ", err; " << YAvg - rollcal << "\n";
-        //CSerial::is() << "Pitch; " << Z << ", err; " << ZAvg -pitchcal << "\n";
+         //determine Pitch and roll errors
+         //int32_t rollcal = nvm::is().GetCampY();
+         //int32_t pitchcal = nvm::is().GetCampZ();
          
-         // CSerial::is() << "Roll; " << Y << ", Pitch; " << Z ;
          
-         // CSerial::is()  << "** roll err; " << Y - rollcal  << ";   pitch err; " << Z -pitchcal << "\n";
+         CMMA8451::is().ReadXYZ();
+         //CSerial::is() << "Roll;  " << Y << ", Avg; " <<  (int16_t)YAvg << ", err; " << (int16_t)(YAvg - rollcal) << "\n";
+         //CSerial::is() << "Pitch; " << Z <<  ", Avg; " <<  (int16_t)ZAvg << ", err; " << (int16_t)(ZAvg -pitchcal) << "\n";
          
          DebugDelay = CTimer::GetTick();
      }
 }
 
-void FsmCamp::LevelMachine()
+uint16_t FsmCamp::FilterIt(int32_t* filter, int16_t roll)
 {
-	int16_t slowY;
-	int16_t slowZ;
+    int32_t Avg=0;
+    
+    filter[FilterStep] = roll;
+    
+    if(++FilterStep >= FilterSize) FilterStep = 0;
+
+    for(int i=0;i<FilterSize; i++)
+    {
+        Avg += filter[i];
+    }
+    
+    Avg /= FilterSize;
+
+    return Avg;
+}
+    
+
+void FsmCamp::GetPitchRoll(void)
+{
+    int16_t X;
     int16_t Y;
     int16_t Z;
+
+    //int32_t YAvg;
+    //int32_t ZAvg;
+
+    //Read Acccel
+    CMMA8451::is().ReadXYZ(X, Y, Z);
+    
+     //double pitch, roll, Xg, Yg, Zg;
+    //acc.read(&Xg, &Yg, &Zg);
+//
+    //
+    ////Roll & Pitch Equations
+    //roll  = (atan2(-fYg, fZg)*180.0)/M_PI;
+    //pitch = (atan2(fXg, sqrt(fYg*fYg + fZg*fZg))*180.0)/M_PI;
+
+    
+    if(PowerLevel)
+    {
+        Roll = Y;
+        
+        Pitch = Z;
+    }
+    else
+    {
+        Roll = Z;// X;
+        
+        Pitch = Y;// Z;
+    }
+    
+    SlowRoll = FilterIt( AvgRoll, Roll);
+    
+    SlowPitch =  FilterIt(AvgPitch, Pitch);
+    
+}
+
+
+void FsmCamp::GetPitchRollCal(void)
+{
+    int16_t xcal = nvm::is().GetCampX();
+    int16_t ycal = nvm::is().GetCampY();
+    int16_t zcal = nvm::is().GetCampZ();
+    
+    int16_t absZcal = zcal > 0? zcal: 0-zcal;
+    
+    //if microlevel is vertical +- 10 degrees we must be power level
+    
+    if(absZcal > QUARTER_G)
+    {
+       PowerLevel = false; 
+    }
+    else
+    {
+        PowerLevel = true;
+    }
+    
+    if(PowerLevel )
+    {
+        //powerlevel
+      RollCal = xcal;;
+      PitchCal = zcal;  
+    }
+    else
+    {
+        //Electrolevel
+        RollCal = zcal;;
+        PitchCal = ycal;
+    }    
+}
+
+
+void FsmCamp::LevelMachine(void)
+{
 
     static uint32_t Current = 0;
     static const uint32_t CheckTime = 100; //milliseconds
@@ -214,12 +310,7 @@ void FsmCamp::LevelMachine()
     {
         Current = CTimer::GetTick();
 
-        GetYZ(slowY, slowZ, Y, Z);
-
-	    //determine Pitch and roll errors
-	    int16_t rollcal = nvm::is().GetCampY();
-
-	    int16_t pitchcal = nvm::is().GetCampZ();
+        GetPitchRoll(); 
 
 	    switch(PitchState)
 	    {
@@ -229,12 +320,12 @@ void FsmCamp::LevelMachine()
 			
                 //first get coach level front to rear
                 //rear low
-                if( Z > pitchcal + pitchtol )
+                if( Pitch > PitchCal + PitchTol )
                 {
                     SetPitchState(CampRearLow);
                 }
                 //rear high
-                else  if( Z < pitchcal - pitchtol )
+                else  if( Pitch < PitchCal - PitchTol )
                 {
                     SetPitchState(CampRearHigh);
                 }
@@ -247,24 +338,24 @@ void FsmCamp::LevelMachine()
 		    case CampRearLow:
 			    //pitch up ( rear too Damn low)
                 //rear high
-                if( Z < (pitchcal - pitchtol) )
+                if( Pitch < (PitchCal - PitchTol) )
                 {
                     SetPitchState(CampRearHigh);
                 }
                 //we're level, check roll
-                else if( (Z > pitchcal - pitchtol) && (Z < pitchcal + pitchtol))
+                else if( (Pitch > PitchCal - PitchTol) && (Pitch < PitchCal + PitchTol))
                 {
                     SetPitchState(CampLevel);
                 }
                 else //still low
                 {
                     //decide which side to raise
-                    if(Y < rollcal - rolltol)//Roll up ( Left down )
+                    if(Roll < RollCal - RollTol)//Roll up ( Left down )
                     {
                         Cio::is().Right(eValveStates::Hold);
                         Cio::is().Left(eValveStates::Fill);
                     }
-                    else if(Y > rollcal + rolltol) //Roll down (Right Down)
+                    else if(Roll > RollCal + RollTol) //Roll down (Right Down)
                     {
                         Cio::is().Left(eValveStates::Hold);
                         Cio::is().Right(eValveStates::Fill);
@@ -279,25 +370,25 @@ void FsmCamp::LevelMachine()
 		
 		    case CampRearHigh:
                 //rear low
-                if( Z > pitchcal + pitchtol )
+                if( Pitch > PitchCal + PitchTol )
                 {
                     SetPitchState(CampRearLow);
                 }
                     
                 //we're level, check roll
-                else if( (Z > pitchcal - pitchtol) && (Z < pitchcal + pitchtol))//we're level
+                else if( (Pitch > PitchCal - PitchTol) && (Pitch < PitchCal + PitchTol))//we're level
                 {
                     SetPitchState(CampLevel);
                 }
 			    else //still high
 			    {
                     //decide which side to lower
-                    if(Y < rollcal - rolltol)//Roll up ( Left down )
+                    if(Roll < RollCal - RollTol)//Roll up ( Left down )
                     {
                         Cio::is().Left(eValveStates::Hold);
                         Cio::is().Right(eValveStates::Dump);
                     }
-                    else if(Y > rollcal + rolltol) //Roll down (Right Down)
+                    else if(Roll > RollCal + RollTol) //Roll down (Right Down)
                     {
                         Cio::is().Right(eValveStates::Hold);
                         Cio::is().Left(eValveStates::Dump);
@@ -311,23 +402,23 @@ void FsmCamp::LevelMachine()
 		        break;
 		    case CampLevel:
                  //rear low
-                 if( Z > pitchcal + pitchtol )
+                 if( Pitch > PitchCal + PitchTol )
                  {
                      SetPitchState(CampRearLow);
                  }
                  //rear high
-                 else  if( Z < pitchcal - pitchtol )
+                 else  if( Pitch < PitchCal - PitchTol )
                  {
                      SetPitchState(CampRearHigh);
                  }
-                 else //pitch and roll level
+                 else //Pitch and roll level
                  {
-                    if(Y < rollcal - rolltol)//Roll up ( Left down )
+                    if(Roll < RollCal - RollTol)//Roll up ( Left down )
                     {
                         Cio::is().Right(eValveStates::Dump);
                         Cio::is().Left(eValveStates::Fill);
                     }
-                    else if(Y > rollcal + rolltol) //Roll down (Right Down)
+                    else if(Roll > RollCal + RollTol) //Roll down (Right Down)
                     {
                         Cio::is().Left(eValveStates::Dump);
                         Cio::is().Right(eValveStates::Fill);
@@ -350,18 +441,18 @@ void FsmCamp::LevelMachine()
                 //and then SLOWLY
                 if(CTimer::IsTimedOut(ReCheckTime, CompleteStart))
                 {
-                    if( slowZ > pitchcal + (pitchtol *2))
+                    if( SlowPitch > PitchCal + (PitchTol *2))
                     {
                         SetPitchState(CampRearLow);
                     }
                     //rear high
-                    else  if( slowZ < pitchcal - (pitchtol *2) )
+                    else  if( SlowPitch < PitchCal - (PitchTol *2) )
                     {
                         SetPitchState(CampRearHigh);
                     }
                     else //pitch is level check roll
                     {
-                        if( (slowY < rollcal - (rolltol *2)) || (slowY > rollcal + (rolltol*2)))
+                        if( (SlowRoll < RollCal - (RollTol *2)) || (SlowRoll > RollCal + (RollTol*2)))
                         {
                             //Check roll
                             SetPitchState(CampLevel);

@@ -43,9 +43,13 @@ class FsmCamp :public virtual CState
 	void OnExit();
 	
 	private:
-    void LevelMachine();
+    void GetPitchRoll(void);
+    void GetPitchRollCal(void);
+    
+    void LevelMachine(void);
 	void SetPitchState(PitchStates_e s);
     void GetYZ(int16_t &slowy, int16_t &slowz, int16_t &fasty, int16_t &fastz);
+    uint32_t FilterIt(int32_t* filter, int16_t roll);
 	
 	uint32_t Start;
 	uint32_t DebugDelay;
@@ -57,7 +61,17 @@ class FsmCamp :public virtual CState
 
     int32_t AvgY[FilterSize];
     int32_t AvgZ[FilterSize];
+    int32_t AvgRoll[FilterSize];
+    int32_t AvgPitch[FilterSize];
     uint16_t FilterStep;
+    
+    int16_t Roll;
+    int16_t SlowRoll;
+    int16_t Pitch;
+    int16_t SlowPitch;
+    int16_t RollCal;
+    int16_t PitchCal;
+    bool PowerLevel;
 
 }; //Camp
 
