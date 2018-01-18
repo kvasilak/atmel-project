@@ -21,8 +21,8 @@
 
     #define PITCH_STATES_LIST(macro) \
     macro(CampIniting),     \
-    macro(CampRearLow),     \
-    macro(CampRearHigh),    \
+    macro(CampNoseHigh),     \
+    macro(CampNoseLow),    \
 	macro(CampLevel),       \
     macro(CampCompleteEnter), \
     macro(CampComplete)
@@ -49,7 +49,10 @@ class FsmCamp :public virtual CState
     void LevelMachine(void);
 	void SetPitchState(PitchStates_e s);
     void GetYZ(int16_t &slowy, int16_t &slowz, int16_t &fasty, int16_t &fastz);
-    uint32_t FilterIt(int32_t* filter, int16_t roll);
+    uint16_t FilterIt(int32_t* filter, uint8_t *filterstep, int16_t roll);
+    bool IsPitchUp(bool slow = false);
+    bool IsPitchDown(bool slow = false);
+    bool IsPitchOK(void);
 	
 	uint32_t Start;
 	uint32_t DebugDelay;
@@ -59,11 +62,10 @@ class FsmCamp :public virtual CState
 	PitchStates_e PitchState;
 	uint32_t DebugTime;
 
-    int32_t AvgY[FilterSize];
-    int32_t AvgZ[FilterSize];
     int32_t AvgRoll[FilterSize];
     int32_t AvgPitch[FilterSize];
-    uint16_t FilterStep;
+    uint8_t RollFilterStep;
+    uint8_t PitchFilterStep;
     
     int16_t Roll;
     int16_t SlowRoll;

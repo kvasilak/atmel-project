@@ -138,9 +138,9 @@ void CMMA8451::ReadXYZ()
 	int16_t Z;
 	ReadXYZ(X,Y,Z);
 	
-    CSerial::is().Dec();
-	CSerial::is() << "XYZ, " << X <<", " << Y << ", " << Z ;//<< "\n";
-    CSerial::is().Hex();
+   // CSerial::is().Dec();
+	CSerial::is() << "XYZ, " << X <<", " << Y << ", " << Z << "\n";
+    //CSerial::is().Hex();
 }
 
 void CMMA8451::ReadXYZ(int16_t &X, int16_t &Y, int16_t &Z)
