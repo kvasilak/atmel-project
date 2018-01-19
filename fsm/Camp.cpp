@@ -404,14 +404,12 @@ void FsmCamp::LevelMachine(void)
 			    Cio::is().Right(eValveStates::Hold);
 			
                 //first get coach level front to rear
-                //Node High
-                //if( Pitch > PitchCal + PitchTol )
                 if(IsPitchUp())
                 {
                     SetPitchState(CampNoseHigh);
                 }
                 //Nose Low
-                else  if( IsPitchDown()) //pitch < PitchCal - PitchTol )
+                else  if( IsPitchDown()) 
                 {
                     SetPitchState(CampNoseLow);
                 }
@@ -428,7 +426,6 @@ void FsmCamp::LevelMachine(void)
                     SetPitchState(CampNoseLow);
                 }
                 //we're level, check roll
-                //else if( (Pitch > PitchCal - PitchTol) && (Pitch < PitchCal + PitchTol))
                 else if( IsPitchOK()) 
                 {
                     SetPitchState(CampLevel);
@@ -436,12 +433,12 @@ void FsmCamp::LevelMachine(void)
                 else //still nose high
                {
                     //decide which side to raise
-                    if(Roll < RollCal - RollTol)//Roll up ( Left down )
+                    if(Roll < RollCal - RollTol)
                     {
                         Cio::is().Right(eValveStates::Hold);
                         Cio::is().Left(eValveStates::Fill);
                     }
-                    else if(Roll > RollCal + RollTol) //Roll down (Right Down)
+                    else if(Roll > RollCal + RollTol) 
                     {
                         Cio::is().Left(eValveStates::Hold);
                         Cio::is().Right(eValveStates::Fill);
@@ -456,13 +453,12 @@ void FsmCamp::LevelMachine(void)
 		
 		    case CampNoseLow:
                 //Nose High
-                if( IsPitchUp()) //Pitch > PitchCal + PitchTol )
+                if( IsPitchUp()) 
                 {
                     SetPitchState(CampNoseHigh);
                 }
                     
                 //we're level, check roll
-                //else if( (Pitch > PitchCal - PitchTol) && (Pitch < PitchCal + PitchTol))//we're level
                 else if( IsPitchOK()) 
                 {
                     SetPitchState(CampLevel);
@@ -470,12 +466,12 @@ void FsmCamp::LevelMachine(void)
 			    else //still low
 			    {
                     //decide which side to lower
-                    if(Roll < RollCal - RollTol)//Roll up ( Left down )
+                    if(Roll < RollCal - RollTol)
                     {
                         Cio::is().Left(eValveStates::Hold);
                         Cio::is().Right(eValveStates::Dump);
                     }
-                    else if(Roll > RollCal + RollTol) //Roll down (Right Down)
+                    else if(Roll > RollCal + RollTol) 
                     {
                         Cio::is().Right(eValveStates::Hold);
                         Cio::is().Left(eValveStates::Dump);
@@ -489,23 +485,23 @@ void FsmCamp::LevelMachine(void)
 		        break;
 		    case CampLevel:
                  //Nose High
-                 if( IsPitchUp()) //Pitch > PitchCal + PitchTol )
+                 if( IsPitchUp()) 
                  {
                      SetPitchState(CampNoseHigh);
                  }
                  //rear high
-                 else  if( IsPitchDown()) //Pitch < PitchCal - PitchTol )
+                 else  if( IsPitchDown()) 
                  {
                      SetPitchState(CampNoseLow);
                  }
                  else //Pitch and roll level
                  {
-                    if(Roll < RollCal - RollTol)//Roll up ( Left down )
+                    if(Roll < RollCal - RollTol)
                     {
                         Cio::is().Right(eValveStates::Dump);
                         Cio::is().Left(eValveStates::Fill);
                     }
-                    else if(Roll > RollCal + RollTol) //Roll down (Right Down)
+                    else if(Roll > RollCal + RollTol) 
                     {
                         Cio::is().Left(eValveStates::Dump);
                         Cio::is().Right(eValveStates::Fill);
@@ -528,12 +524,12 @@ void FsmCamp::LevelMachine(void)
                 //and then SLOWLY
                 if(CTimer::IsTimedOut(ReCheckTime, CompleteStart))
                 {
-                    if(  IsPitchUp(true)) //SlowPitch > PitchCal + (PitchTol *2))
+                    if(  IsPitchUp(true)) 
                     {
                         SetPitchState(CampNoseHigh);
                     }
                     //rear high
-                    else  if( IsPitchDown(true)) //SlowPitch < PitchCal - (PitchTol *2) )
+                    else  if( IsPitchDown(true)) 
                     {
                         SetPitchState(CampNoseLow);
                     }
