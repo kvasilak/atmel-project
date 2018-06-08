@@ -91,8 +91,7 @@ class CCorner
     uint32_t UpdateTime;
     uint32_t PulseTotal;
     uint32_t PulseTime;
-                        
-    bool DoPulse;                        
+                   
     
     int16_t LimitLow;
     int16_t LimitHigh;
