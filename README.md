@@ -1,7 +1,7 @@
 MicroLevel
 ==========
 
-GMC motorhome air ride controller
+Project settings info
 
 From Visual studio Tools dialog...
 
