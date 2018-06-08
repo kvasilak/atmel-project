@@ -14,8 +14,8 @@
 #include "CTimer.h"
 #include "string.h"
 
-static const int16_t PitchTol = 20;
-static const int16_t RollTol = 20;//10;
+static const int16_t PitchTol = 10;
+static const int16_t RollTol = 10;//10;
 
 #define ONE_G 4096    // 2g mode so 4096 counts per G
 #define HALF_G 2048   // 1/2 G = 2048
@@ -386,7 +386,7 @@ void FsmCamp::LevelMachine(void)
 {
 
     static uint32_t Current = 0;
-    static const uint32_t CheckTime = 500; //milliseconds
+    static const uint32_t CheckTime = 100; //milliseconds
     static uint32_t CompleteStart =  0;
     static const uint32_t ReCheckTime = 5; // seconds before we recheck levelness once level
 
@@ -498,8 +498,8 @@ void FsmCamp::LevelMachine(void)
                  {
                     if(Roll < RollCal - RollTol)
                     {
-                        Cio::is().Right(eValveStates::Dump);
                         Cio::is().Left(eValveStates::Fill);
+                        Cio::is().Right(eValveStates::Dump);
                     }
                     else if(Roll > RollCal + RollTol) 
                     {
