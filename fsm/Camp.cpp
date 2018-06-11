@@ -154,56 +154,6 @@ void FsmCamp::SetPitchState(PitchStates_e s)
 }
 
 
-//Get Filtered Y and Z
-void FsmCamp::GetYZ(int16_t &slowy, int16_t &slowz,int16_t &fasty, int16_t &fastz)
-{
-    //int16_t X=0;
-	//int16_t Y=0;
-	//int16_t Z=0;
-//
-    //int32_t YAvg;
-    //int32_t ZAvg;
-//
-	////Read Acccel
-	//CMMA8451::is().ReadXYZ(X, Y, Z);
-    //fasty = Y;
-    //fastz = Z;
-//
-    //AvgY[FilterStep] = Y;
-    //AvgZ[FilterStep] = Z;
-    //
-    //if(++FilterStep >= FilterSize) FilterStep = 0;
-//
-    //YAvg = AvgY[0];
-    //ZAvg = AvgZ[0];
-//
-    //for(int i=1;i<FilterSize; i++)
-    //{
-        //YAvg += AvgY[i];
-        //ZAvg += AvgZ[i];
-    //}
-    //
-    //YAvg = YAvg / FilterSize;
-    //ZAvg /= FilterSize;
-//
-    //slowy = YAvg;
-    //slowz = ZAvg;
-    //
-     //if(CTimer::IsTimedOut(DebugTime, DebugDelay))
-     //{
-         ////determine Pitch and roll errors
-         ////int32_t rollcal = nvm::is().GetCampY();
-         ////int32_t pitchcal = nvm::is().GetCampZ();
-         //
-         //
-         //CMMA8451::is().ReadXYZ();
-         ////CSerial::is() << "Roll;  " << Y << ", Avg; " <<  (int16_t)YAvg << ", err; " << (int16_t)(YAvg - rollcal) << "\n";
-         ////CSerial::is() << "Pitch; " << Z <<  ", Avg; " <<  (int16_t)ZAvg << ", err; " << (int16_t)(ZAvg -pitchcal) << "\n";
-         //
-         //DebugDelay = CTimer::GetTick();
-     //}
-}
-
 uint16_t FsmCamp::FilterIt(int32_t* filter, uint8_t *FilterStep, int16_t it)
 {
     int32_t Avg=0;

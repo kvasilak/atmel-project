@@ -60,18 +60,7 @@ void CCorner::Init(Position p)
     
     HeightSpeed = 0;
     
-    FilterReset();
-    
-    //OldHeight = GetAvgHeight();
-    //SpeedTime = CTimer::GetTick();
-
-    //just at the start
-    //HeightAverageCount = 0;
-        //for(int i=0;i<10;i++)
-    //{
-        //HeightAverages[i] = GetHeight();
-    //}
-    
+    FilterReset();  
     
     SetState(ValveIniting);
 }
@@ -80,24 +69,6 @@ void CCorner::Limits(int16_t Low, int16_t high)
     LimitLow = Low +2;
     LimitHigh = high -2;
 }
-
-////Get the height of this corner
-//int16_t CCorner::GetHeight()
-//{
-    //int16_t h = 0;
-    //
-    //switch(corner)
-   //{
-        //case LeftRear:
-			//h = CADC::is().GetLeftHeight();
-			////
-            //break;
-        //case RightRear:
-			//h = CADC::is().GetRightHeight();
-            //break;
-   //}   
-   //return h;
-//}   
    
 int32_t CCorner::GetAvgHeight()
 {
@@ -115,37 +86,6 @@ int32_t CCorner::GetAvgHeight()
     }
     return h;
 }    
-    //int32_t height=0;
-    //int32_t h = GetHeight();
-    //
-  //HeightAverages[HeightAverageCount++] = h;
-  //if(HeightAverageCount >= 10) HeightAverageCount = 0;
-  //
-  //for(int i=0;i<10;i++)
-  //{
-      //height += HeightAverages[i];
-  //}     
-  //
-  //height /= 10;
-   //
-   ////calculate speed, counts/second
-   //if(CTimer::IsTimedOut(1000, SpeedTime))
-   //{
-        //if(height > OldHeight)
-        //{
-            //HeightSpeed = height - OldHeight;
-        //}
-        //else
-        //{
-            //HeightSpeed = OldHeight - height;
-        //}
-        //
-        //OldHeight = height;
-        //SpeedTime = CTimer::GetTick();
-   //}
-   //
-   //return height;
-//}
 
 //open or close the fill solenoid for this corner
 void CCorner::FillOn()
@@ -213,19 +153,19 @@ void CCorner::SetState(ValveOp s)
     State = s;
 }
 
-void CCorner::FillExit()
+void CCorner::FillExit(int32_t setpoint)
 {
     FillOff();
     SetState(ValveHolding);
-    FilterReset();
+    FilterForce(setpoint);
     HoldOffTime = CTimer::GetTick();
 }
 
-void CCorner::DumpExit()
+void CCorner::DumpExit(int32_t setpoint)
 {
     DumpOff();
     SetState(ValveHolding);
-    FilterReset();
+    FilterForce(setpoint);
     HoldOffTime = CTimer::GetTick();
 }
 void CCorner::FilterReset()
@@ -250,6 +190,32 @@ void CCorner::FilterReset()
     int32_t slow = (filter_reg >> FILTER_SHIFT);
     
     CSerial::is() << "Filter reset " << height << ", reg " << slow <<"\n";
+}
+
+//Force the filters to the calibrated value
+void CCorner::FilterForce(int32_t setpoint)
+{
+    int i;
+
+    if(true == LongFilter)
+    {
+        filter_reg = (setpoint << FILTER_SHIFT);
+    
+        //initialize filters
+        for(i=0; i<10; i++)
+        {
+            SmoothAvg[i] = setpoint;
+        }
+    
+        for(i=0; i<100; i++)
+        {
+            HeightAvg[i] = setpoint;
+        }
+    
+        int32_t slow = (filter_reg >> FILTER_SHIFT);
+    
+        CSerial::is() << "Filter reset " << setpoint << ", reg " << slow <<"\n";
+    }    
 }
 
 uint16_t CCorner::Average(uint16_t value)
@@ -295,15 +261,15 @@ uint16_t CCorner::Smooth(uint16_t value)
 }
 
 
-void CCorner::SetLongFilter(bool slow)
+void CCorner::SetLongFilter(bool slow, int32_t setpoint)
 {
+    LongFilter = slow;
+    
     //reset filters if switching to long filter
     if((false == LongFilter) && (true == slow))
     {
-        FilterReset();
+        FilterForce(setpoint);
     }
-    
-    LongFilter = slow;
 
 	if(slow)
 	{
@@ -332,7 +298,7 @@ bool CCorner::AtHeight()
 
 //Uses the low pass IIR filter described in "Simple Software Lowpass Filter.pdf"
 //And two simple FIR filters
-void CCorner::FilterHeight( int32_t setpoint)
+void CCorner::FilterHeight(int32_t setpoint)
 {
     int32_t height 			= GetAvgHeight();
     
@@ -390,10 +356,18 @@ void CCorner::FilterHeight( int32_t setpoint)
 
 void CCorner::Run(int32_t setpoint)
 {		
-    int16_t height = GetAvgHeight();
     FilterHeight(setpoint); 
     
-     if(LongFilter) { height = slowheight; }
+    int16_t height;
+    
+     if(LongFilter) 
+     { 
+         height = slowheight; 
+     }
+     else
+     {
+          height = SmoothHeight;
+     }
 
     switch (State)
     {
@@ -406,45 +380,44 @@ void CCorner::Run(int32_t setpoint)
             break;
         case ValveHolding:
             //below setpoint
-            if( slowheight < (setpoint - DeadBand))
+                       
+            if( height < (setpoint - WideDeadBand))
             {
-                Cio::is().BlinkTravel(true);
-                //Stay in Long filter SetLongFilter(false);
-                SetState(ValveFilling);
                 FillOn();
-                    
-                //if within WideDeadBand, only pulse the valve
-                //so we don't over shoot the setpoint due to the long lag time
-
-                if(height > (setpoint - WideDeadBand) )
-                {                        
-                    //calc total pulse time as a multiple of deadbands from setpoint
-                    //we know height < setpoint or we wouldn't be here
-                    PulseTotal =(abs(setpoint - height) / DeadBand) * PulseTime; // pulsetime = 250ms
-                    PulseStart = CTimer::GetTick();
-
-                    SetState(ValveFillPulse);
-                }
+                Cio::is().BlinkTravel(true);
+                SetLongFilter(false,setpoint);
+                SetState(ValveFilling);
             }
-            else if(slowheight > (setpoint + DeadBand)) //>524
+            //if within WideDeadBand, only pulse the valve
+            //so we don't over shoot the setpoint due to the long lag time
+            else if(height < (setpoint - DeadBand)   )
+            {
+                FillOn();               
+
+                //calc total pulse time as a multiple of deadbands from setpoint
+                //we know height < setpoint or we wouldn't be here
+                PulseTotal = ((setpoint - height) / DeadBand) * PulseTime; 
+                PulseStart = CTimer::GetTick();
+
+                SetState(ValveFillPulse);
+            }
+            else if(height > (setpoint + WideDeadBand)) 
             {
                 Cio::is().BlinkTravel(true);
-                SetLongFilter(false);
+                SetLongFilter(false, setpoint);
                 SetState(ValveDumping);
-                DumpOn();
-                    
-                //if within WideDeadBand, only pulse the valve
-                //so we don't over shoot the setpoint due to the long lag time
-                    
-                if(height < (setpoint + WideDeadBand) )
-                {                        
-                    //calc total pulse time as a multiple of deadbands from setpoint
-                    //we know height > setpoint or we wouldn't be here
-                    PulseTotal = (abs(height - setpoint) / DeadBand) * PulseTime; // pulsetime = 250ms
-                    PulseStart = CTimer::GetTick();
+                DumpOn();   
+            }              
+            //if within WideDeadBand, only pulse the valve
+            //so we don't over shoot the setpoint due to the long lag time
+            else if(height > (setpoint + DeadBand) )
+            {                        
+                //calc total pulse time as a multiple of deadbands from setpoint
+                //we know height > setpoint or we wouldn't be here
+                PulseTotal = ((height - setpoint) / DeadBand) * PulseTime; 
+                PulseStart = CTimer::GetTick();
 
-                    SetState(ValveDumpPulse);
-                }
+                SetState(ValveDumpPulse);
             }
             else //within +- 1 deadband
             {
@@ -456,25 +429,25 @@ void CCorner::Run(int32_t setpoint)
         case ValveFillPulse:
             if(CTimer::IsTimedOut(PulseTotal, PulseStart))
             {
-                FillExit();
+                FillExit(setpoint);
             }
             break;
         case ValveFilling:
             if(height >= (setpoint-WideDeadBand))
             {    
-                FillExit();
+                FillExit(setpoint);
             }
             break;
         case ValveDumpPulse:
             if(CTimer::IsTimedOut(PulseTotal, PulseStart))
             {
-                DumpExit();
+                DumpExit(setpoint);
             }
             break;
         case ValveDumping:
             if(height <= (setpoint + WideDeadBand))
             {    
-                DumpExit();
+                DumpExit(setpoint);
             }
             break;
 

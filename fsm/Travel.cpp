@@ -32,8 +32,8 @@ void FsmTravel::OnEntry()
 	LeftSide.Init(LeftRear);
 	RightSide.Init(RightRear);
 
-	LeftSide.SetLongFilter(false);
-	RightSide.SetLongFilter(false);
+	LeftSide.SetLongFilter(false, (int32_t)nvm::is().GetLeftTravel());
+	RightSide.SetLongFilter(false, (int32_t)nvm::is().GetRightTravel());
     
     LeftSide.AtHeight(false);
     RightSide.AtHeight(false);
@@ -72,8 +72,8 @@ void FsmTravel::HandleEvent(eEvents evt)
                      if(CTimer::IsTimedOut(filterwait, 1000))
                      {
                         CSerial::is() << " *******Setting long travel Filter ******\r\n";
-                        LeftSide.SetLongFilter(true);
-                        RightSide.SetLongFilter(true);
+                        LeftSide.SetLongFilter(true, (int32_t)nvm::is().GetLeftTravel());
+                        RightSide.SetLongFilter(true, (int32_t)nvm::is().GetRightTravel());
                          
                         Cio::is().BlinkTravel(false);
                         CLeds::is().TravelOn();
@@ -133,8 +133,8 @@ void FsmTravel::HandleEvent(eEvents evt)
                 LeftSide.AtHeight(false);
                 RightSide.AtHeight(false);
         
-                LeftSide.SetLongFilter(false);
-                RightSide.SetLongFilter(false);
+                LeftSide.SetLongFilter(false, (int32_t)nvm::is().GetLeftTravel());
+                RightSide.SetLongFilter(false, (int32_t)nvm::is().GetRightTravel());
             
                 Starting = true;
                 CSerial::is() << " FsmTravel::Ignition On\r\n";

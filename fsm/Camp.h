@@ -48,7 +48,6 @@ class FsmCamp :public virtual CState
     
     void LevelMachine(void);
 	void SetPitchState(PitchStates_e s);
-    void GetYZ(int16_t &slowy, int16_t &slowz, int16_t &fasty, int16_t &fastz);
     uint16_t FilterIt(int32_t* filter, uint8_t *filterstep, int16_t roll);
     bool IsPitchUp(bool slow = false);
     bool IsPitchDown(bool slow = false);

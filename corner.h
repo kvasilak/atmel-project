@@ -67,11 +67,11 @@ class CCorner
 	void FillOff();
     void DumpOn();//Solenoid state);
 	void DumpOff();
-    void FillExit();
-    void DumpExit();
+    void FillExit(int32_t setpoint);
+    void DumpExit(int32_t setpoint);
     void Init(Position p);
     void Limits(int16_t Low, int16_t high);
-    void SetLongFilter(bool slow);
+    void SetLongFilter(bool slow,int32_t setpoint);
     void AtHeight(bool at);
     bool AtHeight();
     int16_t GetHeight();
@@ -107,6 +107,7 @@ class CCorner
     int32_t SmoothHeight;
     uint16_t Smooth(uint16_t value);
     void FilterReset(void);
+    void FilterForce(int32_t setpoint);
     int32_t GetAvgHeight();
     
     bool LongFilter;

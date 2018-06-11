@@ -56,7 +56,8 @@ void CSerial::Init()
 	IsOpen = false;
 	
 	UBRR0H = 0;
-	UBRR0L = 16; 
+	//UBRR0L = 16;  //115200 baud
+    UBRR0L = 207; //9600 baud for Bluetooth
 	UCSR0A |= _BV(U2X0);
 
 	UCSR0C = (3 << UCSZ00); //8n1 
