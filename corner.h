@@ -86,7 +86,6 @@ class CCorner
 	ValveOp State;
 	uint32_t LastTime;		    //the last time valve changed state
 	int32_t filter_reg; 
-    uint32_t HoldOffTime;       //Min time between state changes
     uint32_t PulseStart;
     uint32_t UpdateTime;
     uint32_t PulseTotal;

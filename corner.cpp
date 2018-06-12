@@ -156,17 +156,17 @@ void CCorner::SetState(ValveOp s)
 void CCorner::FillExit(int32_t setpoint)
 {
     FillOff();
-    SetState(ValveHolding);
     FilterForce(setpoint);
-    HoldOffTime = CTimer::GetTick();
+    
+    SetState(ValveHolding);
 }
 
 void CCorner::DumpExit(int32_t setpoint)
 {
     DumpOff();
-    SetState(ValveHolding);
     FilterForce(setpoint);
-    HoldOffTime = CTimer::GetTick();
+    
+    SetState(ValveHolding);
 }
 void CCorner::FilterReset()
 {
@@ -213,8 +213,12 @@ void CCorner::FilterForce(int32_t setpoint)
         }
     
         int32_t slow = (filter_reg >> FILTER_SHIFT);
+        
+        slowheight = setpoint;
     
-        CSerial::is() << "Filter reset " << setpoint << ", reg " << slow <<"\n";
+        CSerial::is().Dec();
+        CSerial::is() << "Filter Force " << (int16_t)setpoint << ", slow " << (int16_t)slow <<"\n";
+        CSerial::is().Hex();
     }    
 }
 
@@ -263,17 +267,21 @@ uint16_t CCorner::Smooth(uint16_t value)
 
 void CCorner::SetLongFilter(bool slow, int32_t setpoint)
 {
-    LongFilter = slow;
-    
     //reset filters if switching to long filter
     if((false == LongFilter) && (true == slow))
     {
+        LongFilter = true;
         FilterForce(setpoint);
+    }
+    else
+    {
+        LongFilter = false;
     }
 
 	if(slow)
 	{
-		CycleTime = 10000; //seconds between readings
+		//CycleTime = 10000; //seconds between readings
+        CycleTime = 1000; //testing
 	}
 	else
 	{
@@ -332,20 +340,21 @@ void CCorner::FilterHeight(int32_t setpoint)
                     CSerial::is() << "R Height: ";
                     break;
            } 
+           
+           CSerial::is().Dec();
             CSerial::is() << (int16_t)height;
+            
+            CSerial::is() << " (";
+            CSerial::is() << (int16_t)(height - setpoint);
+            CSerial::is() << ") ";
                                
-            CSerial::is() << " [";
             CSerial::is() << (int16_t)slowheight;
-            CSerial::is() << "]";
-
             
             CSerial::is() << " [";
             CSerial::is() << (int16_t)(slowheight - setpoint);
             CSerial::is() << "]\n";
                                
-            CSerial::is() << " (";
-            CSerial::is() << (int16_t)(height - setpoint);
-            CSerial::is() << ")";
+           CSerial::is().Hex();
 
            UpdateTime = CTimer::GetTick();
         }
@@ -375,8 +384,6 @@ void CCorner::Run(int32_t setpoint)
             FillOff();
             DumpOff();
             SetState(ValveHolding);
-            //filter_reg = (height << FILTER_SHIFT);
-            HoldOffTime = CTimer::GetTick();
             break;
         case ValveHolding:
             //below setpoint
@@ -399,6 +406,7 @@ void CCorner::Run(int32_t setpoint)
                 PulseTotal = ((setpoint - height) / DeadBand) * PulseTime; 
                 PulseStart = CTimer::GetTick();
 
+                CSerial::is() << "Fill Pulse: " << PulseTotal << "\n";
                 SetState(ValveFillPulse);
             }
             else if(height > (setpoint + WideDeadBand)) 
@@ -416,6 +424,12 @@ void CCorner::Run(int32_t setpoint)
                 //we know height > setpoint or we wouldn't be here
                 PulseTotal = ((height - setpoint) / DeadBand) * PulseTime; 
                 PulseStart = CTimer::GetTick();
+                
+                uint32_t PTotal = PulseTotal;
+                
+                CSerial::is().Dec();
+                 CSerial::is() << "Dump Pulse: " << (int16_t)PTotal << " h: " << (int16_t)height << " s: " << (int16_t)setpoint <<"\n";
+                 CSerial::is().Hex();
 
                 SetState(ValveDumpPulse);
             }
@@ -447,7 +461,10 @@ void CCorner::Run(int32_t setpoint)
         case ValveDumping:
             if(height <= (setpoint + WideDeadBand))
             {    
-                DumpExit(setpoint);
+                DumpOff();
+                //FilterForce(setpoint);
+    
+                SetState(ValveHolding);
             }
             break;
 
@@ -456,7 +473,6 @@ void CCorner::Run(int32_t setpoint)
             FillOff();
             DumpOff();
             SetState(ValveHolding);
-            HoldOffTime = CTimer::GetTick();
     }
 }
 
