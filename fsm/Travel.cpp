@@ -32,8 +32,11 @@ void FsmTravel::OnEntry()
 	LeftSide.Init(LeftRear);
 	RightSide.Init(RightRear);
 
-	LeftSide.SetLongFilter(false, (int32_t)nvm::is().GetLeftTravel());
-	RightSide.SetLongFilter(false, (int32_t)nvm::is().GetRightTravel());
+    LeftSide.SetSetPoint(height); //nvm::is().GetLeftTravel());
+    RightSide.SetSetPoint(height); //nvm::is().GetRightTravel());
+
+	LeftSide.SetLongFilter(false); //, (int32_t)nvm::is().GetLeftTravel());
+	RightSide.SetLongFilter(false);//, (int32_t)nvm::is().GetRightTravel());
     
     LeftSide.AtHeight(false);
     RightSide.AtHeight(false);

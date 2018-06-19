@@ -77,6 +77,7 @@ class CCorner
     int16_t GetHeight();
     void FilterHeight( int32_t setpoint);
     bool IsMoving();
+    void SetSetPoint(int32_t height);
   
 	private:
 	int16_t DeadBand;			//how far the corner has to move before we try to adjust the position
