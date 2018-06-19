@@ -239,7 +239,6 @@ void CController::Run()
 			ScheduleEvent(eEvents::TimerEvent);
 
 			//LED brightness controlled by voltage on dimmer input
-			//Todo Scale to resistor divider
 			//
             //Dash lamp dimmer varies from 0 to 12v when headlights are on
             //and is zero volts when headlights are off

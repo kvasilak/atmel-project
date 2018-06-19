@@ -98,10 +98,47 @@ void CSerial::put_p(const char *text)
 
 #endif
 
+//void CSerial::put32(int32_t number)
+//{
+	//put16(number & 0x00FF);
+	//put16((number & 0xFF00) > 16);
+//}
+
 void CSerial::put32(int32_t number)
 {
-	put16(number & 0x00FF);
-	put16((number & 0xFF00) > 16);
+    char buf[32] = {0};
+    register int i = 30;
+    bool neg =  false;
+    
+    if(number < 0)
+    {
+        number = number * (-1);
+        neg = true;
+    }
+    
+    if(number != 0)
+    {
+
+        for(; number && i ; --i, number /= m_Base)
+        {
+            buf[i] = "0123456789abcdef"[number % m_Base];
+        }
+        
+        if(neg)
+        {
+            buf[i] = '-';
+            this->put(&buf[i]);
+        }
+        else
+        {
+            this->put(&buf[i+1]);
+        }
+
+    }
+    else
+    {
+        this->put("0");
+    }
 }
 
 //Put number on UART

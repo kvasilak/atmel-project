@@ -45,8 +45,10 @@ void FsmTravel::OnEntry()
     
     FilterState = FilterStart;
 	
+    CSerial::is().Dec();
 	CSerial::is() << " FsmTravel::OnEntry()\r\n";
 	CSerial::is() << "Travel Cal vals; Left, " << nvm::is().GetLeftTravel() << ", Right, " << nvm::is().GetRightTravel() << "\n";
+    CSerial::is().Hex();
 }
 
 void FsmTravel::HandleEvent(eEvents evt)
@@ -69,7 +71,7 @@ void FsmTravel::HandleEvent(eEvents evt)
                     }
                     break;
                 case FilterWait:
-                     if(CTimer::IsTimedOut(filterwait, 1000))
+                     if(CTimer::IsTimedOut(filterwait, 2000))
                      {
                         CSerial::is() << " *******Setting long travel Filter ******\r\n";
                         LeftSide.SetLongFilter(true, (int32_t)nvm::is().GetLeftTravel());
@@ -84,8 +86,11 @@ void FsmTravel::HandleEvent(eEvents evt)
                      {
                          if((LeftSide.AtHeight() == false) || (RightSide.AtHeight() == false) )
                          {
+                             //CSerial::is() << "Long Filter reset\n";
                              //restart timer
                              filterwait = CTimer::GetTick();
+                             
+                              FilterState = FilterStart;
                          }
                      }                
                     break;
