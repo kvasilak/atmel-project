@@ -269,8 +269,8 @@ void CCorner::SetLongFilter(bool slow, int32_t setpoint)
 
 	if(slow)
 	{
-		CycleTime = 10000; //seconds between readings
-        //CycleTime = 1000; //testing
+		//CycleTime = 10000; //seconds between readings
+        CycleTime = 1000; //testing
 	}
 	else
 	{

@@ -64,9 +64,9 @@ class CCorner
 	public:
 	CCorner(Position c);
 	void Run(int32_t setpoint);
-    void FillOn();//Solenoid state);
+    void FillOn();
 	void FillOff();
-    void DumpOn();//Solenoid state);
+    void DumpOn();
 	void DumpOff();
     void Init(Position p);
     void Limits(int16_t Low, int16_t high);
