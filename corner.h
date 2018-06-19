@@ -63,19 +63,19 @@ class CCorner
 {
 	public:
 	CCorner(Position c);
-	void Run(int32_t setpoint);
-    void FillOn();//Solenoid state);
+	void Run(int32_t height);
+    void FillOn();
 	void FillOff();
-    void DumpOn();//Solenoid state);
+    void DumpOn();
 	void DumpOff();
     void Init(Position p);
     void Limits(int16_t Low, int16_t high);
-    void SetLongFilter(bool slow,int32_t setpoint);
+    void SetLongFilter(bool slow);
     void AtHeight(bool at);
     void NotAtHeight();
     bool AtHeight();
     int16_t GetHeight();
-    void FilterHeight( int32_t setpoint);
+    void FilterHeight( void);
     bool IsMoving();
     void SetSetPoint(int32_t height);
   
@@ -91,7 +91,7 @@ class CCorner
     uint32_t UpdateTime;
     uint32_t PulseTotal;
     uint32_t PulseTime;
-                   
+    int32_t Setpoint;
     
     int16_t LimitLow;
     int16_t LimitHigh;
@@ -107,7 +107,7 @@ class CCorner
     int32_t SmoothHeight;
     uint16_t Smooth(uint16_t value);
     void FilterReset(void);
-    void FilterForce(int32_t setpoint);
+    void FilterForce(void);
     int32_t GetAvgHeight();
     
     bool LongFilter;
