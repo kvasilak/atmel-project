@@ -115,6 +115,55 @@ void visual_stream_init(void)
 		CSerial::is().PutBuf((uint8_t *)&end, sizeof(end));
 }
 
+inline static float sqr(float x)
+{
+    return x*x;
+}
+
+void LeastSquares(int size, int16_t *y, int16_t *m, int16_t *b)
+{
+    double   sumx = 0.0;                      /* sum of x     */
+    double   sumx2 = 0.0;                     /* sum of x**2  */
+    double   sumxy = 0.0;                     /* sum of x * y */
+    double   sumy = 0.0;                      /* sum of y     */
+    double   sumy2 = 0.0;                     /* sum of y**2  */
+
+    for (int i=0;i<size;i++)
+    {
+        sumx  += i; //x[i];
+        sumx2 += sqr(i); //x[i]);
+        sumxy += i /*x[i]*/ * y[i];
+        sumy  += y[i];
+        sumy2 += sqr(y[i]);
+    }
+
+    double denom = (size * sumx2 - sqr(sumx));
+    
+    if (denom == 0)
+    {
+        // singular matrix. can't solve the problem.
+        *m = 0;
+        *b = 0;
+        //if (r) *r = 0;
+        //return false;
+    }
+
+    double fm = (size * sumxy  -  sumx * sumy) / denom;
+    double fb = (sumy * sumx2  -  sumx * sumxy) / denom;
+    
+    *m = fm;
+    *b = fb;
+    
+    //if (r!=NULL)
+    //{
+    //*r = (sumxy - sumx * sumy / n) /    /* compute correlation coeff */
+    //sqrt((sumx2 - sqr(sumx)/n) *
+    //(sumy2 - sqr(sumy)/n));
+    //}
+
+    //return true;
+}
+
 int main(void)
 {
     mcusr=MCUSR;
@@ -144,13 +193,13 @@ int main(void)
 	CMMA8451::is().Init();
 	
 	nvm::is().init();
-    
-    //CSerial::is().Dec();
-    //uint32_t i;
-    //for(i=0; i<90000;i+=100)
-    //{
-        //CSerial::is() << i <<"\n";
-    //}
+
+    //least squares fit test
+    int16_t data[] = {1, 2,4,5,10,20};
+    int16_t m;
+    int16_t b;
+        
+    LeastSquares(6, data, &m, &b);
 
     while(1)
     {

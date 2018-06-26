@@ -15,6 +15,7 @@
 #define HEIGHTSIZE 100
 
  #define FILTER_STATES_LIST(macro) \
+ macro(FilterInit),    \
  macro(FilterStart),     \
  macro(FilterWait),     \
  macro(FilterLong)
@@ -34,8 +35,8 @@ class FsmTravel :public CState
     void LeastSquares(int size, int16_t *x, int16_t *m, int16_t *b);
     
 private:
-    void UpdateHeights(void);
-    
+    void UpdateHeights(int length);
+    void SetState(FilterStates_e s);
     
 	CCorner LeftSide;
 	CCorner RightSide;
@@ -49,6 +50,8 @@ private:
     int16_t LeftHeight;
     int16_t RightHeight;
     int HeightIndex;
+    int ShortFilterLen;
+    int LomgFilterLen;
 }; //Travel
 
 #endif //__TRAVEL_H__

@@ -43,7 +43,10 @@ public:
 
     if (In >= MAX_ENTRIES) { In = 0; }
 
-    if(Size < MAX_ENTRIES ) { Size++; }
+    if(Size < MAX_ENTRIES ) 
+    { 
+        Size++; 
+     }
   }
 
 //Get a byte from the buffer

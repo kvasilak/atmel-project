@@ -39,14 +39,15 @@ enum Position {
 //enum ValveOp { Filling, Dumping, Holding, LastState };
 	
     #define VALVE_STATES_LIST(macro)\
-        macro(ValveIniting),     \
+        macro(ValveIniting),      \
+        macro(ValveHolding),      \
+        macro(ValveTweek),        \
         macro(ValveFilling),      \
         macro(ValveFillPulse),    \
         macro(ValveDumping),      \
         macro(ValveDumpPulse),    \
-        macro(ValveHoldEntry),    \
-        macro(ValveHolding),      \
-        macro(ValveCycleDelay),     \
+        macro(ValveCycleDelay),   \
+        macro(ValveTweekDelay),   \
         macro(ValveLastState)
     
 typedef enum 
@@ -71,9 +72,8 @@ class CCorner
     void Init(Position p);
     void Limits(int16_t Low, int16_t high);
     void SetLongFilter(bool slow);
-    void AtHeight(bool at);
     void NotAtHeight();
-    bool AtHeight();
+    bool IsAtHeight(int32_t height);
     int16_t GetHeight();
     void FilterHeight( void);
     bool IsMoving();
@@ -115,7 +115,7 @@ class CCorner
     int SmoothAt;
     int32_t slowheight; 
     int count;
-    bool IsAtHeight;
+    //bool IsAtHeight;
     
     int32_t HeightSpeed;
     int32_t OldHeight;
