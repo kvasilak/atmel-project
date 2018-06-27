@@ -40,13 +40,15 @@ enum Position {
 	
     #define VALVE_STATES_LIST(macro)\
         macro(ValveIniting),     \
+        macro(ValveHolding),      \
+        macro(ValvePulse),        \
         macro(ValveFilling),      \
         macro(ValveFillPulse),    \
         macro(ValveDumping),      \
         macro(ValveDumpPulse),    \
         macro(ValveHoldEntry),    \
-        macro(ValveHolding),      \
-        macro(ValveCycleDelay),     \
+        macro(ValvePulseDelay),   \
+        macro(ValveCycleDelay),   \
         macro(ValveLastState)
     
 typedef enum 
@@ -56,7 +58,7 @@ typedef enum
 
 
 // Parameter K for the filter
-#define FILTER_SHIFT    8//8
+#define FILTER_SHIFT    12//8
 #define DEAD_BAND       7//10
 
 class CCorner 
@@ -77,6 +79,8 @@ class CCorner
     int16_t GetHeight();
     void FilterHeight( int32_t setpoint);
     bool IsMoving();
+    
+    int32_t slowheight; 
   
 	private:
 	int16_t DeadBand;			//how far the corner has to move before we try to adjust the position
@@ -112,7 +116,7 @@ class CCorner
     bool LongFilter;
     int SlowAt;
     int SmoothAt;
-    int32_t slowheight; 
+    
     int count;
     bool IsAtHeight;
     

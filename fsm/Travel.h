@@ -26,6 +26,7 @@ class FsmTravel :public CState
 {
 	public:
 	FsmTravel(CController& FsmManager);
+    void SetState(FilterStates_e s);
 	void OnEntry();
 	void HandleEvent(eEvents evt);
 	void OnExit();

@@ -13,6 +13,7 @@
 
 #include "Travel.h"
 #include "nvm.h"
+#include "CADC.h"
 
 FsmTravel::FsmTravel(CController& SMManager) :
 CState(SMManager, eStates::STATE_TRAVEL),
@@ -24,6 +25,18 @@ filterwait(0),
 waiting(false)
 {
 }
+
+void FsmTravel::SetState(FilterStates_e s)
+{
+     static const char *StateStrs[] = {FILTER_STATES_LIST(STRINGIFY)};
+
+     CSerial::is() << "**Travel State,";
+     CSerial::is() << StateStrs[s] ;
+     CSerial::is() << "\r\n";
+
+     FilterState = s;
+}
+
 
 void FsmTravel::OnEntry()
 {
@@ -43,7 +56,7 @@ void FsmTravel::OnEntry()
 
 	Start = CTimer::GetTick();
     
-    FilterState = FilterStart;
+    SetState(FilterStart);
 	
     CSerial::is().Dec();
 	CSerial::is() << " FsmTravel::OnEntry()\r\n";
@@ -53,13 +66,38 @@ void FsmTravel::OnEntry()
 
 void FsmTravel::HandleEvent(eEvents evt)
 {
+     uint16_t lset;
+     uint16_t rset;
+     
+     int32_t lh;
+     int32_t rh;
+     
+    int32_t slh;
+     int32_t srh;
+     
+     
 	switch(evt)
 	{
 		case eEvents::TimerEvent:
 			//run travel FSM
-			LeftSide.Run(nvm::is().GetLeftTravel());
-			RightSide.Run(nvm::is().GetRightTravel());
-			
+            
+            lset = nvm::is().GetLeftTravel();
+            rset = nvm::is().GetRightTravel();
+            
+            lh = CADC::is().GetLeftAvgHeight();
+            rh = CADC::is().GetRightAvgHeight();
+            
+            slh = LeftSide.slowheight;
+            srh = RightSide.slowheight;
+            
+			LeftSide.Run(lset);
+			RightSide.Run(rset);
+	    
+            CSerial::is().Dec();
+            CSerial::is() << (int16_t)lh << ", " << (int16_t)rh << ": err " << int16_t(lh - lset) << ", " << int16_t(rh - rset);
+            CSerial::is() << " ,slow: " << slh << ", " << srh << ": err " << int16_t(slh - lset) << ", " << int16_t(srh - rset) << "\n";
+            CSerial::is().Hex();
+		
             
             switch(FilterState)
             {
@@ -67,7 +105,7 @@ void FsmTravel::HandleEvent(eEvents evt)
                     if(LeftSide.AtHeight() && RightSide.AtHeight() )
                     {
                         filterwait = CTimer::GetTick();
-                        FilterState = FilterWait;
+                        SetState(FilterWait);
                     }
                     break;
                 case FilterWait:
@@ -80,7 +118,7 @@ void FsmTravel::HandleEvent(eEvents evt)
                         Cio::is().BlinkTravel(false);
                         CLeds::is().TravelOn();
                      
-                         FilterState = FilterLong;
+                         SetState(FilterLong);
                      }     
                      else
                      {
@@ -90,7 +128,7 @@ void FsmTravel::HandleEvent(eEvents evt)
                              //restart timer
                              filterwait = CTimer::GetTick();
                              
-                              FilterState = FilterStart;
+                              SetState(FilterStart);
                          }
                      }                
                     break;
@@ -98,7 +136,7 @@ void FsmTravel::HandleEvent(eEvents evt)
                      if((LeftSide.AtHeight() == false) || (RightSide.AtHeight() == false) )
                      {
                         //long filter turned off in Corner class                    
-                        FilterState = FilterStart;
+                        SetState(FilterStart);
                      }
                 break;
             }
