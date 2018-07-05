@@ -36,8 +36,6 @@ static const char *CornerName[] = {"Left,", "Right,"};
 //There is one instance of this class for each corner of the vehicle usually 4
 //This is where the decisions are made as to add or remove air from the suspension
 CCorner::CCorner(Position p):
-	DeadBand(DEAD_BAND),
-    WideDeadBand(DEAD_BAND*5),
 	CycleTime(100), //ms between updates
 	State(ValveIniting),
 	PulseTime(100),
@@ -356,7 +354,7 @@ void CCorner::Run(int32_t setpoint)
         case ValveHolding:
             //below setpoint
                        
-            if( height < (setpoint - WideDeadBand))
+            if( height < (setpoint - WIDE_DEAD_BAND))
             {
                 //NotAtHeight();
                 FillOn();
@@ -364,21 +362,22 @@ void CCorner::Run(int32_t setpoint)
                 //SetLongFilter(false,setpoint);
                 SetState(ValveFilling);
             }
-            //if within WideDeadBand, only pulse the valve
+            //if within WIDE_DEAD_BAND, and lower than DEAD_BAND only pulse the valve
             //so we don't over shoot the setpoint due to the long lag time
-            else if(height < (setpoint - DeadBand)   )
+            else if(height < (setpoint - DEAD_BAND)   )
             {
                 //NotAtHeight();
                 FillOn();               
 
-                //calc total pulse time as a multiple of deadbands from setpoint
+                //calc total pulse time as a multiple of DEAD_BANDs from setpoint
                 //we know height < setpoint or we wouldn't be here
-                PulseTotal = /*((setpoint - height) / DeadBand) * */ PulseTime; 
+                //New... just one pulse then wait
+                PulseTotal = /*((setpoint - height) / DEAD_BAND) * */ PulseTime; 
                 StartTime = CTimer::GetTick();
 
                 SetState(ValveFillPulse);
             }
-            else if(height > (setpoint + WideDeadBand)) 
+            else if(height > (setpoint + WIDE_DEAD_BAND)) 
             {
                 //NotAtHeight();
                 Cio::is().BlinkTravel(true);
@@ -386,16 +385,16 @@ void CCorner::Run(int32_t setpoint)
                 SetState(ValveDumping);
                 DumpOn();   
             }              
-            //if within WideDeadBand, only pulse the valve
+            //if within WIDE_DEAD_BAND, , and higher than DEAD_BAND only pulse the valve
             //so we don't over shoot the setpoint due to the long lag time
-            else if(height > (setpoint + DeadBand) )
+            else if(height > (setpoint + DEAD_BAND) )
             {                        
                 //NotAtHeight();
                 DumpOn();
                 
-                //calc total pulse time as a multiple of deadbands from setpoint
+                //calc total pulse time as a multiple of DEAD_BANDs from setpoint
                 //we know height > setpoint or we wouldn't be here
-                PulseTotal = /*((height - setpoint) / DeadBand) * */ PulseTime; 
+                PulseTotal = /*((height - setpoint) / DEAD_BAND) * */ PulseTime; 
                 StartTime = CTimer::GetTick();
 
                 SetState(ValveDumpPulse);
@@ -408,26 +407,26 @@ void CCorner::Run(int32_t setpoint)
 
             break;
         case ValvePulse:
-            if(height < (setpoint - DeadBand)   )
+            if(height < (setpoint - DEAD_BAND)   )
             {
                 //NotAtHeight();
                 FillOn();
 
-                //calc total pulse time as a multiple of deadbands from setpoint
+                //calc total pulse time as a multiple of DEAD_BANDs from setpoint
                 //we know height < setpoint or we wouldn't be here
-                PulseTotal = /*((setpoint - height) / DeadBand) * */ PulseTime;
+                PulseTotal = /*((setpoint - height) / DEAD_BAND) * */ PulseTime;
                 StartTime = CTimer::GetTick();
                         
                 SetState(ValveFillPulse);
             }
-            else if(height > (setpoint + DeadBand) )
+            else if(height > (setpoint + DEAD_BAND) )
             {
                 //NotAtHeight();
                 DumpOn();
                         
-                //calc total pulse time as a multiple of deadbands from setpoint
+                //calc total pulse time as a multiple of DEAD_BANDs from setpoint
                 //we know height > setpoint or we wouldn't be here
-                PulseTotal = /*((height - setpoint) / DeadBand) * */ PulseTime;
+                PulseTotal = /*((height - setpoint) / DEAD_BAND) * */ PulseTime;
                 StartTime = CTimer::GetTick();
 
                 SetState(ValveDumpPulse);
@@ -459,7 +458,7 @@ void CCorner::Run(int32_t setpoint)
             }
             break;
         case ValveFilling:
-            if(height >= (setpoint-WideDeadBand))
+            if(height >= (setpoint-WIDE_DEAD_BAND))
             {    
                 FillOff();
                 StartTime = CTimer::GetTick();
@@ -467,7 +466,7 @@ void CCorner::Run(int32_t setpoint)
             }
             break;
         case ValveDumping:
-            if(height <= (setpoint + WideDeadBand))
+            if(height <= (setpoint + WIDE_DEAD_BAND))
             {    
                 DumpOff();
                 StartTime = CTimer::GetTick();

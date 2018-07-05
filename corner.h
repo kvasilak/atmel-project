@@ -59,7 +59,18 @@ typedef enum
 
 // Parameter K for the filter
 #define FILTER_SHIFT    12//8
-#define DEAD_BAND       7//10
+
+//coach height is 11 11/16 +- 4/16
+//so 11 7/16 to 11 15/16
+//
+//this corresponds to about 60 (+- 30) adc counts
+//I measured 240 and 300 counts, min, max
+//
+//.250" / 30 = .00833" per count
+// 15 counts * .00833 = 1/8"
+
+#define WIDE_DEAD_BAND  30 /* +- 1/4" (was 35) */
+#define DEAD_BAND       15 /* +- 1/8" (was 7) */
 
 class CCorner 
 {
@@ -83,8 +94,6 @@ class CCorner
     int32_t slowheight; 
   
 	private:
-	int16_t DeadBand;			//how far the corner has to move before we try to adjust the position
-    int16_t WideDeadBand;
 	Position corner;
 	uint32_t CycleTime;		    //The minimum time between valve state changes. Prevents valve chatter
 	ValveOp State;
