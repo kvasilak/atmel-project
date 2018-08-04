@@ -43,7 +43,7 @@ void ManualCal::HandleEvent(eEvents evt)
 	switch(evt)
 	{
 		case eEvents::TimerEvent:
-			if(CTimer::IsTimedOut(250, Blink))
+			if(CTimer::IsTimedOut(100, Blink))
 			{
                 lset = nvm::is().GetLeftTravel();
                 rset = nvm::is().GetRightTravel();
@@ -53,7 +53,7 @@ void ManualCal::HandleEvent(eEvents evt)
                 
                 
                  CSerial::is().Dec();
-                 CSerial::is() << (int16_t)lh << ", " << (int16_t)rh << ": err " << int16_t(lh - lset) << ", " << int16_t(rh - rset) << "\n";
+                 CSerial::is() << "m," << (int16_t)lh << "," << (int16_t)rh << "," << int16_t(lh - lset) << "," << int16_t(rh - rset) << "\n";
                  CSerial::is().Hex();
                  
 				if(Active)

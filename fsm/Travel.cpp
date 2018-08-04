@@ -22,6 +22,7 @@ RightSide(RightRear),
 Starting(true),
 Start(0),
 filterwait(0),
+LogTimeout(0),
 waiting(false)
 {
 }
@@ -55,6 +56,8 @@ void FsmTravel::OnEntry()
     waiting = false;
 
 	Start = CTimer::GetTick();
+    
+    LogTimeout = CTimer::GetTick();
     
     SetState(FilterStart);
 	
@@ -93,11 +96,15 @@ void FsmTravel::HandleEvent(eEvents evt)
 			LeftSide.Run(lset);
 			RightSide.Run(rset);
 	    
-            CSerial::is().Dec();
-            CSerial::is() << (int16_t)lh << ", " << (int16_t)rh << ": err " << int16_t(lh - lset) << ", " << int16_t(rh - rset);
-            CSerial::is() << " ,slow: " << slh << ", " << srh << ": err " << int16_t(slh - lset) << ", " << int16_t(srh - rset) << "\n";
-            CSerial::is().Hex();
-		
+            if(CTimer::IsTimedOut(LogTimeout, 100))
+            {
+                CSerial::is().Dec();
+                CSerial::is() << "t," << (int16_t)lh << "," << (int16_t)rh << "," << int16_t(lh - lset) << "," << int16_t(rh - rset);
+                CSerial::is() << "," << slh << "," << srh << "," << int16_t(slh - lset) << "," << int16_t(srh - rset) << "\n";
+                CSerial::is().Hex();
+                
+                LogTimeout = CTimer::GetTick();
+            }		
             
             switch(FilterState)
             {

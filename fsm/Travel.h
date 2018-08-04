@@ -37,6 +37,7 @@ private:
 	bool Starting;
 	uint32_t Start;
     uint32_t filterwait;
+    uint32_t LogTimeout;
     bool waiting;
     FilterStates_e FilterState;
 }; //Travel

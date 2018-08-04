@@ -47,7 +47,10 @@ void FsmCamp::OnEntry()
     
     GetPitchRollCal();
 
+    CSerial::is().Dec();
 	CSerial::is() << " FsmCamp::OnEntry(), roll cal; " << RollCal << " pitch cal; " << PitchCal << " tol; " << PitchTol << "\r\n";
+    CSerial::is().Hex();
+    
 	Start = CTimer::GetTick();
 	
 	IsLevel  = false;
@@ -144,11 +147,11 @@ void FsmCamp::OnExit()
 
 void FsmCamp::SetPitchState(PitchStates_e s)
 {
-	static const char *StateStrs[] = {PITCH_STATES_LIST(STRINGIFY)};
+	//static const char *StateStrs[] = {PITCH_STATES_LIST(STRINGIFY)};
 
-	CSerial::is() << "Pitch State, ";
-	CSerial::is() << StateStrs[s] ;
-	CSerial::is() << "\n";
+	//CSerial::is() << "Pitch State, ";
+	//CSerial::is() << StateStrs[s] ;
+	//CSerial::is() << "\n";
 
 	PitchState = s;
 }
@@ -199,8 +202,10 @@ void FsmCamp::GetPitchRoll(void)
     
     SlowPitch =  FilterIt(AvgPitch, &PitchFilterStep, Pitch);
     
-    CSerial::is() << "Roll;  " << Roll << ", Avg; " <<  (int16_t)SlowRoll << ", err; " << (int16_t)(SlowRoll - RollCal) << "\n";
-    CSerial::is() << "Pitch; " << Pitch <<  ", Avg; " <<  (int16_t)SlowPitch << ", err; " << (int16_t)(SlowPitch - PitchCal) << "\n";
+    CSerial::is().Dec();
+    CSerial::is() << "c," << Roll << "," <<  (int16_t)SlowRoll << "," << (int16_t)(SlowRoll - RollCal);
+    CSerial::is() << "," << Pitch <<  "," <<  (int16_t)SlowPitch << "," << (int16_t)(SlowPitch - PitchCal) << "\n";
+    CSerial::is().Hex();
     
     //CMMA8451::is().ReadXYZ();
     SetPitchState(PitchState);
