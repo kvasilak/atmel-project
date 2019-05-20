@@ -86,9 +86,12 @@ bool CMMA8451::Init()
 			
 			 writeRegister8(MMA8451_REG_CTRL_REG2, 0x40); // reset
 
+            //wait for reset complete
 			while (readRegister8(MMA8451_REG_CTRL_REG2) & 0x40);
     
 			writeRegister8(MMA8451_REG_CTRL_REG1, 1);
+            
+            CSerial::is() << "MMA8451 reset\n";
 
 			success = true;
 		}
@@ -198,14 +201,26 @@ bool CMMA8451::readRegister8(uint8_t reg, uint8_t *data)
 	{
 	   if(i2c_write(reg)==0) //Control reg single register
 	   {
-		if(i2c_rep_start(MMA8451_ADDRESS + I2C_READ)==0)
-		{
-	      *data = i2c_readNak();
-			i2c_stop();
-			success = true;
-		  }
+		    if(i2c_rep_start(MMA8451_ADDRESS + I2C_READ)==0)
+		    {
+	          *data = i2c_readNak();
+			    i2c_stop();
+			    success = true;
+		    }
+            else
+            {
+                CSerial::is() << "MMA8451 i2c Read failed\n";
+            }              
 	   }
+       else
+       {
+           CSerial::is() << "MMA8451 i2c write failed\n";
+       }           
 	}
+    else
+    {
+        CSerial::is() << "MMA8451 i2c start Failed\n";
+    }
 
 	return success; 
 }
