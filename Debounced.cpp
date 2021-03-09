@@ -127,7 +127,7 @@ void Debounced::Update()
  		break;
  
  	case BOUNCING:
- 		if(CTimer::IsTimedOut(10, DebounceStart) )
+ 		if(CTimer::IsTimedOut(20, DebounceStart) )
  		{
  			//check again
  			newlevel =  GetPin();

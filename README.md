@@ -24,18 +24,19 @@ Maximum speed       N/A
 
 
 +Device settings:
-BODLEVEL = DISABLED
+BODLEVEL = 4V3
 OCDEN = [ ]
 JTAGEN = [X]
 SPIEN = [X]
 WDTON = [ ]
-EESAVE = [ ]
+EESAVE = [X]
 BOOTSZ = 4096W_F000
 BOOTRST = [ ]
 CKDIV8 = [ ]
 CKOUT = [ ]
-SUT_CKSEL = EXTXOSC_8MHZ_XX_258CK_4MS1
+SUT_CKSEL = FSOSC_16KCK_0MS_XOSC_BODEN
 
-EXTENDED = 0xFF (valid)
-HIGH = 0x99 (valid)
-LOW = 0x4E (valid)
+EXTENDED = 0xFC (valid)
+HIGH = 0x91 (valid)
+LOW = 0xD7 (valid)
+

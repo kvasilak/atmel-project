@@ -56,37 +56,37 @@ void CLedDriver::Init()
                      {
                         CSerial::is() << "** CLED Driver Init Succeeded\n";
                      }                         
-                     else {CSerial::is() << "** CLED Driver Init failed 1\n"; } 
+                     else {CSerial::is() << "** CLED Driver Init failed LED out 1\n"; } 
                     }
-                    else {CSerial::is() << "** CLED Driver I2C Init failed 2!!\n"; } 
+                    else {CSerial::is() << "** CLED Driver I2C Init failed led out 2!!\n"; } 
                    }
-                   else {CSerial::is() << "** CLED Driver I2C Init failed 3!!\n"; } 
+                   else {CSerial::is() << "** CLED Driver I2C Init failed grpfreq!!\n"; } 
                   }
-                  else {CSerial::is() << "** CLED Driver I2C Init failed 4!!\n"; } 
+                  else {CSerial::is() << "** CLED Driver I2C Init failed grppwm!!\n"; } 
                  }
-                 else {CSerial::is() << "** CLED Driver I2C Init failed 5!!\n"; } 
+                 else {CSerial::is() << "** CLED Driver I2C Init failed PWM 7!!\n"; } 
                 }
-                else {CSerial::is() << "** CLED Driver I2C Init failed 6!!\n"; } 
+                else {CSerial::is() << "** CLED Driver I2C Init failed PWM 6!!\n"; } 
                }
-               else {CSerial::is() << "** CLED Driver I2C Init failed 7!!\n"; } 
+               else {CSerial::is() << "** CLED Driver I2C Init failed PWM 5!!\n"; } 
               }
-              else {CSerial::is() << "** CLED Driver I2C Init failed 8!!\n"; } 
+              else {CSerial::is() << "** CLED Driver I2C Init failed PWM 4!!\n"; } 
              }
-             else {CSerial::is() << "** CLED Driver I2C Init failed 9 !!\n"; } 
+             else {CSerial::is() << "** CLED Driver I2C Init failed PWM 3 !!\n"; } 
             }
-            else {CSerial::is() << "** CLED Driver I2C Init failed 0!!\n"; } 
+            else {CSerial::is() << "** CLED Driver I2C Init failed PWM 2!!\n"; } 
            }
-           else {CSerial::is() << "** CLED Driver I2C Init failed a!!\n"; } 
+           else {CSerial::is() << "** CLED Driver I2C Init failed PWM 1!!\n"; } 
           }
-          else {CSerial::is() << "** CLED Driver I2C Init failed b !!\n"; } 
+          else {CSerial::is() << "** CLED Driver I2C Init failed PWM 0 !!\n"; } 
          }
-         else {CSerial::is() << "** CLED Driver I2C Init failed c!!\n"; } 
+         else {CSerial::is() << "** CLED Driver I2C Init failed mODE 2!!\n"; } 
         }
-        else {CSerial::is() << "** CLED Driver I2C Init failed d!!\n"; } 
+        else {CSerial::is() << "** CLED Driver I2C Init failed aUTO iNC!!\n"; } 
        }                                                                
-       else {CSerial::is() << "** CLED Driver I2C Init failed e!!\n"; }                                                                                                                                                                    
+       else {CSerial::is() << "** CLED Driver I2C Init failed CTRL REG!!\n"; }                                                                                                                                                                    
       }
-      else {CSerial::is() << "** CLED Driver I2C Init failed f!!\n"; }                                       
+      else {CSerial::is() << "** CLED Driver I2C Init failed led addr!!\n"; }                                       
 	  
 	  i2c_stop();
 }

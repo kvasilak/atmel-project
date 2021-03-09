@@ -56,7 +56,7 @@ void CController::Init()
 	IgnitionEventPending = true;
 
 	CLeds::is().ActiveOn();
-	Cio::is().CompressorOn();
+	//Cio::is().CompressorOn();
  		
   	Cio::is().Wakeup();
 	if(on) {Cio::is().Awake = true;}
