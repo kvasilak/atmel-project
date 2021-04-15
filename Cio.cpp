@@ -539,12 +539,13 @@ bool Cio::CalibrateChanged()
 
 void Cio::RockerSwitch()
 {
-	if(!ButtonUp.Level())
+	if(!ButtonUp.Level())//is button pressed?
 	{
 		CSerial::is() << "ButtonUp\n";
 		
-		if(FillPressed)
+		if(FillPressed) //filling
 		{
+            //button pressed again, turn off filling
 			CSerial::is() << "fill off\n";
 			LeftFillOff();
 			RightFillOff();
@@ -553,6 +554,7 @@ void Cio::RockerSwitch()
 		}
 		else
 		{
+            //start filling
 			//turn off and unlatch the dump button
 			if(DumpPressed)
 			{
@@ -602,15 +604,9 @@ void Cio::RockerSwitch()
 			
 			CSerial::is() << "dump on\n";
 			
-			if(CADC::is().LeftHeightOK())
-			{
-				LeftDumpOn();
-			}
+			LeftDumpOn();
 		
-			if(CADC::is().RightHeightOK())
-			{
-				RightDumpOn();
-			}
+			RightDumpOn();
 			
 			DumpPressed = true;
 		}
@@ -620,67 +616,71 @@ void Cio::RockerSwitch()
 
 void Cio::OutsideRemote()
 {
+    static bool OldLeftUp = false;
+    static bool OldRightUp = false;
+    static bool OldLeftDown = false;
+    static bool OldRightDown = false;
+  
 	bool RemoteLeftDown  = REMOTE_LD_PORT & _BV(REMOTE_LD_BIT);
 	bool RemoteLeftUp    = REMOTE_LU_PORT & _BV(REMOTE_LU_BIT);		
     bool RemoteRightDown = REMOTE_RD_PORT & _BV(REMOTE_RD_BIT);
 	bool RemoteRightUp   = REMOTE_RU_PORT & _BV(REMOTE_RU_BIT);		
 	
-	//FillPressed = false;
-	//DumpPressed = false;
+	if(RemoteLeftUp != OldLeftUp)
+    {
+        if(RemoteLeftUp)
+        {
+            LeftFillOn();
+            OldLeftUp = true;
+        }
+        else
+        {
+            LeftFillOff();
+            OldLeftUp = false;
+        }
+    }    
+		
+    if(RemoteRightUp != OldRightUp)
+    {
+	    if(RemoteRightUp)
+	    {
+		    RightFillOn();
+            OldRightUp = true;
+	    }
+	    else 
+        {
+		    RightFillOff();
+            OldRightUp = false;
+	    }
+    }    
 	
-	if(RemoteLeftUp)
-	{
-		LeftFillOn();
-		FillPressed = true;
-	}
-	else
-	{
-		LeftFillOff();
-		FillPressed = false;
-	}
-		
-	if(RemoteRightUp)
-	{
-		RightFillOn();
-		FillPressed = true;
-	}
-	else
-	{
-		RightFillOff();
-		FillPressed = false;
-	}
-		
-	if(RemoteLeftDown)
-	{
-		if(CADC::is().LeftHeightOK())
-		{
+    if(RemoteLeftDown != OldLeftDown)	
+    {
+	    if(RemoteLeftDown)
+	    {
 			LeftDumpOn();
-			DumpPressed = true;
-		}
-	}
-	else
-	{
-		if(CADC::is().RightHeightOK())
-		{
-			LeftDumpOff();
-			DumpPressed = false;
-		}
-	}
+            OldLeftDown = true;
+	    }
+	    else
+	    {
+		    LeftDumpOff();
+            OldLeftDown = false;
+	    }
+    }    
 		
-	if(RemoteRightDown)
+	if(RemoteRightDown!= OldRightDown)
 	{
-		if(CADC::is().RightHeightOK())
-		{
+        if(RemoteRightDown)
+        {
 			RightDumpOn();
-			DumpPressed = true;
-		}
-	}
-	else
-	{
-		RightDumpOff();
-		DumpPressed = false;
-	}
-	
+            OldRightDown = true;
+	    }
+	    else
+	    {
+		    RightDumpOff();
+            OldRightDown = false;
+	    }
+    }        
 }
 
 void Cio::SteeringRemote()
@@ -740,15 +740,8 @@ void Cio::SteeringRemote()
 				FillPressed = false;
 			}
 			
-			if(CADC::is().LeftHeightOK())
-			{
-				LeftDumpOn();
-			}
-			
-			if(CADC::is().RightHeightOK())
-			{
-				RightDumpOn();
-			}
+			LeftDumpOn();
+			RightDumpOn();
 			
 			DumpPressed = true;
 		}
@@ -802,6 +795,9 @@ void Cio::AllOff()
 	RightDumpOff();
 	LeftFillOff();
 	LeftDumpOff();
+    
+     FillPressed = false;
+     DumpPressed  = false;
 }
 
 void Cio::Right(eValveStates s)
@@ -1021,7 +1017,7 @@ void Cio::EL2CompOn()
 
 void Cio::EL2CompOff()
 {
-    if(EL2CompCount >0)
+    if(EL2CompCount > 0)
     {
         EL2CompCount--;
     }

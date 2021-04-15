@@ -78,6 +78,13 @@ void FsmManual::HandleEvent(eEvents evt)
 
 			break;
 		case eEvents::OutSideEvent:
+        
+            //if filling or dumping switch to holding
+            if(false == Cio::is().IsHolding()) 
+            {
+                Cio::is().AllOff();
+            }
+        
 			Cio::is().OutsideRemote();
 			
 			WakeTime = REMOTEWAKETIME;
