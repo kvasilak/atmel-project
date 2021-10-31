@@ -59,7 +59,7 @@
 //   MMA8451_DATARATE_1_56_HZ    = 0b111, // 1.56Hz
 // } mma8451_dataRate_
 
-#define SENSITIVITY_2G		  4096
+//#define SENSITIVITY_2G		  4096
 
 #define PI					  3.14159
 
@@ -79,7 +79,7 @@ bool CMMA8451::Init()
 	
 	if(readRegister8(MMA8451_REG_WHOAMI, &deviceid))
 	{
-		if (deviceid == 0x1A)
+		if( (deviceid == 0x1A) || (deviceid == 0x2A))
 		{
 			// MMA8451 detected 
 			CSerial::is() << "found MMA8451\n";
@@ -91,10 +91,18 @@ bool CMMA8451::Init()
     
 			writeRegister8(MMA8451_REG_CTRL_REG1, 1);
             
-            CSerial::is() << "MMA8451 reset\n";
-
+            if(deviceid == 0x1A)
+            {
+                CSerial::is() << "MMA8451 Found and reset\n";
+                Sensitivity = 4096;
+            }
+            else if( deviceid == 0x2A)
+            {
+                CSerial::is() << "MMA8452 Found and reset\n";
+                Sensitivity = 1024;
+            }
 			success = true;
-		}
+		}          
 		else		{			CSerial::is() << "unknown device; " << deviceid << "\n";		}	}
 	else
 	{
@@ -117,9 +125,9 @@ void CMMA8451::PitchRoll()
 	
 	ReadXYZ(x, y, z);
 	
-	float Xout_g = ((float) x) / SENSITIVITY_2G;		// Compute X-axis output value in g's
-	float Yout_g = ((float) y) / SENSITIVITY_2G;		// Compute Y-axis output value in g's
-	float Zout_g = ((float) z) / SENSITIVITY_2G;		// Compute Z-axis output value in g's
+	float Xout_g = ((float) x) / Sensitivity;		// Compute X-axis output value in g's
+	float Yout_g = ((float) y) / Sensitivity;		// Compute Y-axis output value in g's
+	float Zout_g = ((float) z) / Sensitivity;		// Compute Z-axis output value in g's
 			
 	float Pitch = atan2 (-Xout_g, sqrt (Yout_g*Yout_g + Zout_g*Zout_g)) * 180 / PI;		// Equation 37 in the AN3461
 		

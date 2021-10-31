@@ -93,59 +93,46 @@ void FsmManual::HandleEvent(eEvents evt)
 			
 			ButtonWakeStart = CTimer::GetTick();
 			break;
-		case eEvents::SteeringEvent:
-			Cio::is().SteeringRemote();
-			//Steering remote does not wake controller
-			WakeTime = REMOTEWAKETIME;
-			break;
+            //Steering remote no longer supported
+		//case eEvents::SteeringEvent:
+			//Cio::is().SteeringRemote();
+			////Steering remote does not wake controller
+			//WakeTime = REMOTEWAKETIME;
+			//break;
 		case eEvents::CalibrateEvent:
 			m_SMManager.ChangeState(eStates::STATE_MANUAL_CALIBRATE);
 			break;
+            //stay awake forever on buttonpress. timeout if no button presssed
 		case eEvents::TimerEvent:
 			//we are awake due to a button press
 			//timeout and sleep
 			if(Cio::is().ButtonWake)
 			{
-				if(CTimer::IsTimedOut(WakeTime, ButtonWakeStart))
-				{
-					Cio::is().ButtonWake = false;
+			    if(CTimer::IsTimedOut(WakeTime, ButtonWakeStart))
+			    {
+                    //CSerial::is() << " FsmManual::button wake timneout\r\n";
+                         
+                    if( Cio::is().IsHolding() ) //timeout only if nothing pressed
+                    {
+					    Cio::is().ButtonWake = false;
 					
-					m_SMManager.ScheduleEvent(eEvents::IgnitionOffEvent);
-				}
+					    m_SMManager.ScheduleEvent(eEvents::IgnitionOffEvent);
+                    }                        
+			    }
 			}
-			
-			//if(CTimer::IsTimedOut(250, Blink))
-			//{
-				//Lheight = CADC::is().GetLeftHeight();
-				//Rheight = CADC::is().GetRightHeight();
-				//
-				//CSerial::is() << "L, " << Lheight << " R, " << Rheight << "\n";
-				//
-				//Blink = CTimer::GetTick();
-			//}
-			
-			
+
 			break;
 		case eEvents::IgnitionOnEvent:
-			//if(Cio::is().Awake == false)
-			//{
-				Cio::is().ButtonWake = false;
-				//Cio::is().Awake = true;
-				Cio::is().Wakeup();
+			Cio::is().ButtonWake = false;
+			//Cio::is().Awake = true;
+			Cio::is().Wakeup();
 				
-				Cio::is().UpdateButtons();
+			Cio::is().UpdateButtons();
 
-				CSerial::is() << " FsmManual::Ignition On\r\n";
-			//}
-			//else
-			//{
-			//	Cio::is().ButtonWake = false;
-			//	CSerial::is() << "Awake already\n";			
-			//}
+			CSerial::is() << " FsmManual::Ignition On\r\n";
+
 			break;
 		case eEvents::IgnitionOffEvent:
-			//Cio::is().Awake = false;
-
 			CSerial::is() << " FsmManual::Ignition Off\r\n";
 			
 			Cio::is().Sleep();

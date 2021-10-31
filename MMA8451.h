@@ -40,6 +40,8 @@ private:
 	CMMA8451();
 	CMMA8451( const CMMA8451 &c );
 	CMMA8451& operator=( const CMMA8451 &c );
+    
+    float Sensitivity;
 
 }; //MMA8451
 

@@ -92,6 +92,9 @@ public:
 	void Sleep();
 	void Wakeup();
 	bool IsIgnitionOn(void);
+    //
+    //void EL2CompOn(void);
+    //void EL2CompOff(void);
 	
 	static volatile bool IgnitionChanged;
 	static volatile bool ButtonChanged;
@@ -120,8 +123,6 @@ private:
     void RightDownBlink(bool blink);
     void CalcLeftSpeed(void);
     void CalcRightSpeed(void);
-    void EL2CompOn(void);
-    void EL2CompOff(void);
 
 	bool FillPressed;
 	bool DumpPressed;
@@ -142,7 +143,7 @@ private:
     bool DumpLeft;
     bool DumpRight;
     
-    uint8_t EL2CompCount;
+//    uint8_t EL2CompCount;
 
 }; //Cio
 

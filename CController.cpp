@@ -56,7 +56,7 @@ void CController::Init()
 	IgnitionEventPending = true;
 
 	CLeds::is().ActiveOn();
-	//Cio::is().CompressorOn();
+	Cio::is().CompressorOn();
  		
   	Cio::is().Wakeup();
 	if(on) {Cio::is().Awake = true;}
@@ -227,10 +227,12 @@ void CController::CheckEvent()
 
 void CController::Run()
 {
+#ifdef comp_test
+    static bool on = false;
+#endif
 	Cio::is().Run();
 	
 	CheckEvent();
-	
 	
 	if(CTimer::IsTimedOut(50, Time))
 	{

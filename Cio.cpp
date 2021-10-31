@@ -38,8 +38,8 @@ SpeedTimeLeft(0),
 FillLeft(false),
 FillRight(false),
 DumpLeft(false),
-DumpRight(false),
-EL2CompCount(0)
+DumpRight(false)
+//EL2CompCount(0)
 {
 } //Cio
 
@@ -870,8 +870,6 @@ void Cio::RightFillOn()
 {
 	//CSerial::is() << "*RightFillOn\n";
     
-    EL2CompOn();
-    
     FillRight = true;
     
     SpeedTimeRight = CTimer::GetTick();
@@ -885,9 +883,7 @@ void Cio::RightFillOn()
 void Cio::RightFillOff()
 {
 	//CSerial::is() << "*RightFillOff\n";
-    
-    EL2CompOff();
-    
+
     FillRight = false;
 	
 	SOLENOID_RU_PORT &= ~_BV(SOLENOID_RU_BIT);
@@ -897,8 +893,6 @@ void Cio::RightFillOff()
 void Cio::RightDumpOn()
 {
 	//CSerial::is() << "*RightDumpOn\n";
-    
-    EL2CompOn();
     
     DumpRight = true;
     
@@ -914,8 +908,6 @@ void Cio::RightDumpOff()
 {
 	//CSerial::is() << "*RightDumpOff\n";
     
-    EL2CompOff();
-    
     DumpRight = false;
 	
 	SOLENOID_RD_PORT &= ~_BV(SOLENOID_RD_BIT);
@@ -926,9 +918,7 @@ void Cio::RightDumpOff()
 void Cio::LeftFillOn()
 {
 	//CSerial::is() << "*LeftFillOn\n";
-    
-    EL2CompOn();
-    
+
     FillLeft = true;
     
     SpeedTimeLeft = CTimer::GetTick();
@@ -943,8 +933,6 @@ void Cio::LeftFillOff()
 {
 	//CSerial::is() << "*LeftFillOff\n";
     
-    EL2CompOff();
-    
     FillLeft = false;
 	
 	SOLENOID_LU_PORT &= ~_BV(SOLENOID_LU_BIT);
@@ -954,9 +942,7 @@ void Cio::LeftFillOff()
 void Cio::LeftDumpOn()
 {
 	//CSerial::is() << "*LeftDumpOn\n";
-    
-    EL2CompOn();
-    
+
     DumpLeft = true;
     SpeedTimeLeft = CTimer::GetTick();
     oldleft= CADC::is().GetLeftAvgHeight();
@@ -969,8 +955,6 @@ void Cio::LeftDumpOn()
 void Cio::LeftDumpOff()
 {
 	//CSerial::is() << "*LeftDumpOff\n";
-    
-    EL2CompOff();
     
     DumpLeft = false;
 	
@@ -1005,30 +989,6 @@ void Cio::PowerOff()
 	POWER_ON_PORT &= ~_BV(POWER_ON_BIT);
 }
 
-//for Electrolevel 2 we need to open the hold valves when ever we are fill or dumping
-// And close otherwise
-// So we need to a count of opens and closes
-void Cio::EL2CompOn()
-{
-    EL2CompCount++;
-    
-    CompressorOn();
-}    
-
-void Cio::EL2CompOff()
-{
-    if(EL2CompCount > 0)
-    {
-        EL2CompCount--;
-    }
-    
-    if(EL2CompCount == 0)
-    {
-        CompressorOff();
-    }
-           
-}
-
 void Cio::CompressorOn()
 {
 	//Turn on Air compressor enable, PA3
@@ -1051,7 +1011,7 @@ void Cio::Sleep()
 	//turn off all valves
 	AllOff();
 	
-	//CompressorOff();
+	CompressorOff();
 	
 	PowerOff();
 	
@@ -1080,7 +1040,7 @@ void Cio::Wakeup()
 {
 	//int i=0;
 	PowerOn();
-	//CompressorOn();
+	CompressorOn();
 	
     CSerial::is() << "LED Init 0";
 	CLeds::is().Init();
