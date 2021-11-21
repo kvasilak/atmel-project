@@ -1074,8 +1074,8 @@ void Cio::UpdateButtons()
 	}
 	else if(DumpPressed)
 	{
-		LeftDumpOff();
-		RightDumpOff();
+		LeftDumpOn();
+		RightDumpOn();
 	}
 }
 
