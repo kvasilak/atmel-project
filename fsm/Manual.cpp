@@ -111,6 +111,8 @@ void FsmManual::HandleEvent(eEvents evt)
 			    if(CTimer::IsTimedOut(WakeTime, ButtonWakeStart))
 			    {
                     //CSerial::is() << " FsmManual::button wake timneout\r\n";
+                    
+                    //Cio::is().ButtonWake = false; //only check once
                          
                     if( Cio::is().IsHolding() ) //timeout only if nothing pressed
                     {
@@ -139,18 +141,18 @@ void FsmManual::HandleEvent(eEvents evt)
 			break;
 		case eEvents::ButtonWakeEvent:
 
-		if(!Cio::is().Awake)
-		{
-			Cio::is().ButtonWake = true;
+		    if(!Cio::is().Awake)
+		    {
+			    Cio::is().ButtonWake = true;
 			
-			ButtonWakeStart = CTimer::GetTick();
+			    ButtonWakeStart = CTimer::GetTick();
 			
-			Cio::is().Wakeup();
+			    Cio::is().Wakeup();
 				
-			Cio::is().UpdateButtons();
+			    Cio::is().UpdateButtons();
 
-			CSerial::is() << " FsmManual::BUtton Wake\r\n";
-		}
+			    CSerial::is() << " FsmManual::BUtton Wake\r\n";
+		    }
 			break;
 		default:
 		break;
