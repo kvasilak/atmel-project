@@ -57,28 +57,28 @@ public:
 	//whats changed
 	bool RockerChanged(void);
 	bool OutSideRemoteChanged(void);
-	bool SteeringRemoteChanged(void);
-	bool CampChanged(void);
-	bool TravelChanged(void);
-	bool CalibrateChanged(void);
-	bool UpDownChanged(void);
+	//bool SteeringRemoteChanged(void);
+	//bool CampChanged(void);
+	//bool TravelChanged(void);
+	//bool CalibrateChanged(void);
+	//bool UpDownChanged(void);
 
 //What to do
 	void RockerSwitch(void);
 	void OutsideRemote(void);
-	void SteeringRemote(void);
+	//void SteeringRemote(void);
 
-	bool CampSwitches(void);
-	bool TravelSwitches(void);
-	bool CalibrateSwitch(void);
+	//bool CampSwitches(void);
+	//bool TravelSwitches(void);
+	//bool CalibrateSwitch(void);
 	
 	bool IsHolding(void);
 	
 	FillStates LeftState;
 	FillStates RightState;
 
-	void PowerOn(void);
-	void PowerOff(void);
+	//void PowerOn(void);
+	//void PowerOff(void);
 	void UpdateButtons(void);
 	
 	void ResetButtons(void) 

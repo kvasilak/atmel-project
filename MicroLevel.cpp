@@ -125,11 +125,11 @@ int main(void)
 
 	Cio::is().Init();
 	
-	Cio::is().PowerOn();
+	//Cio::is().PowerOn();
 	
 	CSerial::is().Init();
 	
-	CSerial::is() << "\n\nMicrolevel " << __DATE__ << "\nCopyright 2016 - 2021 Keith Vasilakes\n\n";
+	CSerial::is() << "\n\nMicrolevel " << __DATE__ << "\nCopyright 2016 - 2022 Keith Vasilakes\n\n";
     
     CSerial::is() << "** reset Cause " << mcusr << "\n";
 	
@@ -141,7 +141,10 @@ int main(void)
 	
 	CADC::is().Init();
 	
-	CMMA8451::is().Init();
+	if(false == CMMA8451::is().Init())
+    {
+        CMMA8451::is().Init();
+    }        
 	
 	nvm::is().init();
     

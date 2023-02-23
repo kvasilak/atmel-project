@@ -201,27 +201,27 @@ void CController::CheckEvent()
 			ScheduleEvent(eEvents::OutSideEvent);
 		}
 	
-		if(Cio::is().UpDownChanged())
-		{
-			ScheduleEvent(eEvents::SteeringEvent);
-		}
-
- 		if(Cio::is().CampChanged())
- 		{
- 			ScheduleEvent(eEvents::CampEvent);
- 		}
-
-		if(Cio::is().TravelChanged())
-		{
-			ScheduleEvent(eEvents::TravelEvent);
-		}
+		//if(Cio::is().UpDownChanged())
+		//{
+			//ScheduleEvent(eEvents::SteeringEvent);
+		//}
+//
+ 		//if(Cio::is().CampChanged())
+ 		//{
+ 			//ScheduleEvent(eEvents::CampEvent);
+ 		//}
+//
+		//if(Cio::is().TravelChanged())
+		//{
+			//ScheduleEvent(eEvents::TravelEvent);
+		//}
 	}
 	
-	if(Cio::is().CalibrateChanged())
-	{
-		ButtonWakeFirst = false;
-		ScheduleEvent(eEvents::CalibrateEvent);
-	}
+	//if(Cio::is().CalibrateChanged())
+	//{
+		//ButtonWakeFirst = false;
+		//ScheduleEvent(eEvents::CalibrateEvent);
+	//}
 	
 }
 
@@ -249,7 +249,7 @@ void CController::Run()
 			
             CLeds::is().Dim(CADC::is().GetDimmer());
             
-           // CSerial::is() << "Dim; " << CADC::is().GetDimmer() << "\n";
+            //CSerial::is() << "Dim; " << CADC::is().GetDimmer() << "\n";
 		}
 		Time = CTimer::GetTick();
 	}
