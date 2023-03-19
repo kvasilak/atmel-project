@@ -71,7 +71,6 @@ void CController::ScheduleEvent(eEvents evt)
 		"Timer Event",
 		"Rocker Event",
 		"Outside Event",
-		"Steering Event",
 		"Travel Event",
 		"Camp Event",
 		"Calibrate Event",
@@ -200,28 +199,23 @@ void CController::CheckEvent()
 		{
 			ScheduleEvent(eEvents::OutSideEvent);
 		}
-	
-		//if(Cio::is().UpDownChanged())
-		//{
-			//ScheduleEvent(eEvents::SteeringEvent);
-		//}
-//
- 		//if(Cio::is().CampChanged())
- 		//{
- 			//ScheduleEvent(eEvents::CampEvent);
- 		//}
-//
-		//if(Cio::is().TravelChanged())
-		//{
-			//ScheduleEvent(eEvents::TravelEvent);
-		//}
+
+ 		if(Cio::is().CampChanged())
+ 		{
+ 			ScheduleEvent(eEvents::CampEvent);
+ 		}
+
+		if(Cio::is().TravelChanged())
+		{
+			ScheduleEvent(eEvents::TravelEvent);
+		}
 	}
 	
-	//if(Cio::is().CalibrateChanged())
-	//{
-		//ButtonWakeFirst = false;
-		//ScheduleEvent(eEvents::CalibrateEvent);
-	//}
+	if(Cio::is().CalibrateChanged())
+	{
+		ButtonWakeFirst = false;
+		ScheduleEvent(eEvents::CalibrateEvent);
+	}
 	
 }
 

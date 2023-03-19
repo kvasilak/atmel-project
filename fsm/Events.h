@@ -7,7 +7,6 @@ enum class eEvents
 	TimerEvent ,
 	RockerEvent,
 	OutSideEvent,
-	SteeringEvent,
 	TravelEvent,
 	CampEvent,
 	CalibrateEvent,

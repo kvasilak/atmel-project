@@ -1,7 +1,7 @@
 /* 
 * Cio.cpp
 *
-* Created: 2/15/2015 3:09:15 PM
+* Created: 2/15/2015 /2023
 * Author: keith
 */
 
@@ -28,8 +28,10 @@ volatile uint8_t ispa;
 Cio::Cio() :
 Awake(false),
 ButtonWake(false),
-FillPressed(false),
-DumpPressed(false),
+RightFillPressed(false),
+RightDumpPressed(false),
+LeftFillPressed(false),
+LeftDumpPressed(false),
 BlinkTravelEn(false),
 LeftSpeed(0),
 RightSpeed(0),
@@ -46,6 +48,7 @@ DumpRight(false)
 //setup IO lines
 //Read using  PINx
 //Write using PORTx
+//DDR 1 for output 0 for input
 void Cio::Direction()
 {      
 	//port A
@@ -76,7 +79,7 @@ void Cio::Direction()
 	#define SOLENOID_LU_BIT			7
 	#define SOLENOID_LU_PORT		PORTA
 		
-	DDRB = 0x03;
+	DDRB = 0xC0; //F0;
 		
 	//port B
 	//0		in		0	Remote LD
@@ -84,29 +87,15 @@ void Cio::Direction()
 	//2		in		0	Remote RD
 	//3		in		0	Remote RU
 		
-	//4		in 		0	BTN Left Down
-	//5		in 		0	BTN Left up
+	//4		in 		0	Btn Left down
+	//5		in 		0	Btn Left up
 	//6		in 		0	NC
 	//7		in		0	NC
-		
-	#define REMOTE_LD_BIT		0
-	#define REMOTE_LD_PORT		PINB
-		
-	#define REMOTE_LU_BIT		1
-	#define REMOTE_LU_PORT		PINB
-		
-	#define REMOTE_RD_BIT		2
-	#define REMOTE_RD_PORT		PINB
-	
-	#define REMOTE_RU_BIT		3
-	#define REMOTE_RU_PORT		PINB
-	
-	#define BTN_LEFT_DOWN		4
-	#define BTN_LEFT_DOWN_PORT  PINB
-	
-	#define BTN_RIGHT_DOWN		5
-	#define BTN_RIGHT_DOWN_PORT PINB
-		
+
+	#define REMOTE_RD_BIT		0 
+	#define REMOTE_LD_BIT		1 
+	#define REMOTE_RU_BIT		2
+	#define REMOTE_LU_BIT		3
 		
 	DDRC = 0x80;
 	//Port C
@@ -122,32 +111,25 @@ void Cio::Direction()
 	#define COMPRESSOR_ON_BIT	7
 	#define COMPRESSOR_ON_PORT	PORTC
 		
-	DDRD = 0x20;
+	DDRD = 0x00;
 	//Port D
 	//0		RX		0	Debug serial
 	//1		TX		1	Debug serial
 	//2		NC
-	//3		in		0	Travel
+
+	//3		in		0	Btn Travel
 		
-	//4		in		0	Calibrate
-	//5		in		0	Camp
-	//6		in		0	Btn R Down
-	//7		in		0	Btn R up
+	//4		in		0	Btn Calibrate
+	//5		in		0	Btn Camp
+	//6		in		0	Btn Right Down
+	//7		in		0	Btn Right Up
 		
-	#define TRAVEL_BUTTON_BIT		3
-	#define TRAVEL_BUTTON_PORT		PIND
-		
-	#define CALIBRATE_BUTTON_BIT	4
-	#define CALIBRATE_BUTTON_PORT	PIND
-		
-	#define CAMP_BUTTON_BIT			5
-	#define CAMP_BUTTON_PORT		PIND
-		
-	#define DOWN_BUTTON_BIT			6 //Right down
-	#define DOWN_BUTTON_PORT		PIND
-		
-	#define UP_BUTTON_BIT			7 // Right up
-	#define UP_BUTTON_PORT			PIND
+	#define BUTTON_TRAVEL_BIT		3
+	#define BUTTON_CALIBRATE_BIT	4
+	#define BUTTON_CAMP_BIT			5
+	#define BUTTON_RD_BIT			6
+	#define BUTTON_RU_BIT			7
+
 }
 
 void Cio::Pullups()
@@ -168,18 +150,18 @@ void Cio::Pullups()
 		
 		
 	PORTB = 0xFF;
-		
+
 	//port B
-	//0		in		1	Remote LD
-	//1		in		1	Remote LU
-	//2		in		1	Remote RD
-	//3		in		1	Remote Camp
-		
-	//4		in 		1	Remote RU
-	//5		in 		1	Remote travel
-	//6		in 		1	Remote down
-	//7		in		1	Remote up
-		
+	//0		in		0	Remote LD
+	//1		in		0	Remote LU
+	//2		in		0	Remote RD
+	//3		in		0	Remote RU
+	
+	//4		in 		0	Btn Left down
+	//5		in 		0	Btn Left up
+	//6		in 		0	NC
+	//7		in		0	NC
+
 	//PORTC = 0x00;
 	//Port C
 	//0		SCL
@@ -188,20 +170,20 @@ void Cio::Pullups()
 	//3		JTAG
 	//4		JTAG
 	//5		JTAG
-	//6		in		0 spare
-	//7		out		0 Compressor on
+	//6	    out		0 spare
+	//7		out		1 Compressor on
 		
 	PORTD = 0xF8;
 	//Port D
 	//0		RX		0	Debug serial
-	//1		TX		0	Debug serial
-	//2		out		0	NC
-	//3		in		1	Travel
-		
-	//4		in		1	Calibrate
-	//5		in		1	Camp
-	//6		in		1	Down
-	//7		in		1	up
+	//1		TX		1	Debug serial
+	//2		NC
+	//3		in		0	Btn Travel
+	
+	//4		in		0	Btn Calibrate
+	//5		in		0	Btn Camp
+	//6		in		0	Btn Right Down
+	//7		in		0	Btn Right Up
 }
 
 
@@ -212,21 +194,21 @@ void Cio::Init()
 	Pullups();
 	
 	//use to debounce switch inputs
-	PushTravel.Attach(IO_PORTD, PORTD3);
-	PushCalibrate.Attach(IO_PORTD, PORTD4);
-	PushCamp.Attach(IO_PORTD, PORTD5);
-	ButtonDown.Attach(IO_PORTD, PORTD6);
-	ButtonUp.Attach(IO_PORTD, PORTD7);
+	PushTravel.Attach     (IO_PORTD, PORTD3);
+	PushCalibrate.Attach  (IO_PORTD, PORTD4);
+	PushCamp.Attach       (IO_PORTD, PORTD5);
+	ButtonRightDown.Attach(IO_PORTD, PORTD6);
+	ButtonRightUp.Attach  (IO_PORTD, PORTD7);
+	ButtonLeftDown.Attach (IO_PORTB, PORTB4);
+	ButtonLeftUp.Attach   (IO_PORTB, PORTB5);
 	
 
 	//setup initial values
-	//CampChanged();
-	//TravelChanged();
+	CampChanged();
+	TravelChanged();
 	RockerChanged();
-	//SteeringRemoteChanged();
 	OutSideRemoteChanged();
-	//CalibrateChanged();
-	//UpDownChanged();
+	CalibrateChanged();
 	
     ResetButtons();
 
@@ -367,8 +349,10 @@ void Cio::Run()
     }
     
 	//debounce inputs
-	ButtonDown.Update();
-	ButtonUp.Update();
+	ButtonRightDown.Update();
+	ButtonRightUp.Update();
+	ButtonLeftUp.Update();
+	ButtonLeftDown.Update();
 	PushTravel.Update();
 	PushCamp.Update();
 	PushCalibrate.Update();
@@ -380,46 +364,55 @@ void Cio::Run()
 void Cio::EnableIgnGPIOInterrupt()
 {
 	//PCI0
-	PCMSK0 = _BV(PCINT2);  //pcint2
+	//PA2 PCint 2, Ign on
+	//PB0 PCint 8, Remote LD
+	PCMSK0 = _BV(PCINT2) | _BV(PCINT8);  
 	
 	//PCI1
-	//PB0 PCint 8, Remote LD
 	//PB1 PCint 9, Remote LU
 	//PB2 PCint 10, Remote RD
 	//PB3 PCint 11, Remote RU
-	//PCMSK1 = 0x17;
-	PCMSK1 = _BV(PCINT8) | _BV(PCINT9) | _BV(PCINT10) | _BV(PCINT11);
+	
+	//PB4 PCint 12, Btn L Down
+	//PB5 PCint 13, Btn R Up
+	
+	PCMSK1 = _BV(PCINT9) | _BV(PCINT10) | _BV(PCINT11) | _BV(PCINT12) | _BV(PCINT13);
 
 	//PCI3
 	//PD3 PCint 27, Travel
 	//PD4 PCint 28, Calibrate
 	//PD5 PCint 29, Camp
-	//PD6 PCint 30, Down
-	//PD7 PCint 31, Up
-	//PCMSK3 = 0xE8;
+
+	//PD6 PCint 30, Btn R Down
+	//PD7 PCint 31, Btn R Up
 	PCMSK3 = _BV(PCINT27) | _BV(PCINT28) | _BV(PCINT29) | _BV(PCINT30) | _BV(PCINT31) ;
 
 	//Enable interrupts
-	//PCICR = 0x0B;
 	PCICR = _BV(PCIE0) | _BV(PCIE1) | _BV(PCIE3) ;
 }
 
 //now a latching pushbutton not a rocker
 bool Cio::RockerChanged()
 {
-	static bool OldRockerDown = false;
-	static bool OldRockerUp = false;
+	static bool OldRockerRightDown = false;
+	static bool OldRockerRightUp = false;
+	static bool OldRockerLeftDown = false;
+	static bool OldRockerLeftUp = false;
 
-	bool changed   = (OldRockerDown	!= ButtonDown.Level());
-		 changed  |= (OldRockerUp	!= ButtonUp.Level());
+	bool changed   = (OldRockerRightDown	!= ButtonRightDown.Level());
+		 changed  |= (OldRockerRightUp	!= ButtonRightUp.Level());
+		 changed  |= (OldRockerLeftDown	!= ButtonLeftDown.Level());
+		 changed  |= (OldRockerLeftUp	!= ButtonLeftUp.Level());
 	
-	OldRockerDown = ButtonDown.Level();
-	OldRockerUp = ButtonUp.Level();
+	OldRockerRightDown = ButtonRightDown.Level();
+	OldRockerRightUp = ButtonRightUp.Level();
+	OldRockerLeftDown = ButtonLeftDown.Level();
+	OldRockerLeftUp = ButtonLeftUp.Level();
 	
 	if(changed)
 	{
 
-		CSerial::is() << "PORTB; " << ButtonDown.Level() << ", " << ButtonUp.Level() <<"\n";
+		CSerial::is() << "PORTB; " << ButtonRightDown.Level() << ", " << ButtonRightUp.Level() <<"\n";
 	}
 	
 	return changed;
@@ -430,7 +423,7 @@ bool Cio::OutSideRemoteChanged()
 	static uint8_t OldPort = false;
 	
 	//pins 0,1,2,4
-	uint8_t port = PINB & 0x17;
+	uint8_t port = PINB & 0x0F; //17;
 	
 	bool changed = OldPort != port;
 	
@@ -439,57 +432,17 @@ bool Cio::OutSideRemoteChanged()
 	return changed;
 }
 
-//bool Cio::SteeringRemoteChanged()
-//{
-	//static uint8_t OldPort = false;
-	//
-	////pins 3, 6 //3,5,6,7
-	//uint8_t port = PINB & 0x24;//E8;
-//
-	//bool changed = OldPort != port;
-//
-	//OldPort = port;
-//
-	//return changed;
-//}
-
-//return true if the steering remote up or down button has changed
-//bool Cio::UpDownChanged()
-//{
-	//static bool oldup = false;
-	//static bool olddown = false;
-	//
-	//bool up = REMOTE_UP_PORT & _BV(REMOTE_UP_BIT);
-	//bool down = REMOTE_DOWN_PORT & _BV(REMOTE_DOWN_BIT);
-	//
-	//bool changed = (oldup != up) || (olddown != down);
-	//
-	//if(changed)
-	//{
-		//oldup = up;
-		//olddown = down;
-	//}
-	//
-	//return changed;
-//}
-
-
-
-//returns true if any camp mode button has changed state
+//returns true if camp mode button has changed state
 //camp switch
-//camp on steering remote
 bool Cio::CampChanged()
 {
 	static bool OldCamp					= false;
-	static bool OldInsideCamp			= false;
-	 
-	bool camp = (CAMP_BUTTON_PORT & _BV(CAMP_BUTTON_BIT));
- 	
+
 	bool Changed	= OldCamp			!= (bool)PushCamp;		//port D bit 7
-	Changed			|= OldInsideCamp	!= camp;  //port B bit 3
+	//Changed			|= OldInsideCamp	!= camp;  //port B bit 3
 	 
 	OldCamp		= (bool)PushCamp;
-	OldInsideCamp  = camp;
+	//OldInsideCamp  = camp;
 
 	return Changed;
 
@@ -500,15 +453,12 @@ bool Cio::CampChanged()
 bool Cio::TravelChanged()
 {
 	static bool OldTravel				= false;
-	static bool OldInsideTravel			= false;	
-	
-	bool trav = (TRAVEL_BUTTON_PORT & _BV(TRAVEL_BUTTON_BIT));
 
 	bool Changed	= OldTravel				!= (bool)PushTravel;
-		 Changed	|= OldInsideTravel		!= trav; 
+		 //Changed	|= OldInsideTravel		!= trav; 
 	
-	OldTravel		= (bool)PushTravel;
-	OldInsideTravel = trav;
+	OldTravel		= PushTravel.Level();
+	//OldInsideTravel = trav;
 	
 	return Changed;
 }
@@ -521,9 +471,9 @@ bool Cio::CalibrateChanged()
 	//only consider a press a change a release isn't a change
 	if(PushCalibrate == 0)
 	{
-		changed = OldCal != (bool)PushCalibrate;
+		changed = OldCal != PushCalibrate.Level();
 	}
-	OldCal = (bool)PushCalibrate;
+	OldCal = PushCalibrate.Level();
 	
 	return changed;
 
@@ -532,79 +482,66 @@ bool Cio::CalibrateChanged()
 
 void Cio::RockerSwitch()
 {
-	if(!ButtonUp.Level())//is button pressed?
+	if(!ButtonRightUp.Level())//is button pressed?
 	{
-		CSerial::is() << "ButtonUp\n";
-		
-		if(FillPressed) //filling
+		if(RightFillPressed) //filling
 		{
             //button pressed again, turn off filling
-			CSerial::is() << "fill off\n";
-			LeftFillOff();
 			RightFillOff();
-			
-			FillPressed = false;
+			RightFillPressed = false;
 		}
 		else
 		{
-            //start filling
-			//turn off and unlatch the dump button
-			if(DumpPressed)
-			{
-				CSerial::is() << "dump off\n";
-				
-				LeftDumpOff();
-				RightDumpOff();
-				
-				DumpPressed = false;
-			}
-			
-			CSerial::is() << "fill on\n";
-			
-			LeftFillOn();
 			RightFillOn();
-			
-			FillPressed = true;
+			RightFillPressed = true;
 		}
 	}
 	
-	if(!ButtonDown.Level())
+	if(!ButtonRightDown.Level())
 	{
-		CSerial::is() <<  "Button Down\n";
-
-		
 		//toggle on button press
-		if(DumpPressed)
+		if(RightDumpPressed)
 		{
-			CSerial::is() << "dump off\n";
-			LeftDumpOff();
 			RightDumpOff();
 			
-			DumpPressed = false;
+			RightDumpPressed = false;
 		}
 		else
 		{
-			//turn off and unlatch the fill button
-			if(FillPressed)
-			{
-				CSerial::is() << "fill off\n";
-				
-				LeftFillOff();
-				RightFillOff();
-				
-				FillPressed = false;
-			}
-			
-			CSerial::is() << "dump on\n";
-			
-			LeftDumpOn();
-		
 			RightDumpOn();
-			
-			DumpPressed = true;
+			RightDumpPressed = true;
 		}
 	}
 
+	if(!ButtonLeftUp.Level())
+	{
+		//toggle on button press
+		if(LeftFillPressed)
+		{
+			LeftFillOff();
+			LeftFillPressed = false;
+		}
+		else
+		{
+			LeftFillOn();
+			LeftFillPressed = true;
+		}
+	}
+
+	if(!ButtonLeftDown.Level())
+	{
+		//toggle on button press
+		if(LeftDumpPressed)
+		{
+			LeftDumpOff();
+			LeftDumpPressed = false;
+		}
+		else
+		{
+			LeftDumpOn();
+			LeftDumpPressed = true;
+		}
+	}
 }
 
 void Cio::OutsideRemote()
@@ -614,12 +551,11 @@ void Cio::OutsideRemote()
     static bool OldLeftDown = false;
     static bool OldRightDown = false;
   
-	bool RemoteLeftDown  = REMOTE_LD_PORT & _BV(REMOTE_LD_BIT);
-	bool RemoteLeftUp    = REMOTE_LU_PORT & _BV(REMOTE_LU_BIT);		
-    bool RemoteRightDown = REMOTE_RD_PORT & _BV(REMOTE_RD_BIT);
-	bool RemoteRightUp   = REMOTE_RU_PORT & _BV(REMOTE_RU_BIT);		
-	
-	if(RemoteLeftUp != OldLeftUp)
+	bool RemoteLeftDown  = PINB & _BV(REMOTE_LD_BIT);
+	bool RemoteLeftUp    = PINB & _BV(REMOTE_LU_BIT);		
+    bool RemoteRightDown = PINB & _BV(REMOTE_RD_BIT);
+	bool RemoteRightUp   = PINB & _BV(REMOTE_RU_BIT);		
+		if(RemoteLeftUp != OldLeftUp)
     {
         if(RemoteLeftUp)
         {
@@ -676,102 +612,18 @@ void Cio::OutsideRemote()
     }        
 }
 
-//void Cio::SteeringRemote()
-//{
-	//bool RemoteUp = REMOTE_UP_PORT & _BV(REMOTE_UP_BIT);
-	//bool RemoteDown = REMOTE_DOWN_PORT & _BV(REMOTE_DOWN_BIT);
-	//
-	//if(RemoteUp)
-	//{
-		//if(FillPressed)
-		//{
-			//LeftFillOff();
-			//RightFillOff();
-			//
-			//FillPressed = false;
-			//
-		//}
-		//else
-		//{
-			////turn off and unlatch the dump button
-			//if(DumpPressed)
-			//{
-				//LeftDumpOff();
-				//RightDumpOff();
-				//
-				//DumpPressed = false;
-			//}
-			//
-			//LeftFillOn();
-			//RightFillOn();
-			//
-			//FillPressed = true;
-			//DumpPressed = false;
-		//}
-		//
-	//}
-//
-	//
-	//if(RemoteDown)
-	//{
-		//if(DumpPressed)
-		//{
-			//LeftDumpOff();
-			//RightDumpOff();
-			//
-			//DumpPressed = false;
-			//
-		//}
-		//else
-		//{
-			////turn off and unlatch the fill button
-			//if(FillPressed)
-			//{
-				//LeftFillOff();
-				//RightFillOff();
-				//
-				//FillPressed = false;
-			//}
-			//
-			//LeftDumpOn();
-			//RightDumpOn();
-			//
-			//DumpPressed = true;
-		//}
-	//}
-//
-//}
+bool Cio::CampSwitches()
+{
+	return PushCamp.Level();
+}
 
-
-//bool Cio::CampSwitches()
-//{
-	//bool SteeringCamp = REMOTE_CAMP_PORT & _BV(REMOTE_CAMP_BIT);
-	//bool pressed =  false;
-	//
-	//if(!PushCamp.Level() || SteeringCamp)
-	//{
-		//pressed  = true;
-	//}
-//
-	//return pressed;
-//}
-
-//bool Cio::TravelSwitches()
-//{
-	//bool SteeringTravel = REMOTE_TRAVEL_PORT & _BV(REMOTE_TRAVEL_BIT);
-	//bool pressed = false;
-	//
-	//if(!PushTravel.Level() || SteeringTravel)
-	//{
-		//pressed = true;
-	//}
-//
-	//return pressed;
-//}
+bool Cio::TravelSwitches()
+{
+	return PushTravel.Level();
+}
 
 bool Cio::CalibrateSwitch()
 {
-
 	bool pressed = false;
 	
 	if(!PushCalibrate.Level() )
@@ -789,8 +641,8 @@ void Cio::AllOff()
 	LeftFillOff();
 	LeftDumpOff();
     
-     FillPressed = false;
-     DumpPressed  = false;
+     RightFillPressed = false;
+     RightDumpPressed  = false;
 }
 
 void Cio::Right(eValveStates s)
@@ -870,7 +722,7 @@ void Cio::RightFillOn()
     RightSpeed = 10; // anything >1
 	
 	SOLENOID_RU_PORT |= _BV(SOLENOID_RU_BIT);
-	//CLeds::is().RightFillOn();
+	CLeds::is().RightFillOn();
 }
 
 void Cio::RightFillOff()
@@ -894,7 +746,7 @@ void Cio::RightDumpOn()
     RightSpeed = 10; // anything >1
     
 	SOLENOID_RD_PORT |= _BV(SOLENOID_RD_BIT);
-	//CLeds::is().RightDumpOn();
+	CLeds::is().RightDumpOn();
 }
 
 void Cio::RightDumpOff()
@@ -919,7 +771,7 @@ void Cio::LeftFillOn()
     LeftSpeed = 10; // anything >1
 	
 	SOLENOID_LU_PORT |= _BV(SOLENOID_LU_BIT);
-	//CLeds::is().LeftFillOn();
+	CLeds::is().LeftFillOn();
 }
 
 void Cio::LeftFillOff()
@@ -942,7 +794,7 @@ void Cio::LeftDumpOn()
     LeftSpeed = 10; // anything >1
 	
 	SOLENOID_LD_PORT |= _BV(SOLENOID_LD_BIT);
-	//CLeds::is().LeftDumpOn();
+	CLeds::is().LeftDumpOn();
 }
 
 void Cio::LeftDumpOff()
@@ -960,27 +812,15 @@ bool Cio::IsHolding()
 {
 	bool hold = false;
 	
-	CSerial::is() << "holding? " << FillPressed << ", " << DumpPressed  << "\n";
+	CSerial::is() << "holding? " << RightFillPressed << ", " << RightDumpPressed  << "\n";
 	
-	if(!FillPressed && !DumpPressed)
+	if(!RightFillPressed && !RightDumpPressed)
 	{
 		hold = true;
 	}
 	
 	return hold;
 }
-
-//void Cio::PowerOn()
-//{
-	////Turn on 5v, PA2
-	//POWER_ON_PORT |= _BV(POWER_ON_BIT);
-//}
-
-//void Cio::PowerOff()
-//{
-	////Turn off 5v, PA2
-	//POWER_ON_PORT &= ~_BV(POWER_ON_BIT);
-//}
 
 void Cio::CompressorOn()
 {
@@ -1012,8 +852,8 @@ void Cio::Sleep()
 	//minimal power savings
     power_all_disable();
 
-	FillPressed = false;
-	DumpPressed = false;
+	RightFillPressed = false;
+	RightDumpPressed = false;
 	
 	//Set CPU to sleep, will wake up on an ignition IRQ
     //button press or outside remote
@@ -1060,12 +900,12 @@ void Cio::Wakeup()
 
 void Cio::UpdateButtons()
 {
-	if(FillPressed)
+	if(RightFillPressed)
 	{
 		LeftFillOn();
 		RightFillOn();
 	}
-	else if(DumpPressed)
+	else if(RightDumpPressed)
 	{
 		LeftDumpOn();
 		RightDumpOn();
@@ -1147,7 +987,16 @@ void Cio::CalcLeftSpeed(void)
 //PA2 pc int 2
 ISR(PCINT0_vect)
 {
-	Cio::IgnitionChanged = true;
+	if(PINA & _BV(IGNITION_ON_BIT))
+	{
+		Cio::IgnitionChanged = true;
+	}
+
+	//Left down button
+	if(PINA & _BV(REMOTE_LD_BIT))
+	{
+		Cio::ButtonChanged = true;
+	}
 }
 
 //Outside remote changed

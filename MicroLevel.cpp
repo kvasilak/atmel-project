@@ -124,9 +124,7 @@ int main(void)
 	CController Controller;
 
 	Cio::is().Init();
-	
-	//Cio::is().PowerOn();
-	
+
 	CSerial::is().Init();
 	
 	CSerial::is() << "\n\nMicrolevel " << __DATE__ << "\nCopyright 2016 - 2022 Keith Vasilakes\n\n";

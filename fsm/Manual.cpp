@@ -32,7 +32,6 @@ void FsmManual::OnEntry()
 	CLeds::is().TravelOff();
 	
 	Cio::is().AllOff();
-	//Cio::is().ResetButtons();
 	CSerial::is() << " FsmManual::OnEntry()\n";
 	
 	Blink = CTimer::GetTick();
@@ -94,11 +93,6 @@ void FsmManual::HandleEvent(eEvents evt)
 			ButtonWakeStart = CTimer::GetTick();
 			break;
             //Steering remote no longer supported
-		//case eEvents::SteeringEvent:
-			//Cio::is().SteeringRemote();
-			////Steering remote does not wake controller
-			//WakeTime = REMOTEWAKETIME;
-			//break;
 		case eEvents::CalibrateEvent:
 			m_SMManager.ChangeState(eStates::STATE_MANUAL_CALIBRATE);
 			break;

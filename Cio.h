@@ -57,34 +57,31 @@ public:
 	//whats changed
 	bool RockerChanged(void);
 	bool OutSideRemoteChanged(void);
-	//bool SteeringRemoteChanged(void);
-	//bool CampChanged(void);
-	//bool TravelChanged(void);
-	//bool CalibrateChanged(void);
-	//bool UpDownChanged(void);
+	bool CampChanged(void);
+	bool TravelChanged(void);
+	bool CalibrateChanged(void);
 
 //What to do
 	void RockerSwitch(void);
 	void OutsideRemote(void);
 	//void SteeringRemote(void);
 
-	//bool CampSwitches(void);
-	//bool TravelSwitches(void);
-	//bool CalibrateSwitch(void);
+	bool CampSwitches(void);
+	bool TravelSwitches(void);
+	bool CalibrateSwitch(void);
 	
 	bool IsHolding(void);
 	
 	FillStates LeftState;
 	FillStates RightState;
 
-	//void PowerOn(void);
-	//void PowerOff(void);
 	void UpdateButtons(void);
-	
 	void ResetButtons(void) 
 	{
-		FillPressed = false;
-		DumpPressed = false;
+		RightFillPressed = false;
+		RightDumpPressed = false;
+		LeftFillPressed = false;
+	    LeftDumpPressed = false;
 	}
 
     void BlinkTravel(bool blink);
@@ -92,10 +89,7 @@ public:
 	void Sleep();
 	void Wakeup();
 	bool IsIgnitionOn(void);
-    //
-    //void EL2CompOn(void);
-    //void EL2CompOff(void);
-	
+
 	static volatile bool IgnitionChanged;
 	static volatile bool ButtonChanged;
 	bool Awake;
@@ -105,8 +99,10 @@ private:
 	Cio();
 	Cio& operator=( const Cio &c );
 
-	Debounced ButtonUp;
-	Debounced ButtonDown;
+	Debounced ButtonRightUp;
+	Debounced ButtonRightDown;
+	Debounced ButtonLeftUp;
+	Debounced ButtonLeftDown;
 	Debounced PushCamp;
 	Debounced PushTravel;
 	Debounced PushCalibrate;
@@ -124,8 +120,10 @@ private:
     void CalcLeftSpeed(void);
     void CalcRightSpeed(void);
 
-	bool FillPressed;
-	bool DumpPressed;
+	bool RightFillPressed;
+	bool RightDumpPressed;
+	bool LeftFillPressed;
+	bool LeftDumpPressed;
 	
 	uint32_t Time;
     bool BlinkTravelEn;
@@ -142,8 +140,6 @@ private:
     bool FillRight;
     bool DumpLeft;
     bool DumpRight;
-    
-//    uint8_t EL2CompCount;
 
 }; //Cio
 

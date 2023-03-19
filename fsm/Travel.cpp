@@ -145,10 +145,6 @@ void FsmTravel::HandleEvent(eEvents evt)
 		case eEvents::OutSideEvent:
 			m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
 		break;
-		case eEvents::SteeringEvent:
-			Cio::is().SteeringRemote();
-			m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
-		break;
 		case eEvents::CampEvent:
 			m_SMManager.ChangeState(eStates::STATE_CAMP);
 		break;
@@ -167,9 +163,7 @@ void FsmTravel::HandleEvent(eEvents evt)
             {
                 Cio::is().Awake = true;
                 Cio::is().Wakeup();
-            
-                //Cio::is().ButtonWake = false;
-                
+
                 CLeds::is().TravelOn();
                         
                 //reset so we get back to ride height quickly
