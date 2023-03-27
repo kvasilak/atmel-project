@@ -92,10 +92,6 @@ void FsmManual::HandleEvent(eEvents evt)
 			
 			ButtonWakeStart = CTimer::GetTick();
 			break;
-            //Steering remote no longer supported
-		case eEvents::CalibrateEvent:
-			m_SMManager.ChangeState(eStates::STATE_MANUAL_CALIBRATE);
-			break;
             //stay awake forever on buttonpress. timeout if no button presssed
 		case eEvents::TimerEvent:
 			//we are awake due to a button press
@@ -103,11 +99,7 @@ void FsmManual::HandleEvent(eEvents evt)
 			if(Cio::is().ButtonWake)
 			{
 			    if(CTimer::IsTimedOut(WakeTime, ButtonWakeStart))
-			    {
-                    //CSerial::is() << " FsmManual::button wake timneout\r\n";
-                    
-                    //Cio::is().ButtonWake = false; //only check once
-                         
+			    {                       
                     if( Cio::is().IsHolding() ) //timeout only if nothing pressed
                     {
 					    Cio::is().ButtonWake = false;

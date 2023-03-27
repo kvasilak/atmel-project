@@ -56,25 +56,27 @@ void FSMCampCal::HandleEvent(eEvents evt)
 			Cio::is().OutsideRemote();
 			break;
 		case eEvents::CalibrateEvent:
-		CSerial::is() << "calibrate event\n";
-			//user pressed the the cal button again, save 
-			int16_t X;
-			int16_t Y;
-			int16_t Z;
+			if(Cio::is().CalibrateSwitch())
+			{
+				CSerial::is() << "calibrate event\n";
+				//user pressed the the cal button again, save 
+				int16_t X;
+				int16_t Y;
+				int16_t Z;
 			
-			//Read Acccel
-			CMMA8451::is().ReadXYZ(X, Y, Z);
+				//Read Acccel
+				CMMA8451::is().ReadXYZ(X, Y, Z);
 			
-			nvm::is().SetCampX(X);
-			nvm::is().SetCampY(Y);
-			nvm::is().SetCampZ(Z);
+				nvm::is().SetCampX(X);
+				nvm::is().SetCampY(Y);
+				nvm::is().SetCampZ(Z);
 			
-			nvm::is().Save();
+				nvm::is().Save();
 			
-			CSerial::is() << "Camp Cal Complete; X, " << X << ", Y, " << Y <<", Z, " << Z << "\n";
+				CSerial::is() << "Camp Cal Complete; X, " << X << ", Y, " << Y <<", Z, " << Z << "\n";
 			
-			m_SMManager.ChangeState(eStates::STATE_CAMP);
-
+				m_SMManager.ChangeState(eStates::STATE_CAMP);
+			}
 			break;
 			//Cancel calibration on any button press except cal or outside remote
 		case eEvents::TravelEvent:

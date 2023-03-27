@@ -24,8 +24,6 @@ CState(SMManager, eStates::STATE_MANUAL_CALIBRATE)
 void ManualCal::OnEntry()
 {
 	CSerial::is() << " ManualCal::OnEntry()\r\n";
-
-	
 }
 
 //Manual calibration basically means finding the lower 

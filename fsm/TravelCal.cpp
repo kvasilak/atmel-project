@@ -67,16 +67,19 @@ void FSMTravelCal::HandleEvent(eEvents evt)
 			Cio::is().OutsideRemote();
 			break;
 		case eEvents::CalibrateEvent:
-			//user pressed the the cal button again, save settings
+			if(Cio::is().CalibrateSwitch())
+			{
+				//user pressed the the cal button again, save settings
 			
-			nvm::is().SetLeftTravel(CADC::is().GetLeftHeight());
-			nvm::is().SetRightTravel(CADC::is().GetRightHeight());
+				nvm::is().SetLeftTravel(CADC::is().GetLeftHeight());
+				nvm::is().SetRightTravel(CADC::is().GetRightHeight());
 			
-			nvm::is().Save();
+				nvm::is().Save();
 			
-			CSerial::is() << "Travel Cal Complete; Left, " << nvm::is().GetLeftTravel() << ", Right, " << nvm::is().GetRightTravel() << "\n";
+				CSerial::is() << "Travel Cal Complete; Left, " << nvm::is().GetLeftTravel() << ", Right, " << nvm::is().GetRightTravel() << "\n";
 			
-			m_SMManager.ChangeState(eStates::STATE_TRAVEL);
+				m_SMManager.ChangeState(eStates::STATE_TRAVEL);
+			}
 			break;
 			//cancel calibration
 		case eEvents::TravelEvent:

@@ -79,10 +79,21 @@ void CController::ScheduleEvent(eEvents evt)
 		"Button Wake Event"
 	};
 
+	static const char *states[]  = {
+		"STATE_MANUAL",
+		"STATE_TRAVEL",
+		"STATE_CAMP",
+		"STATE_MANUAL_CALIBRATE",
+		"STATE_TRAVEL_CALIBRATE",
+		"STATE_CAMP_CALIBRATE",
+		"STATE_DANCE",
+		"STATE_LAST_STATE"
+	};
+
 	//Don't show timer events, too much noise
 	if(evt > eEvents::TimerEvent)
 	{
-		CSerial::is() << "***State Change: " << events[(int)evt] << "\n";
+		CSerial::is() << "***State: " << states[(int)m_CurrState] << ", Evt: " << events[(int)evt] << "\n";
 	}
 	
 	m_StateList[(int)m_CurrState]->HandleEvent(evt);
@@ -183,7 +194,7 @@ void CController::CheckEvent()
 	if( Cio::ButtonChanged)
 	{ 
 		Cio::ButtonChanged = false;
-		CSerial::is() << "ButtonWakeEvent\n";
+		//CSerial::is() << "ButtonWakeEvent\n";
 		ScheduleEvent(eEvents::ButtonWakeEvent);
 	}
 	else

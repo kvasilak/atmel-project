@@ -421,12 +421,8 @@ bool Cio::RockerChanged()
 bool Cio::OutSideRemoteChanged()
 {
 	static uint8_t OldPort = false;
-	
-	//pins 0,1,2,4
 	uint8_t port = PINB & 0x0F; //17;
-	
 	bool changed = OldPort != port;
-	
 	OldPort = port;
 	
 	return changed;
@@ -437,12 +433,8 @@ bool Cio::OutSideRemoteChanged()
 bool Cio::CampChanged()
 {
 	static bool OldCamp					= false;
-
-	bool Changed	= OldCamp			!= (bool)PushCamp;		//port D bit 7
-	//Changed			|= OldInsideCamp	!= camp;  //port B bit 3
-	 
+	bool Changed	= OldCamp			!= (bool)PushCamp;	
 	OldCamp		= (bool)PushCamp;
-	//OldInsideCamp  = camp;
 
 	return Changed;
 
@@ -452,29 +444,19 @@ bool Cio::CampChanged()
 //from not pressed to pressed
 bool Cio::TravelChanged()
 {
-	static bool OldTravel				= false;
-
-	bool Changed	= OldTravel				!= (bool)PushTravel;
-		 //Changed	|= OldInsideTravel		!= trav; 
-	
+	static bool OldTravel = false;
+	bool Changed	= OldTravel	!= (bool)PushTravel;
 	OldTravel		= PushTravel.Level();
-	//OldInsideTravel = trav;
-	
+
 	return Changed;
 }
 
 bool Cio::CalibrateChanged()
 {
 	static bool OldCal	= false;
-	bool changed = false;
-	
-	//only consider a press a change a release isn't a change
-	if(PushCalibrate == 0)
-	{
-		changed = OldCal != PushCalibrate.Level();
-	}
+	bool changed = OldCal != PushCalibrate.Level();
 	OldCal = PushCalibrate.Level();
-	
+
 	return changed;
 
 }
@@ -624,14 +606,7 @@ bool Cio::TravelSwitches()
 
 bool Cio::CalibrateSwitch()
 {
-	bool pressed = false;
-	
-	if(!PushCalibrate.Level() )
-	{
-		pressed = true;
-	}
-
-	return pressed;
+	return PushCalibrate.Level();
 }
 
 void Cio::AllOff()
@@ -713,8 +688,6 @@ void Cio::Left(eValveStates s)
 
 void Cio::RightFillOn()
 {
-	//CSerial::is() << "*RightFillOn\n";
-    
     FillRight = true;
     
     SpeedTimeRight = CTimer::GetTick();
@@ -727,8 +700,6 @@ void Cio::RightFillOn()
 
 void Cio::RightFillOff()
 {
-	//CSerial::is() << "*RightFillOff\n";
-
     FillRight = false;
 	
 	SOLENOID_RU_PORT &= ~_BV(SOLENOID_RU_BIT);
@@ -737,8 +708,6 @@ void Cio::RightFillOff()
 
 void Cio::RightDumpOn()
 {
-	//CSerial::is() << "*RightDumpOn\n";
-    
     DumpRight = true;
     
     SpeedTimeRight = CTimer::GetTick();
@@ -751,8 +720,6 @@ void Cio::RightDumpOn()
 
 void Cio::RightDumpOff()
 {
-	//CSerial::is() << "*RightDumpOff\n";
-    
     DumpRight = false;
 	
 	SOLENOID_RD_PORT &= ~_BV(SOLENOID_RD_BIT);
@@ -762,8 +729,6 @@ void Cio::RightDumpOff()
 
 void Cio::LeftFillOn()
 {
-	//CSerial::is() << "*LeftFillOn\n";
-
     FillLeft = true;
     
     SpeedTimeLeft = CTimer::GetTick();
@@ -776,8 +741,6 @@ void Cio::LeftFillOn()
 
 void Cio::LeftFillOff()
 {
-	//CSerial::is() << "*LeftFillOff\n";
-    
     FillLeft = false;
 	
 	SOLENOID_LU_PORT &= ~_BV(SOLENOID_LU_BIT);
@@ -786,8 +749,6 @@ void Cio::LeftFillOff()
 
 void Cio::LeftDumpOn()
 {
-	//CSerial::is() << "*LeftDumpOn\n";
-
     DumpLeft = true;
     SpeedTimeLeft = CTimer::GetTick();
     oldleft= CADC::is().GetLeftAvgHeight();
@@ -799,8 +760,6 @@ void Cio::LeftDumpOn()
 
 void Cio::LeftDumpOff()
 {
-	//CSerial::is() << "*LeftDumpOff\n";
-    
     DumpLeft = false;
 	
 	SOLENOID_LD_PORT &= ~_BV(SOLENOID_LD_BIT);
@@ -845,9 +804,7 @@ void Cio::Sleep()
 	AllOff();
 	
 	CompressorOff();
-	
-	//PowerOff();
-	
+
 	//turn off unnecessary peripherals
 	//minimal power savings
     power_all_disable();
@@ -872,7 +829,6 @@ void Cio::Sleep()
 void Cio::Wakeup()
 {
 	//int i=0;
-	//PowerOn();
 	CompressorOn();
 	
     CSerial::is() << "LED Init 0";

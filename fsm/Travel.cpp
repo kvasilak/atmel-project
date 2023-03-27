@@ -146,7 +146,10 @@ void FsmTravel::HandleEvent(eEvents evt)
 			m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
 		break;
 		case eEvents::CampEvent:
-			m_SMManager.ChangeState(eStates::STATE_CAMP);
+			if(Cio::is().CampSwitches())
+			{
+				m_SMManager.ChangeState(eStates::STATE_CAMP);
+			}
 		break;
 		case eEvents::TravelEvent:
 			if(Cio::is().TravelSwitches())
@@ -155,7 +158,10 @@ void FsmTravel::HandleEvent(eEvents evt)
 			}
 		break;
 		case eEvents::CalibrateEvent:
-			m_SMManager.ChangeState(eStates::STATE_TRAVEL_CALIBRATE);
+			if(Cio::is().CalibrateSwitch())
+			{
+				m_SMManager.ChangeState(eStates::STATE_TRAVEL_CALIBRATE);
+			}
 			break;
         case eEvents::ButtonWakeEvent:
         case eEvents::IgnitionOnEvent:

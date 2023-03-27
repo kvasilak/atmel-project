@@ -145,13 +145,6 @@ int main(void)
     }        
 	
 	nvm::is().init();
-    
-    //CSerial::is().Dec();
-    //uint32_t i;
-    //for(i=0; i<90000;i+=100)
-    //{
-        //CSerial::is() << i <<"\n";
-    //}
 
     while(1)
     {

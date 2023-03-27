@@ -53,8 +53,6 @@ void FsmCamp::OnEntry()
 	IsLevel  = false;
 	ReadyToSleep = false;
     
-    //int16_t x,y,z;
-    //CMMA8451::is().ReadXYZ(x,y,z);
     GetPitchRoll();
     
     for(int i=0; i<FilterSize; i++)
@@ -85,8 +83,7 @@ void FsmCamp::HandleEvent(eEvents evt)
 			m_SMManager.ChangeState(eStates::STATE_MANUAL, evt);
 		break;
 		case eEvents::CampEvent:
-			CSerial::is() << " FsmCamp::Camp event\r\n";
-            
+
 			if(Cio::is().CampSwitches())
 			{
 				CSerial::is() << " FsmCamp::camp switches\r\n";
@@ -95,18 +92,22 @@ void FsmCamp::HandleEvent(eEvents evt)
 			}
 		break;
 		case eEvents::TravelEvent:
-			m_SMManager.ChangeState(eStates::STATE_TRAVEL);
+			if(Cio::is().TravelSwitches())
+			{
+				m_SMManager.ChangeState(eStates::STATE_TRAVEL);
+			}
 		break;
 		case eEvents::CalibrateEvent:
-			m_SMManager.ChangeState(eStates::STATE_CAMP_CALIBRATE);
+			if(Cio::is().CalibrateSwitch())
+			{
+				m_SMManager.ChangeState(eStates::STATE_CAMP_CALIBRATE);
+			}
 		break;
         case eEvents::ButtonWakeEvent:
         case eEvents::IgnitionOnEvent:
             if( Cio::is().Awake == false)
             {            
                 Cio::is().Awake = true;
-            
-                //Cio::is().ButtonWake = false;
 
                // ReadyToSleep = false;
                 IsLevel = false;
@@ -198,7 +199,6 @@ void FsmCamp::GetPitchRoll(void)
     CSerial::is() << "Roll;  " << Roll << ", Avg; " <<  (int16_t)SlowRoll << ", err; " << (int16_t)(SlowRoll - RollCal) << "\n";
     CSerial::is() << "Pitch; " << Pitch <<  ", Avg; " <<  (int16_t)SlowPitch << ", err; " << (int16_t)(SlowPitch - PitchCal) << "\n";
     
-    //CMMA8451::is().ReadXYZ();
     SetPitchState(PitchState);
    
 }
