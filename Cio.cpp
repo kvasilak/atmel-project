@@ -464,71 +464,96 @@ bool Cio::CalibrateChanged()
 
 void Cio::RockerSwitch()
 {
-	if(!ButtonRightUp.Level())//is button pressed?
+	static bool BRUChanged = false;
+	static bool BLUChanged = false;
+	static bool BRDChanged = false;
+	static bool BLDChanged = false;
+	
+	if(BRUChanged != ButtonRightUp.Level())
 	{
-		if(RightFillPressed) //filling
+		BRUChanged = ButtonRightUp.Level();
+		
+		if(!ButtonRightUp.Level())//is button pressed?
 		{
-            //button pressed again, turn off filling
-			RightFillOff();
-			RightFillPressed = false;
-		}
-		else
-		{
-			RightDumpOff(); //dont have dump and fill on at same time
-			RightDumpPressed = false;
-			RightFillOn();
-			RightFillPressed = true;
+			if(RightFillPressed) //filling
+			{
+				//button pressed again, turn off filling
+				RightFillOff();
+				RightFillPressed = false;
+			}
+			else
+			{
+				RightDumpOff(); //dont have dump and fill on at same time
+				RightDumpPressed = false;
+				RightFillOn();
+				RightFillPressed = true;
+			}
 		}
 	}
 	
-	if(!ButtonRightDown.Level())
+	if(BRDChanged != ButtonRightDown.Level())
 	{
-		//toggle on button press
-		if(RightDumpPressed)
+		BRDChanged = ButtonRightDown.Level();
+		
+		if(!ButtonRightDown.Level())
 		{
-			RightDumpOff();
-			RightDumpPressed = false;
-		}
-		else
-		{
-			RightFillOff();
-			RightFillPressed = false;
-			RightDumpOn();
-			RightDumpPressed = true;
+			//toggle on button press
+			if(RightDumpPressed)
+			{
+				RightDumpOff();
+				RightDumpPressed = false;
+			}
+			else
+			{
+				RightFillOff();
+				RightFillPressed = false;
+				RightDumpOn();
+				RightDumpPressed = true;
+			}
 		}
 	}
 
-	if(!ButtonLeftUp.Level())
+	if(BLUChanged != ButtonLeftUp.Level())
 	{
-		//toggle on button press
-		if(LeftFillPressed)
+		BLUChanged = ButtonLeftUp.Level();
+	
+		if(!ButtonLeftUp.Level())
 		{
-			LeftFillOff();
-			LeftFillPressed = false;
-		}
-		else
-		{
-			LeftDumpOff();
-			LeftDumpPressed = false;
-			LeftFillOn();
-			LeftFillPressed = true;
+			//toggle on button press
+			if(LeftFillPressed)
+			{
+				LeftFillOff();
+				LeftFillPressed = false;
+			}
+			else
+			{
+				LeftDumpOff();
+				LeftDumpPressed = false;
+				LeftFillOn();
+				LeftFillPressed = true;
+			}
 		}
 	}
 
-	if(!ButtonLeftDown.Level())
+	if(BLDChanged != ButtonLeftDown.Level())
 	{
-		//toggle on button press
-		if(LeftDumpPressed)
+		BLDChanged = ButtonLeftDown.Level();
+		
+		if(!ButtonLeftDown.Level())
 		{
-			LeftDumpOff();
-			LeftDumpPressed = false;
-		}
-		else
-		{
-			LeftFillOff();
-			LeftFillPressed = false;
-			LeftDumpOn();
-			LeftDumpPressed = true;
+			//toggle on button press
+			if(LeftDumpPressed)
+			{
+				LeftDumpOff();
+				LeftDumpPressed = false;
+			}
+			else
+			{
+				LeftFillOff();
+				LeftFillPressed = false;
+				LeftDumpOn();
+				LeftDumpPressed = true;
+			}
 		}
 	}
 }
@@ -712,7 +737,7 @@ void Cio::RightFillOff()
 {
     FillRight = false;
 	
-	SOLENOID_RU_PORT |= ~_BV(SOLENOID_RU_BIT);
+	SOLENOID_RU_PORT &= ~_BV(SOLENOID_RU_BIT);
 	CLeds::is().RightFillOff();
 }
 
@@ -753,7 +778,7 @@ void Cio::LeftFillOff()
 {
     FillLeft = false;
 	
-	SOLENOID_LU_PORT |= ~_BV(SOLENOID_LU_BIT);
+	SOLENOID_LU_PORT &= ~_BV(SOLENOID_LU_BIT);
 	CLeds::is().LeftFillOff();
 }
 
