@@ -79,9 +79,10 @@ void FsmManual::HandleEvent(eEvents evt)
 		case eEvents::OutSideEvent:
         
             //if filling or dumping switch to holding
-            if(false == Cio::is().IsHolding()) 
+            if(Cio::is().IsHolding()) 
             {
                 Cio::is().AllOff();
+				CSerial::is() << "All Off\n";
             }
         
 			Cio::is().OutsideRemote();

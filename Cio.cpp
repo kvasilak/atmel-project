@@ -412,7 +412,7 @@ bool Cio::RockerChanged()
 	if(changed)
 	{
 
-		CSerial::is() << "PORTB; " << ButtonRightDown.Level() << ", " << ButtonRightUp.Level() <<"\n";
+		CSerial::is() << "PORTB; " << ButtonRightDown.Level() << ", " << ButtonRightUp.Level() << ", " << ButtonLeftDown.Level() << ", " << ButtonLeftUp.Level() <<"\n";
 	}
 	
 	return changed;
@@ -474,6 +474,8 @@ void Cio::RockerSwitch()
 		}
 		else
 		{
+			RightDumpOff(); //dont have dump and fill on at same time
+			RightDumpPressed = false;
 			RightFillOn();
 			RightFillPressed = true;
 		}
@@ -485,11 +487,12 @@ void Cio::RockerSwitch()
 		if(RightDumpPressed)
 		{
 			RightDumpOff();
-			
 			RightDumpPressed = false;
 		}
 		else
 		{
+			RightFillOff();
+			RightFillPressed = false;
 			RightDumpOn();
 			RightDumpPressed = true;
 		}
@@ -505,6 +508,8 @@ void Cio::RockerSwitch()
 		}
 		else
 		{
+			LeftDumpOff();
+			LeftDumpPressed = false;
 			LeftFillOn();
 			LeftFillPressed = true;
 		}
@@ -520,6 +525,8 @@ void Cio::RockerSwitch()
 		}
 		else
 		{
+			LeftFillOff();
+			LeftFillPressed = false;
 			LeftDumpOn();
 			LeftDumpPressed = true;
 		}
@@ -536,8 +543,9 @@ void Cio::OutsideRemote()
 	bool RemoteLeftDown  = PINB & _BV(REMOTE_LD_BIT);
 	bool RemoteLeftUp    = PINB & _BV(REMOTE_LU_BIT);		
     bool RemoteRightDown = PINB & _BV(REMOTE_RD_BIT);
-	bool RemoteRightUp   = PINB & _BV(REMOTE_RU_BIT);		
-		if(RemoteLeftUp != OldLeftUp)
+	bool RemoteRightUp   = PINB & _BV(REMOTE_RU_BIT);	
+		
+	if(RemoteLeftUp != OldLeftUp)
     {
         if(RemoteLeftUp)
         {
@@ -616,8 +624,10 @@ void Cio::AllOff()
 	LeftFillOff();
 	LeftDumpOff();
     
-     RightFillPressed = false;
+     RightFillPressed  = false;
      RightDumpPressed  = false;
+	 LeftFillPressed   = false;
+	 LeftDumpPressed   = false;
 }
 
 void Cio::Right(eValveStates s)
@@ -702,7 +712,7 @@ void Cio::RightFillOff()
 {
     FillRight = false;
 	
-	SOLENOID_RU_PORT &= ~_BV(SOLENOID_RU_BIT);
+	SOLENOID_RU_PORT |= ~_BV(SOLENOID_RU_BIT);
 	CLeds::is().RightFillOff();
 }
 
@@ -743,7 +753,7 @@ void Cio::LeftFillOff()
 {
     FillLeft = false;
 	
-	SOLENOID_LU_PORT &= ~_BV(SOLENOID_LU_BIT);
+	SOLENOID_LU_PORT |= ~_BV(SOLENOID_LU_BIT);
 	CLeds::is().LeftFillOff();
 }
 
@@ -771,9 +781,9 @@ bool Cio::IsHolding()
 {
 	bool hold = false;
 	
-	CSerial::is() << "holding? " << RightFillPressed << ", " << RightDumpPressed  << "\n";
+	CSerial::is() << "holding? " << RightFillPressed << ", " << RightDumpPressed  << ", " << LeftFillPressed << ", " << LeftDumpPressed<< "\n";
 	
-	if(!RightFillPressed && !RightDumpPressed)
+	if(RightFillPressed || RightDumpPressed || LeftFillPressed || LeftDumpPressed)
 	{
 		hold = true;
 	}
@@ -811,6 +821,8 @@ void Cio::Sleep()
 
 	RightFillPressed = false;
 	RightDumpPressed = false;
+	LeftFillPressed = false;
+	LeftDumpPressed = false;
 	
 	//Set CPU to sleep, will wake up on an ignition IRQ
     //button press or outside remote
@@ -858,13 +870,19 @@ void Cio::UpdateButtons()
 {
 	if(RightFillPressed)
 	{
-		LeftFillOn();
 		RightFillOn();
 	}
 	else if(RightDumpPressed)
 	{
-		LeftDumpOn();
 		RightDumpOn();
+	}
+	else if(LeftFillPressed)
+	{
+		LeftFillOn();
+	}
+	else if(LeftDumpPressed)
+	{
+		LeftDumpOn();
 	}
 }
 
