@@ -89,8 +89,8 @@ void Cio::Direction()
 		
 	//4		in 		0	Btn Left down
 	//5		in 		0	Btn Left up
-	//6		in 		0	NC
-	//7		in		0	NC
+	//6		in 		1	NC
+	//7		in		1	NC
 
 	#define REMOTE_RD_BIT		0 
 	#define REMOTE_LD_BIT		1 
@@ -152,15 +152,15 @@ void Cio::Pullups()
 	PORTB = 0xFF;
 
 	//port B
-	//0		in		0	Remote LD
-	//1		in		0	Remote LU
-	//2		in		0	Remote RD
-	//3		in		0	Remote RU
+	//0		in		1	Remote LD
+	//1		in		1   Remote LU
+	//2		in		1	Remote RD
+	//3		in		1	Remote RU
 	
-	//4		in 		0	Btn Left down
-	//5		in 		0	Btn Left up
-	//6		in 		0	NC
-	//7		in		0	NC
+	//4		in 		1	Btn Left down
+	//5		in 		1	Btn Left up
+	//6		in 		1	NC
+	//7		in		1	NC
 
 	//PORTC = 0x00;
 	//Port C
@@ -176,14 +176,14 @@ void Cio::Pullups()
 	PORTD = 0xF8;
 	//Port D
 	//0		RX		0	Debug serial
-	//1		TX		1	Debug serial
+	//1		TX		0	Debug serial
 	//2		NC
-	//3		in		0	Btn Travel
+	//3		in		1	Btn Travel
 	
-	//4		in		0	Btn Calibrate
-	//5		in		0	Btn Camp
-	//6		in		0	Btn Right Down
-	//7		in		0	Btn Right Up
+	//4		in		1	Btn Calibrate
+	//5		in		1	Btn Camp
+	//6		in		1	Btn Right Down
+	//7		in		1	Btn Right Up
 }
 
 
@@ -365,10 +365,11 @@ void Cio::EnableIgnGPIOInterrupt()
 {
 	//PCI0
 	//PA2 PCint 2, Ign on
-	//PB0 PCint 8, Remote LD
-	PCMSK0 = _BV(PCINT2) | _BV(PCINT8);  
+	
+	PCMSK0 = _BV(PCINT2); 
 	
 	//PCI1
+	//PB0 PCint 8, Remote LD
 	//PB1 PCint 9, Remote LU
 	//PB2 PCint 10, Remote RD
 	//PB3 PCint 11, Remote RU
@@ -376,7 +377,9 @@ void Cio::EnableIgnGPIOInterrupt()
 	//PB4 PCint 12, Btn L Down
 	//PB5 PCint 13, Btn R Up
 	
-	PCMSK1 = _BV(PCINT9) | _BV(PCINT10) | _BV(PCINT11) | _BV(PCINT12) | _BV(PCINT13);
+	PCMSK1 = _BV(PCINT8) | _BV(PCINT9) | _BV(PCINT10) | _BV(PCINT11) | _BV(PCINT12) | _BV(PCINT13);
+	
+	PCMSK2 = 0;
 
 	//PCI3
 	//PD3 PCint 27, Travel
@@ -885,9 +888,7 @@ void Cio::Wakeup()
 
  bool Cio::IsIgnitionOn()
  {
-	 uint8_t port = IGNITION_ON_PORT;
-	 
- 	return (port & _BV(IGNITION_ON_BIT)) == _BV(IGNITION_ON_BIT);
+ 	return (PINA & (1 << IGNITION_ON_BIT)) == (1 << IGNITION_ON_BIT);
  }
 
 
@@ -986,20 +987,16 @@ void Cio::CalcLeftSpeed(void)
 //PA2 pc int 2
 ISR(PCINT0_vect)
 {
-	if(PINA & _BV(IGNITION_ON_BIT))
-	{
-		Cio::IgnitionChanged = true;
-	}
-
-	//Left down button
-	if(PINA & _BV(REMOTE_LD_BIT))
-	{
-		Cio::ButtonChanged = true;
-	}
+	Cio::IgnitionChanged = true;
 }
 
 //Outside remote changed
 ISR(PCINT1_vect)
+{
+	Cio::ButtonChanged = true;
+}
+
+ISR(PCINT2_vect)
 {
 	Cio::ButtonChanged = true;
 }

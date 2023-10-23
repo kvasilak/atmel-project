@@ -16,13 +16,11 @@
 static const uint32_t ONESECOND = 1000;
 static const uint32_t ONEMINUTE = 60 * ONESECOND;
 
-static const uint32_t BUTTONHOLDTIME = 30 * ONESECOND; //how long to stay awake in HOLD
-static const uint32_t REMOTEWAKETIME = 1 * ONEMINUTE; //how long to stay awake if outside remote pressed
-static const uint32_t BUTTONWAKETIME = 1/*5*/ * ONEMINUTE; //how long to stay awake in RAISE or LOWER
+static const uint32_t BUTTONWAKETIME = 1 * ONEMINUTE; //how long to stay awake in RAISE or LOWER
 
 FsmManual::FsmManual(CController& SMManager) :
 CState(SMManager, eStates::STATE_MANUAL),
-WakeTime(BUTTONHOLDTIME)
+WakeTime(BUTTONWAKETIME)
 {
 }
 
@@ -37,7 +35,7 @@ void FsmManual::OnEntry()
 	Blink = CTimer::GetTick();
 	
 	ButtonWakeStart = CTimer::GetTick();
-	WakeTime = BUTTONHOLDTIME;
+	WakeTime = BUTTONWAKETIME;
 }
 
 void FsmManual::HandleEvent(eEvents evt)
@@ -66,7 +64,7 @@ void FsmManual::HandleEvent(eEvents evt)
 			if(Cio::is().IsHolding()) 
 			{
 				CSerial::is() << "Rock is holding\n";
-				WakeTime = BUTTONHOLDTIME;
+				WakeTime = BUTTONWAKETIME;
 			}
 			else
 			{
@@ -87,13 +85,13 @@ void FsmManual::HandleEvent(eEvents evt)
         
 			Cio::is().OutsideRemote();
 			
-			WakeTime = REMOTEWAKETIME;
+			WakeTime = BUTTONWAKETIME;
 			
 			CSerial::is() << "OS is holding\n";
 			
 			ButtonWakeStart = CTimer::GetTick();
 			break;
-            //stay awake forever on buttonpress. timeout if no button presssed
+            //stay awake for 30 sec on button press.
 		case eEvents::TimerEvent:
 			//we are awake due to a button press
 			//timeout and sleep
@@ -101,12 +99,9 @@ void FsmManual::HandleEvent(eEvents evt)
 			{
 			    if(CTimer::IsTimedOut(WakeTime, ButtonWakeStart))
 			    {                       
-                    if( Cio::is().IsHolding() ) //timeout only if nothing pressed
-                    {
-					    Cio::is().ButtonWake = false;
+				    Cio::is().ButtonWake = false;
 					
-					    m_SMManager.ScheduleEvent(eEvents::IgnitionOffEvent);
-                    }                        
+					m_SMManager.ScheduleEvent(eEvents::IgnitionOffEvent);                   
 			    }
 			}
 
