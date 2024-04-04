@@ -141,8 +141,16 @@ int main(void)
 	
 	if(false == CMMA8451::is().Init())
     {
-        CMMA8451::is().Init();
-    }        
+		//try again
+        if(false == CMMA8451::is().Init())
+		{
+			Cio::is().BlinkCamp();
+		}
+    }   
+	else
+	{
+		Cio::is().BlinkCamp();
+	}     
 	
 	nvm::is().init();
 

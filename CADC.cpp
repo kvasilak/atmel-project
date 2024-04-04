@@ -16,6 +16,7 @@
 //led brightness table
 //y (x^3)/65636
 //To give better resolution at the dim end
+//lowest values are so if the dimmer is missing it still lights up and user doesn't think it's broken
 static const uint8_t BrightnessLU[] =
 {32,32,32,32,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,
 2,2,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,5,5,5,5,5,6,6,6,6,6,7,7,7,7,8,8,8,9,9,9,

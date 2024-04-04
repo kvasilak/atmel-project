@@ -85,6 +85,7 @@ public:
 	}
 
     void BlinkTravel(bool blink);
+	void BlinkCamp(void);
     
 	void Sleep();
 	void Wakeup();
@@ -112,6 +113,7 @@ private:
 	void EnableIgnGPIOInterrupt(void);
     
     void CalcSpeed(void);
+	void CampBlink(bool blink);
     void TravelBlink(bool blink);
     void LeftUpBlink(bool blink);
     void LeftDownBlink(bool blink);
@@ -126,6 +128,7 @@ private:
 	bool LeftDumpPressed;
 	
 	uint32_t Time;
+	bool BlinkCampEn;
     bool BlinkTravelEn;
     uint32_t Blink;
     

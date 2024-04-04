@@ -32,6 +32,7 @@ RightFillPressed(false),
 RightDumpPressed(false),
 LeftFillPressed(false),
 LeftDumpPressed(false),
+BlinkCampEn(false),
 BlinkTravelEn(false),
 LeftSpeed(0),
 RightSpeed(0),
@@ -41,7 +42,6 @@ FillLeft(false),
 FillRight(false),
 DumpLeft(false),
 DumpRight(false)
-//EL2CompCount(0)
 {
 } //Cio
 
@@ -221,6 +221,22 @@ void Cio::Init()
     sleep_enable();
 }
 
+//Blink if MMA8451 not found
+void Cio::CampBlink(bool blink)
+{
+	if(BlinkCampEn)
+	{
+		if(blink)
+		{
+			CLeds::is().CampOff();
+		}
+		else
+		{
+			CLeds::is().CampOn();
+		}
+	}
+}
+
 void Cio::TravelBlink(bool blink)
 {
     if(BlinkTravelEn)
@@ -338,6 +354,7 @@ void Cio::Run()
     {       
         
         TravelBlink(blinkon);
+		CampBlink(blinkon);
         LeftUpBlink(blinkon);
         LeftDownBlink(blinkon);
         RightUpBlink(blinkon);
@@ -910,6 +927,11 @@ void Cio::UpdateButtons()
 	{
 		LeftDumpOn();
 	}
+}
+
+void Cio::BlinkCamp(void)
+{
+	BlinkCampEn = true;
 }
 
 void Cio::BlinkTravel(bool blink)
