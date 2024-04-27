@@ -51,6 +51,10 @@ class FsmCamp :public virtual CState
     uint16_t FilterIt(int32_t* filter, uint8_t *filterstep, int16_t roll);
     bool IsPitchUp(bool slow = false);
     bool IsPitchDown(bool slow = false);
+	bool IsRollLeft(bool slow = false);
+	bool IsRollRight(bool slow = false);
+	bool IsRollLeft2(bool slow = false);
+	bool IsRollRight2(bool slow = false);
     bool IsPitchOK(void);
 	
 	uint32_t Start;

@@ -91,6 +91,6 @@ void FSMCampCal::HandleEvent(eEvents evt)
 void FSMCampCal::OnExit()
 {
 	CLeds::is().ActiveOn();
-	CSerial::is() << " FSMTravelCal::OnExit()\r\n";
+	CSerial::is() << " FSMCampCal::OnExit()\r\n";
 
 }

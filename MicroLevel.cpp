@@ -146,11 +146,7 @@ int main(void)
 		{
 			Cio::is().BlinkCamp();
 		}
-    }   
-	else
-	{
-		Cio::is().BlinkCamp();
-	}     
+    }      
 	
 	nvm::is().init();
 

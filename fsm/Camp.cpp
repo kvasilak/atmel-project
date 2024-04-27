@@ -181,7 +181,7 @@ void FsmCamp::GetPitchRoll(void)
     
     if(PowerLevel)
     {
-        Roll = Y;
+        Roll = -X;
         
         Pitch = Z;
     }
@@ -189,25 +189,27 @@ void FsmCamp::GetPitchRoll(void)
     {
         Roll = Z;
         
-        Pitch = Y;
+        Pitch = X;
     }
     
     SlowRoll = FilterIt( AvgRoll, &RollFilterStep, Roll);
     
     SlowPitch =  FilterIt(AvgPitch, &PitchFilterStep, Pitch);
     
-    CSerial::is() << "Roll;  " << Roll << ", Avg; " <<  (int16_t)SlowRoll << ", err; " << (int16_t)(SlowRoll - RollCal) << "\n";
-    CSerial::is() << "Pitch; " << Pitch <<  ", Avg; " <<  (int16_t)SlowPitch << ", err; " << (int16_t)(SlowPitch - PitchCal) << "\n";
+    //CSerial::is() << "Roll;  " << Roll << ", Avg; " <<  (int16_t)SlowRoll << ", err; " << (int16_t)(SlowRoll - RollCal) << "\n";
+    //CSerial::is() << "Pitch; " << Pitch <<  ", Avg; " <<  (int16_t)SlowPitch << ", err; " << (int16_t)(SlowPitch - PitchCal) << "\n";
     
-    SetPitchState(PitchState);
+    //SetPitchState(PitchState);
+	
+	CSerial::is() << "r " << Roll << " p " << Pitch <<" P err " << Pitch - PitchCal << " R err " << Roll - RollCal << "\n";
    
 }
 
 
 void FsmCamp::GetPitchRollCal(void)
 {
-    //int16_t xcal = nvm::is().GetCampX();
-    int16_t ycal = nvm::is().GetCampY();
+    int16_t xcal = nvm::is().GetCampX();
+    //int16_t ycal = nvm::is().GetCampY();
     int16_t zcal = nvm::is().GetCampZ();
     
     int16_t absZcal = zcal > 0? zcal: 0-zcal;
@@ -219,26 +221,36 @@ void FsmCamp::GetPitchRollCal(void)
        PowerLevel = false; 
        
        CSerial::is() << "** Electro Level Cal!!\n";
+	   
+	    RollCal = zcal;
+        //PitchCal = ycal;
+		PitchCal = xcal;
     }
     else
     {
         PowerLevel = true;
         
         CSerial::is() << "** Power Level Cal!!\n";
+		
+		//RollCal = ycal;;
+		RollCal = -xcal;
+		PitchCal = zcal;  
     }
     
-    if(PowerLevel )
-    {
-        //powerlevel
-      RollCal = ycal;;
-      PitchCal = zcal;  
-    }
-    else
-    {
-        //Electrolevel
-        RollCal = zcal;;
-        PitchCal = ycal;
-    }    
+    //if(PowerLevel )
+    //{
+        ////powerlevel
+      ////RollCal = ycal;;
+	  //RollCal = -xcal;
+      //PitchCal = zcal;  
+    //}
+    //else
+    //{
+        ////Electrolevel
+        //RollCal = zcal;
+        ////PitchCal = ycal;
+		//PitchCal = xcal;
+    //}    
 }
 
 bool FsmCamp::IsPitchUp(bool slow)
@@ -256,15 +268,23 @@ bool FsmCamp::IsPitchUp(bool slow)
     
     if(PowerLevel )
     {
-       if( pitch > PitchCal + tol)
+       //if( pitch > PitchCal + tol) MicroLevel 1.0
+	   if( pitch < PitchCal - tol) //MicroLevel 2.0
         {
             up = true;
         }
     }
     else
     {
+		 /*nose uo is negative
+		  pitch  cal   tol Pitch up?
+		  5  < 2 - 20 (22):		false //nose up in tol
+		  30 < 2 - 20 :		false //nose up out of tol
+		  -5 < 2 - 20 :		false //nose down in tol
+		  -30 < 2 - 20 :		true //nowe down out of tol
+		  */
+		 
         //Electro Level pitch is backwards
-        //if( pitch < PitchCal + tol)
         if( pitch < PitchCal - tol)
         {
             up = true;
@@ -289,15 +309,24 @@ bool FsmCamp::IsPitchDown(bool slow)
      
      if(PowerLevel )
      {
-         if( pitch < PitchCal - tol)
+         if( pitch > PitchCal + tol)
          {
              down = true;
          }
      }
      else
      {
+		 /*
+		 pitch down?
+		 pitch  cal   tol
+		5  > 2 + 20 (22):		false //nose up in tol
+		30 > 2 + 20 :		true //nose up out of tol
+		-5 > 2 + 20 :		false //nose up 
+		-30 > 2 + 20 :		false //nowe up 
+		 */
+		 
          //Electro Level pitch is backwards
-         //if( pitch < PitchCal - tol)
+		 //nose down is positive
          if( pitch > PitchCal + tol)
          {
              down = true;
@@ -310,22 +339,67 @@ bool FsmCamp::IsPitchDown(bool slow)
 bool FsmCamp::IsPitchOK(void)
 {
     bool ok = false;
-    if(PowerLevel )
-    {
-        if( (Pitch > PitchCal - PitchTol) && (Pitch < PitchCal + PitchTol))//we're level
-        {
-            ok = true;
-        }
-    }  
-    else
-    {
-        if( (Pitch > PitchCal - PitchTol) && (Pitch < PitchCal + PitchTol))//we're level
-        {
-            ok = true;
-        }
-    }  
+	
+	if(!IsPitchDown() && !IsPitchUp())
+	{
+		ok = true;
+	}
 
 return ok;
+}
+
+//Left side down
+bool FsmCamp::IsRollLeft(bool slow)
+{
+	bool left = false;
+	
+	//Postive is roll left
+	if(Roll > RollCal + RollTol)
+	{
+		left = true;
+	}
+	
+	return left;
+}
+
+//Right side down
+bool FsmCamp::IsRollRight(bool slow)
+{
+	bool right = false;
+	
+	//negative is roll right
+	if(Roll < RollCal - RollTol)
+	{
+		right = true;	
+	}
+	return right;
+}
+
+//Left side down
+bool FsmCamp::IsRollLeft2(bool slow)
+{
+	bool left = false;
+	
+	//Postive is roll left
+	if(Roll > RollCal + (RollTol*2))
+	{
+		left = true;
+	}
+	
+	return left;
+}
+
+//Right side down
+bool FsmCamp::IsRollRight2(bool slow)
+{
+	bool right = false;
+	
+	//negative is roll right
+	if(Roll < RollCal - (RollTol*2))
+	{
+		right = true;	
+	}
+	return right;
 }
 
 void FsmCamp::LevelMachine(void)
@@ -379,12 +453,12 @@ void FsmCamp::LevelMachine(void)
                 else //still nose high
                {
                     //decide which side to raise
-                    if(Roll < RollCal - RollTol)
+                    if(IsRollLeft())
                     {
                         Cio::is().Right(eValveStates::Hold);
                         Cio::is().Left(eValveStates::Fill);
                     }
-                    else if(Roll > RollCal + RollTol) 
+                    else if(IsRollRight()) 
                     {
                         Cio::is().Left(eValveStates::Hold);
                         Cio::is().Right(eValveStates::Fill);
@@ -412,12 +486,12 @@ void FsmCamp::LevelMachine(void)
 			    else //still low
 			    {
                     //decide which side to lower
-                    if(Roll < RollCal - RollTol)
+					if(IsRollLeft())
                     {
                         Cio::is().Left(eValveStates::Hold);
                         Cio::is().Right(eValveStates::Dump);
                     }
-                    else if(Roll > RollCal + RollTol) 
+                    else if(IsRollRight()) 
                     {
                         Cio::is().Right(eValveStates::Hold);
                         Cio::is().Left(eValveStates::Dump);
@@ -442,12 +516,14 @@ void FsmCamp::LevelMachine(void)
                  }
                  else //Pitch and roll level
                  {
-                    if(Roll < RollCal - RollTol)
+                    //if(Roll < RollCal - RollTol)
+					if(IsRollLeft())
                     {
                         Cio::is().Right(eValveStates::Dump);
                         Cio::is().Left(eValveStates::Fill);
                     }
-                    else if(Roll > RollCal + RollTol) 
+                    //else if(Roll > RollCal + RollTol) 
+					else if(IsRollRight())
                     {
                         Cio::is().Left(eValveStates::Dump);
                         Cio::is().Right(eValveStates::Fill);
@@ -481,7 +557,8 @@ void FsmCamp::LevelMachine(void)
                     }
                     else //pitch is level check roll
                     {
-                        if( (SlowRoll < RollCal - (RollTol *2)) || (SlowRoll > RollCal + (RollTol*2)))
+                        //if( (SlowRoll < RollCal - (RollTol *2)) || (SlowRoll > RollCal + (RollTol*2)))
+						if(IsRollLeft2(true) || IsRollRight2(true))
                         {
                             //Check roll
                             SetPitchState(CampLevel);

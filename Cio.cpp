@@ -224,15 +224,27 @@ void Cio::Init()
 //Blink if MMA8451 not found
 void Cio::CampBlink(bool blink)
 {
-	if(BlinkCampEn)
+	static int count;
+	
+	if(BlinkCampEn) //only blink for 1 minute
 	{
-		if(blink)
+		if(count < 120)
 		{
-			CLeds::is().CampOff();
+			if(blink)
+			{
+				CLeds::is().CampOff();
+			}
+			else
+			{
+				CLeds::is().CampOn();
+			
+				count++;
+			}
 		}
 		else
 		{
-			CLeds::is().CampOn();
+			BlinkCampEn = false;
+			CLeds::is().CampOff();
 		}
 	}
 }
