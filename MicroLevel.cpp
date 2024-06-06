@@ -127,7 +127,7 @@ int main(void)
 
 	CSerial::is().Init();
 	
-	CSerial::is() << "\n\nMicrolevel " << __DATE__ << "\nCopyright 2016 - 2022 Keith Vasilakes\n\n";
+	CSerial::is() << "\n\nMicrolevel " << __DATE__ << "\nCopyright 2016 - 2024 Keith Vasilakes\n\n";
     
     CSerial::is() << "** reset Cause " << mcusr << "\n";
 	
