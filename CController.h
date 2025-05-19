@@ -54,7 +54,7 @@ public:
 	FsmTravel		m_stateTravel;
 	FsmCamp			m_stateCamp;
 
-	ManualCal		m_stateManualCal;
+	//ManualCal		m_stateManualCal;
 	FSMTravelCal	m_stateTravelCal;
 	FSMCampCal		m_stateCampCal;
 //	FSMDance		m_stateDance;

@@ -20,7 +20,7 @@ ButtonWakeFirst(false),
 m_stateManual(*this), //call the state constructor with a pointer to the manager class ( this )
 m_stateTravel(*this), 
 m_stateCamp(*this),
-m_stateManualCal(*this),
+/*m_stateManualCal(*this),*/
 m_stateTravelCal(*this),
 m_stateCampCal(*this),
 m_CurrState(eStates::STATE_MANUAL),
@@ -35,7 +35,7 @@ ButtonWakeup(false)
 	m_StateList[0] = &m_stateManual;
 	m_StateList[1] = &m_stateTravel;
 	m_StateList[2] = &m_stateCamp;
-	m_StateList[3] = &m_stateManualCal;
+	/*m_StateList[3] = &m_stateManualCal;*/
 	m_StateList[4] = &m_stateTravelCal;
 	m_StateList[5] = &m_stateCampCal;
 } 
