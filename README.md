@@ -1,5 +1,11 @@
-u-level
+Microlevel
 ==========
+
+Current Release:
+April 19 2026
+C:\Projects\MicroLevel\SW\Debug\MicroLevel.hex
+
+============================
 
 Project settings info
 
@@ -39,4 +45,3 @@ SUT_CKSEL = FSOSC_16KCK_0MS_XOSC_BODEN
 EXTENDED = 0xFC (valid)
 HIGH = 0x91 (valid)
 LOW = 0xD7 (valid)
-
